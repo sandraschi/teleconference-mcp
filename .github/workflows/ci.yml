@@ -2,7 +2,10 @@ name: CI
 
 on:
   push:
+    branches: ["master", "main"]
     tags: ["v*"]
+  pull_request:
+    branches: ["master", "main"]
   workflow_dispatch:
 
 jobs:
@@ -30,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
       - name: Set up Python
@@ -45,7 +48,7 @@ jobs:
         run: uv run pytest tests/ apps/agent/tests/ -v --tb=short --junit-xml=test-results.xml --cov --cov-fail-under=70
       - name: ty type-check (non-blocking)
         continue-on-error: true
-        run: uv run ty check apps/agent/ packages/conferencing_mcp/ myconf/ --ignore-missing-imports 2>&1
+        run: uv run ty check apps/agent/ packages/conferencing_mcp/ teleconference_mcp/ --ignore-missing-imports 2>&1
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
