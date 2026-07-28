@@ -22,9 +22,9 @@ Write-Host "  tsc --noEmit..." -ForegroundColor Gray
 $tscOut = npx tsc --noEmit 2>&1
 $tscExit = $LASTEXITCODE
 if ($tscExit -ne 0) {
-    Write-Host "  TypeScript compilation FAILED — fix errors before building NSIS" -ForegroundColor Red
+    Write-Host "  TypeScript compilation FAILED - fix errors before building NSIS" -ForegroundColor Red
     Write-Host $tscOut
-    throw "TypeScript compilation failed — fix all errors before building NSIS installer"
+    throw "TypeScript compilation failed - fix all errors before building NSIS installer"
 }
 
 Write-Host "  Next.js static export (TAURI_BUILD=1)..." -ForegroundColor Gray
@@ -32,7 +32,7 @@ $env:TAURI_BUILD = "1"
 npm run build
 Remove-Item env:TAURI_BUILD -ErrorAction SilentlyContinue
 if ($LASTEXITCODE -ne 0) { throw "Frontend build failed" }
-if (-not (Test-Path "out\index.html")) { throw "Next.js export failed — out/index.html missing" }
+if (-not (Test-Path "out\index.html")) { throw "Next.js export failed - out/index.html missing" }
 Pop-Location
 
 Write-Host "-> [2/5] PyInstaller backend..." -ForegroundColor Yellow
@@ -40,7 +40,7 @@ $specFile = "$Root\$RepoName-backend.spec"
 if (Test-Path $specFile) {
     $entryFile = "$Root\run_server.py"
     if (-not (Test-Path $entryFile)) {
-        throw "run_server.py not found at $entryFile — required by spec file"
+        throw "run_server.py not found at $entryFile - required by spec file"
     }
     Push-Location $Root
     $fm = "$Root\.venv\Lib\site-packages\fastmcp\__init__.py"
@@ -81,15 +81,15 @@ if (Test-Path $specFile) {
     Remove-Item "$Root\dist\pyi-crash.log" -Force -ErrorAction SilentlyContinue
     Write-Host "  Frozen binary smoke test PASSED" -ForegroundColor Green
 } else {
-    throw "Backend spec file not found at $specFile — create $RepoName-backend.spec before building NSIS installer."
+    throw "Backend spec file not found at $specFile - create $RepoName-backend.spec before building NSIS installer."
 }
 
 Write-Host "-> [3/5] Embedding backend..." -ForegroundColor Yellow
 $src = "$Root\dist\$RepoName-backend.exe"
-if (-not (Test-Path $src)) { throw "Backend exe not found at $src — PyInstaller step failed" }
+if (-not (Test-Path $src)) { throw "Backend exe not found at $src - PyInstaller step failed" }
 $sizeMB = (Get-Item $src).Length / 1MB
 if ($sizeMB -lt 5) {
-    throw "Backend exe is only $([math]::Round($sizeMB, 1)) MB at $src — PyInstaller produced an empty/broken binary."
+    throw "Backend exe is only $([math]::Round($sizeMB, 1)) MB at $src - PyInstaller produced an empty/broken binary."
 }
 Copy-Item $src "$ResourceDir\$RepoName-backend.exe" -Force
 Copy-Item $src "$DevDir\$RepoName-backend-$Triple.exe" -Force
