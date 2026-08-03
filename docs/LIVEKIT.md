@@ -81,6 +81,21 @@ logging:
 
 ### Starting LiveKit
 
+**Fleet standard (Goliath, 2026-08):** LiveKit runs as a **Windows service** (`LiveKitSFU`) — NSSM-wrapped native `livekit-server` 1.7.0, config from this repo's `livekit.yaml`, auto-start + crash-restart. Docker is NOT required for the fleet SFU.
+
+```powershell
+# Verify (should be Running, Automatic)
+Get-Service LiveKitSFU
+
+# Logs (rotated by NSSM)
+Get-Content D:\Dev\repos\myconf\logs\livekit.out.log -Tail 50
+
+# Reinstall/repair service (elevated — UAC prompt)
+powershell -ExecutionPolicy Bypass -File D:\Dev\repos\teleoperator-mcp\scripts\install-livekit-service.ps1
+```
+
+Docker alternative (non-Windows or dev machines):
+
 ```powershell
 docker compose up -d livekit
 ```
@@ -91,6 +106,8 @@ Or build from source:
 docker build -t livekit-server -f livekit.Dockerfile .
 docker run -p 15580:15580 -p 15581:15581 -p 15582:15582/udp livekit-server
 ```
+
+> **Note:** `teleoperator-mcp/scripts/install-livekit-service.ps1` is the canonical service installer. Keep `livekit.yaml` in this repo as the single source of config truth.
 
 ---
 
@@ -202,7 +219,7 @@ The web dashboard at `/health` shows LiveKit reachability and active rooms.
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `ConnectionError` on join | LiveKit not running | `docker compose up -d livekit` |
+| `ConnectionError` on join | LiveKit not running | `Get-Service LiveKitSFU` (service must be Running); restart with `Restart-Service LiveKitSFU` (elevated). Docker fallback: `docker compose up -d livekit` |
 | `401 Unauthorized` | Key mismatch | Check `livekit.yaml` keys match env vars |
 | No video from remote | UDP ports blocked | Open ports 15582 + 50000–60000 |
 | Room list empty | Wrong `LIVEKIT_URL` | Check port (15580, not 7880) |
