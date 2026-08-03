@@ -88,7 +88,7 @@ logging:
 Get-Service LiveKitSFU
 
 # Logs (rotated by NSSM)
-Get-Content D:\Dev\repos\myconf\logs\livekit.out.log -Tail 50
+Get-Content D:\Dev\repos\teleconference-mcp\logs\livekit.out.log -Tail 50
 
 # Reinstall/repair service (elevated — UAC prompt)
 powershell -ExecutionPolicy Bypass -File D:\Dev\repos\teleoperator-mcp\scripts\install-livekit-service.ps1

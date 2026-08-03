@@ -7,7 +7,7 @@
   <a href="https://github.com/PrefectHQ/fastmcp"><img src="https://img.shields.io/badge/FastMCP-3.2-7c5cfc?style=flat-square" alt="FastMCP"></a>
 </p>
 
-[![CI](https://github.com/sandraschi/myconf/actions/workflows/ci.yml/badge.svg)](https://github.com/sandraschi/myconf/actions/workflows/ci.yml)
+[![CI](https://github.com/sandraschi/teleconference-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/sandraschi/teleconference-mcp/actions/workflows/ci.yml)
 [![Docker](https://img.shields.io/badge/docker-8%20containers-2496ed?logo=docker)](https://docker.com)
 [![Grafana](https://img.shields.io/badge/observability-grafana%2Bprometheus%2Bloki-orange)](docs/FEATURES.md)
 
@@ -18,8 +18,8 @@
 ## Quick Start
 
 ```powershell
-git clone https://github.com/sandraschi/myconf
-cd myconf
+git clone https://github.com/sandraschi/teleconference-mcp
+cd teleconference-mcp
 just
 ```
 
@@ -28,8 +28,8 @@ This opens an interactive dashboard showing all available commands. Run `just bo
 ### Manual Setup
 
 If you don't have `just` installed:
-git clone https://github.com/sandraschi/myconf.git
-cd myconf
+git clone https://github.com/sandraschi/teleconference-mcp.git
+cd teleconference-mcp
 uv sync
 npm install
 docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
@@ -154,3 +154,4 @@ docker compose up -d livekit redis
 ## License
 
 MIT — see [LICENSE](LICENSE).
+

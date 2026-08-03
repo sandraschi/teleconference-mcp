@@ -25,8 +25,8 @@ We follow a **reductionist, mission-oriented** approach to collaboration.
 ### Initialization
 ```powershell
 # Clone and setup monorepo
-git clone https://github.com/sandraschi/myconf.git
-cd myconf
+git clone https://github.com/sandraschi/teleconference-mcp.git
+cd teleconference-mcp
 .\setup.ps1
 ```
 
@@ -80,3 +80,4 @@ By contributing, you agree that your contributions will be licensed under the **
 **Last Updated:** 2026-04-06  
 **Status:** Modern v2.0.0 (Teams++) Compliance  
 **Author:** Sandra Schipal
+

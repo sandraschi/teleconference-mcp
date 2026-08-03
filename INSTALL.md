@@ -12,8 +12,8 @@
 ## Step 1: Clone & Setup
 
 ```powershell
-git clone https://github.com/sandraschi/myconf.git
-cd myconf
+git clone https://github.com/sandraschi/teleconference-mcp.git
+cd teleconference-mcp
 ```
 
 Install Python dependencies:
@@ -152,3 +152,4 @@ All 44 tests should pass.
 | Port conflicts | Check `netstat -ano \| findstr :10886` and kill zombie processes |
 | Agent can't connect | Verify `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` match `livekit.yaml` |
 | No audio/video | Check browser permissions at `http://localhost:10886/test` |
+
