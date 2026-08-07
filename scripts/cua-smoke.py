@@ -449,7 +449,7 @@ def nav_click_through(output_dir: str):
         log("CUA client unavailable -- nav click-through skipped")
         return
 
-    nav_routes = cfg("nav_routes", [["Dashboard", "Automation Dashboard"], ["Logging", "Logs"], ["Settings", "Settings"], ["Help", "Help"]])
+    nav_routes = cfg("nav_routes", [["Dashboard", "Dashboard"], ["Meetings", "Meetings"], ["Settings", "Settings"], ["Help", "Help"]])
     if isinstance(nav_routes, list):
         nav_routes = [(r[0], r[1]) for r in nav_routes if len(r) >= 2]
 
@@ -471,7 +471,19 @@ def nav_click_through(output_dir: str):
             sidebar_step_y = int(cfg("sidebar_step_y", 55))
             click_x = wx + sidebar_click_x
             click_y = wy + sidebar_first_y + idx * sidebar_step_y
-            cua_click(win.get("handle", 0), click_x, click_y)
+            clicked = False
+            try:
+                import pywinauto
+                app = pywinauto.Application(backend="uia").connect(handle=win.get("handle", 0))
+                w = app.window(handle=win.get("handle", 0))
+                link = w.descendants(title=label)
+                if link:
+                    link[0].click_input()
+                    clicked = True
+            except Exception:
+                pass
+            if not clicked:
+                cua_click(win.get("handle", 0), click_x, click_y)
             time.sleep(2)
 
             # OCR after click
@@ -498,8 +510,8 @@ def nav_click_through(output_dir: str):
 def analyze_logs():
     """Read the Tauri app logs and report errors/warnings."""
     log_paths = [
-        os.path.join(INSTALL_DIR, "pywinauto-mcp.log"),
-        os.path.expandvars(r"%APPDATA%\com.sandraschi.pywinauto-mcp\logs\backend-spawn.log"),
+        os.path.join(INSTALL_DIR, "teleconference-mcp.log"),
+        os.path.expandvars(r"%APPDATA%\com.sandraschi.teleconference-mcp\logs\backend-spawn.log"),
     ]
     errors = []
     warnings = []

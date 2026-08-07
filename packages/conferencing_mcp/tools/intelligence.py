@@ -5,7 +5,7 @@ from typing import Annotated, Any
 from fastmcp import Context
 from pydantic import Field
 
-from ..mcp_server import _MUTATING, cid, db, embedding_model, mcp
+from ..mcp_server import _MUTATING, _get_db, _get_embedding_model, cid, mcp
 
 logger = logging.getLogger("ag-visio-mcp")
 
@@ -32,8 +32,8 @@ async def generate_meeting_summary(
         summary_obj = await ctx.sample(prompt, max_tokens=1000)
         summary_text = summary_obj.content.text
 
-        vector = list(next(embedding_model.embed([summary_text])))
-        table = db.open_table("meeting_insights")
+        vector = list(next(_get_embedding_model().embed([summary_text])))
+        table = _get_db().open_table("meeting_insights")
         table.add(
             [
                 {
@@ -83,8 +83,8 @@ async def extract_action_items(
         items_obj = await ctx.sample(prompt, max_tokens=1000)
         items_text = items_obj.content.text
 
-        vector = list(next(embedding_model.embed([items_text])))
-        table = db.open_table("meeting_insights")
+        vector = list(next(_get_embedding_model().embed([items_text])))
+        table = _get_db().open_table("meeting_insights")
         table.add(
             [
                 {

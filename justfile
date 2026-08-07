@@ -1,13 +1,13 @@
-set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
+set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
 import 'scripts/just/fleet.just'
 
-# ── Dashboard ─────────────────────────────────────────────────────────────────
+# --- Dashboard ---
 
 # Open the interactive recipe dashboard in the browser
 default:
     @just --list
 
-# ── Teams++ Orchestration ───────────────────────────────────────────────────
+# --- Teams Orchestration ---
 
 # Launch the native remoting substrate
 remoting:
@@ -34,7 +34,7 @@ build-web:
     Set-Location '{{justfile_directory()}}'
     npm run build --workspace=web
 
-# ── Quality ───────────────────────────────────────────────────────────────────
+# --- Quality ---
 
 # Execute Ruff SOTA v13.1 linting across monorepo
 lint:
@@ -63,7 +63,7 @@ install:
     uv sync --all-extras; \
     uv pip install -e packages/conferencing_mcp -e packages/remoting_mcp
 
-# ── Hardening ─────────────────────────────────────────────────────────────────
+# --- Hardening ---
 
 # Execute Bandit security audit
 check-sec:
@@ -75,7 +75,7 @@ audit-deps:
     Set-Location '{{justfile_directory()}}'
     uv run safety check
 
-# ── Maintenance ───────────────────────────────────────────────────────────────
+# --- Maintenance ---
 
 # Perform PWSH-native monorepo cleanup
 clean:
@@ -88,3 +88,23 @@ clean:
 setup:
     Set-Location '{{justfile_directory()}}'
     .\setup.ps1
+
+# --- Native  NSIS ---
+
+# --- Build the NSIS desktop installer  full pipeline frontend  PyInstaller  Rust  NSIS ---
+build-native:
+    Set-Location '{{justfile_directory()}}\native'
+    $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
+    .\build.ps1
+
+# Build Tauri native app in debug mode (skip PyInstaller)
+build-native-debug:
+    Set-Location '{{justfile_directory()}}\native'
+    $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
+    npx @tauri-apps/cli build --debug
+
+# Bootstrap: install dev deps + pre-commit hook
+bootstrap:
+    uv sync --group dev
+    uv run pre-commit install
+    Write-Host "Pre-commit hooks installed." -ForegroundColor Green

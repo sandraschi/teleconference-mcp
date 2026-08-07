@@ -8,7 +8,7 @@ if ($Headless -and ($Host.UI.RawUI.WindowTitle -notmatch 'Hidden')) {
 $WindowStyle = if ($Headless) { 'Hidden' } else { 'Normal' }
 # ------------------------------
 
-# start.ps1 â€” SOTA 2026 Startup Script
+# start.ps1 â€" SOTA 2026 Startup Script
 # Industrial-grade process management for conferencing-mcp
 
 $PORT = 10720

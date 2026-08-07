@@ -2,8 +2,6 @@ import logging
 import os
 import sys
 
-import lancedb
-from fastembed import TextEmbedding
 from fastmcp import FastMCP
 from fastmcp.server import create_proxy
 
@@ -53,15 +51,34 @@ if _bridge_urls:
             except Exception as e:
                 logger.warning("MCP bridge failed for %s: %s", _url, e)
 
-# Persistence Substrate
+# Persistence Substrate — lazy-initialized to avoid I/O on import
+_db = None
+_embedding_model = None
+
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "apps", "agent", "lancedb_data")
-db = lancedb.connect(DB_PATH)
-embedding_model = TextEmbedding()
+
+
+def _get_db():
+    global _db
+    if _db is None:
+        import lancedb
+
+        _db = lancedb.connect(DB_PATH)
+    return _db
+
+
+def _get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        from fastembed import TextEmbedding
+
+        _embedding_model = TextEmbedding()
+    return _embedding_model
 
 
 def _init_insight_tables():
-    if "meeting_insights" not in db.list_tables():
-        db.create_table(
+    if "meeting_insights" not in _get_db().list_tables():
+        _get_db().create_table(
             "meeting_insights",
             data=[
                 {

@@ -1,9 +1,12 @@
 """PyInstaller entry point — starts the conferencing MCP + health/metrics servers."""
 import os
 import sys
-import threading
+
+sys.argv = ["run_server.py"]
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
+
+import threading
 
 from conferencing_mcp.health_server import run_health_server
 

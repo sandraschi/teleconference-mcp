@@ -10,5 +10,14 @@
     "window_title_re": "Teleconference MCP",
     "nsis_glob": "native/target/release/bundle/nsis/Teleconference MCP_*_x64-setup.exe",
     "bridge_ok_text": "REST bridge reachable",
-    "uninstall_registry_filter": "*Teleconference MCP*"
+    "uninstall_registry_filter": "*Teleconference MCP*",
+    "nav_routes": [
+        ["Dashboard", "Dashboard"],
+        ["Meetings", "Meetings"],
+        ["Recordings", "Recordings"],
+        ["Settings", "Settings"]
+    ],
+    "sidebar_click_x": 30,
+    "sidebar_first_y": 90,
+    "sidebar_step_y": 55
 }
