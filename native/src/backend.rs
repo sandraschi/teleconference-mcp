@@ -1,4 +1,4 @@
-use std::fs::{self, OpenOptions};
+﻿use std::fs::{self, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::path::PathBuf;
@@ -14,7 +14,7 @@ use tauri::{AppHandle, Emitter, Manager};
 pub struct BackendProcess(pub Mutex<Option<Child>>);
 
 const BACKEND_NAME: &str = "teleconference-mcp-backend.exe";
-const BACKEND_PORT: u16 = 10720;
+const BACKEND_PORT: u16 = 10887;
 const BACKEND_TAG: &str = "teleconference-mcp-backend-x86_64-pc-windows-msvc.exe";
 const ENV_PORT: &str = "MCP_PORT";
 const ENV_HOST: &str = "MCP_HOST";
@@ -154,7 +154,7 @@ fn stop_managed_child(state: &BackendProcess) {
 pub fn spawn_backend(app: AppHandle, state: &BackendProcess) -> Result<String, String> {
     stop_managed_child(state);
     if !free_port(BACKEND_PORT) {
-        let msg = format!("Could not free port {BACKEND_PORT} after 240s — TIME_WAIT not cleared");
+        let msg = format!("Could not free port {BACKEND_PORT} after 240s â€” TIME_WAIT not cleared");
         log_line(&app, &msg);
         return Err(msg);
     }
@@ -228,7 +228,7 @@ pub fn spawn_backend(app: AppHandle, state: &BackendProcess) -> Result<String, S
         }
         log_line(
             &app_health,
-            &format!("Backend health check FAILED — not listening on port {BACKEND_PORT} after 30 attempts"),
+            &format!("Backend health check FAILED â€” not listening on port {BACKEND_PORT} after 30 attempts"),
         );
         let _ = app_health.emit("backend-status", "error: backend not reachable");
     });
