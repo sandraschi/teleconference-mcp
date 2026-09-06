@@ -1,155 +1,95 @@
-# Installation Guide
+# Installing teleconference-mcp
 
 ## Prerequisites
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| Python | 3.12+ | MCP servers, AI agent, backend |
-| Node.js | 18+ | Next.js dashboard |
-| Docker | 24.0+ | LiveKit server, Redis |
-| Ollama | latest | Local LLM inference |
+Install these if you don't have them already:
 
-## Step 1: Clone & Setup
+| Tool | Purpose | Install |
+|------|---------|---------|
+| Claude Desktop | Required host | [download](https://claude.ai/download) |
+| Git | Clone repo (Option C/D only) | `winget install Git.Git` |
+| Python + uv | Run servers (Option C/D only) | `winget install astral-sh.uv` |
+| Node.js 18+ | Dashboard + mcpb CLI (Option B/C/D) | `winget install OpenJS.NodeJS` |
+| Docker 24+ | LiveKit + Redis containers (Options C/D only, not needed for A/B) | [download](https://docker.com) |
+| Ollama | Local LLM for the Visio agent | `winget install Ollama.Ollama`, then `ollama pull gemma2` |
 
-```powershell
-git clone https://github.com/sandraschi/teleconference-mcp.git
-cd teleconference-mcp
+> Windows: all installs via [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
+> macOS: use `brew install` equivalents
+> Linux: use your distro package manager
+
+LiveKit itself is never bundled — fleet Windows uses the `LiveKitSFU` service, everyone else runs
+the container (`docker compose up -d livekit`). See [docs/ONBOARDING.md](docs/ONBOARDING.md) for the
+5-minute path and [docs/LIVEKIT_OVERVIEW.md](docs/LIVEKIT_OVERVIEW.md) for what LiveKit is.
+
+## Option A — Drag and Drop (Recommended)
+
+1. Go to [Releases](https://github.com/sandraschi/teleconference-mcp/releases/latest)
+2. Download `teleconference-mcp-{version}.mcpb`
+3. Open Claude Desktop → drag the file onto the window
+   *Or*: Settings → MCP Servers → Install from file
+
+## Option B — mcpb CLI
+
+```bash
+# Requires Node.js (see Prerequisites)
+npx @anthropic-ai/mcpb install https://github.com/sandraschi/teleconference-mcp
 ```
 
-Install Python dependencies:
+## Option C — Manual Configuration
+
+1. Clone: `git clone https://github.com/sandraschi/teleconference-mcp`
+2. Install deps: `cd teleconference-mcp && uv sync && npm install`
+3. Start infrastructure: `docker compose up -d livekit redis`
+4. Pull the agent model: `ollama pull gemma2`
+5. Add to Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "teleconference": {
+      "command": "uv",
+      "args": ["--directory", "D:\\Dev\\repos\\teleconference-mcp", "run", "run_server.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "LIVEKIT_URL": "ws://localhost:15580",
+        "LIVEKIT_API_KEY": "devkey"
+      }
+    }
+  }
+}
+```
+
+Config file location:
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+6. Restart Claude Desktop
+
+## Option D — Developer Mode
+
+For contributing or running from source with live reload.
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Quick version:
 
 ```powershell
 uv sync
-```
-
-Install Node dependencies (includes `@livekit/track-processors` for background blur):
-
-```powershell
 npm install
-```
-
-## Step 2: Start Infrastructure
-
-```powershell
 docker compose up -d livekit redis
+.\start.ps1 all        # or: just web / just agent / just conferencing
 ```
 
-This starts:
-- **LiveKit** (WebRTC SFU) on ports 15580–15582
-- **Redis** (state bus) on port 16379
-
-## Step 3: Install Ollama Models
-
-The AI agent needs a local LLM. [Install Ollama](https://ollama.com/download), then:
-
-```powershell
-ollama pull gemma2
-```
-
-The agent uses `gemma2` by default. Configure via `OLLAMA_MODEL` env var.
-
-## Step 4: Configure Environment
-
-```powershell
-# apps/web/.env.local (optional, defaults work for dev)
-NEXT_PUBLIC_LIVEKIT_URL=ws://localhost:15580
-LIVEKIT_API_KEY=devkey
-LIVEKIT_API_SECRET=secret
-```
-
-## Step 5: Launch Services
-
-### Start everything:
-
-```powershell
-.\start.ps1 all
-```
-
-### Or start individual services:
-
-```powershell
-uv run -m teleconference_mcp conferencing   # MCP server (port 10720)
-uv run -m teleconference_mcp remoting       # Remoting MCP (port 10725)
-uv run -m teleconference_mcp agent          # AI agent (port 10887)
-uv run -m teleconference_mcp web            # Dashboard (port 10886)
-```
-
-### Using Just:
-
-```powershell
-just web        # Dashboard
-just agent      # AI agent
-just conferencing   # MCP server
-just remoting       # Remoting MCP
-```
-
-## Docker Full Stack
-
-Build and start all 8 containers:
-
-```powershell
-docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d --build
-```
-
-This builds and starts: LiveKit, Redis, Web (port 15500), Agent, Prometheus (19090), Loki (13100), Grafana (13000), Promtail.
-
-### Access Points
-
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| Dashboard | http://localhost:15500 | — |
-| Grafana | http://localhost:13000 | admin / admin |
-| Prometheus | http://localhost:19090 | — |
-
-### Observability
-
-- **Grafana** is auto-provisioned with Prometheus + Loki datasources
-- **Prometheus** scrapes: LiveKit, conferencing-mcp, remoting-mcp, web dashboard, agent, Redis
-- **Loki** receives logs from all containers via Promtail
-- Metrics endpoints: `/metrics` on MCP servers, `/api/metrics` on web dashboard
-
-### Without Observability
-
-```powershell
-docker compose -f docker-compose.yaml up -d --build
-```
-
-Starts: LiveKit, Redis, Web (port 15500), Agent. No monitoring stack.
-
-> **Note**: Ollama runs outside Docker on your PC. The agent reaches it via `host.docker.internal:11434`.
-
-## First-Time Setup
-
-Run the automated setup script:
-
-```powershell
-.\setup.ps1
-```
-
-This detects missing dependencies and installs everything needed.
+Ollama runs outside Docker on your PC; the agent reaches it via
+`http://host.docker.internal:11434` (Linux: add `host-gateway`).
 
 ## Verify Installation
 
-```powershell
-# Check health
-curl http://localhost:10720/mcp
+After installing, open Claude Desktop and type:
+> "Is the LiveKit server healthy? How many rooms are active?"
 
-# Run tests
-uv run pytest tests/ -v
-```
+You should see: a health summary with the SFU state and room list (empty on fresh install).
 
-All 44 tests should pass.
-
----
+Web dashboard: `http://localhost:10886` (dev) or `:15500` (Docker full stack).
+Run the suite: `uv run pytest tests/ -q` — all 68 tests should pass.
 
 ## Troubleshooting
 
-| Problem | Check |
-|---------|-------|
-| `uv run -m teleconference_mcp` fails | Run `uv sync` first |
-| LiveKit unreachable | `docker compose ps` to verify containers |
-| Ollama not responding | `ollama serve` and `ollama list` |
-| Port conflicts | Check `netstat -ano \| findstr :10886` and kill zombie processes |
-| Agent can't connect | Verify `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` match `livekit.yaml` |
-| No audio/video | Check browser permissions at `http://localhost:10886/test` |
-
+See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for common issues.

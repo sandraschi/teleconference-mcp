@@ -1,5 +1,8 @@
 # LiveKit Configuration — SOTA 2026 (Server v1.13.6)
 
+> New to LiveKit? Read [LIVEKIT_OVERVIEW.md](LIVEKIT_OVERVIEW.md) first — what it is, history,
+> who uses it, community links. This page is the technical reference: server config, rooms, tokens.
+
 ## 2026 Feature Upgrades
 
 Available with LiveKit Server v1.13.6 (2026-08-26) and Agents SDK v1.8.0.

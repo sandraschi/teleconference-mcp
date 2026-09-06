@@ -13,6 +13,9 @@
 
 **Self-hosted, AI-powered video conferencing** — a privacy-respecting alternative to Zoom/Teams with a local-first AI voice assistant, real-time screen sharing, RAG memory, remote desktop, and full observability stack.
 
+Wraps **[LiveKit](docs/WRAPPEE.md)** (open-source WebRTC SFU + voice-agent framework) as its media host —
+new to LiveKit? Start with [LiveKit Overview](docs/LIVEKIT_OVERVIEW.md), then [LiveKit config](docs/LIVEKIT.md).
+
 ---
 
 ## Quick Start
@@ -40,14 +43,18 @@ docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
 
 | Guide | Description |
 |-------|-------------|
-| **[Installation](docs/INSTALL.md)** | Full setup guide: prerequisites, Docker, Ollama, config |
+| **[Installation](INSTALL.md)** | All install methods, prerequisites |
+| **[Onboarding](docs/ONBOARDING.md)** | First 15 minutes: zero to working call, costs, pitfalls |
+| **[LiveKit Overview](docs/LIVEKIT_OVERVIEW.md)** | What LiveKit is, history, who uses it, community — read first |
+| **[Wrapped app](docs/WRAPPEE.md)** | LiveKit links, license, disambiguation |
+| **[LiveKit config](docs/LIVEKIT.md)** | SFU technical reference: server, STUN/TURN, rooms, tokens |
 | **[Architecture](docs/ARCHITECTURE.md)** | System design: services, ports, data flow, MCP discovery |
-| **[LiveKit](docs/LIVEKIT.md)** | WebRTC infrastructure: server config, STUN, room management |
-| **[Features](docs/FEATURES.md)** | All capabilities: conferencing, AI agent, remoting, memory, contacts, observability |
-| **[Usage](docs/USAGE.md)** | User manual: dashboard, settings, agent interaction, Docker, observability |
-| **[Contributing](CONTRIBUTING.md)** | Development standards: Ruff, tests, CI/CD, PR process |
-| **[Technical Reference](TECHNICAL.md)** | Deep-dive into protocol details and internals |
-| **[Changelog](CHANGELOG.md)** | Version history from 0.1.0 to 2.1.0 |
+| **[Configuration](docs/CONFIGURATION.md)** | Env vars and config options |
+| **[Tool Reference](docs/TOOLS.md)** | All 28 conferencing tools + remoting |
+| **[Features](docs/FEATURES.md)** | Capabilities: conferencing, AI agent, remoting, memory, observability |
+| **[Usage](docs/USAGE.md)** | User manual: dashboard, settings, agent interaction |
+| **[Development](docs/DEVELOPMENT.md)** | Contributing, local setup |
+| **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues |
 
 ---
 
@@ -148,6 +155,39 @@ docker compose up -d livekit redis
 | **Grafana** | http://localhost:13000 (admin/admin) |
 | **Prometheus** | http://localhost:19090 |
 | **LiveKit** | http://localhost:15580 |
+
+---
+
+## What You Can Do
+
+**How it runs**: LiveKit SFU as fleet Windows service (`LiveKitSFU`) or Docker; Next.js dashboard +
+Python agent as local processes (`start.ps1`) or containers; Ollama LLM on your PC (never bundled).
+LiveKit itself is never bundled — install separately.
+
+| Direction | Artifacts | Notes |
+|-----------|-----------|-------|
+| **Hands-in** | Room links, natural-language prompts, screen shares, uploaded files | Join via dashboard, guest link, or MCP tools |
+| **Hands-out** | MP4 recordings, transcripts, meeting summaries, action items | Egress API + Conferencing tools |
+
+- Drop the Visio agent into any room for voice assistance, transcription, summaries
+- Schedule meetings, invite participants, get join links — all from Claude
+- Share screen, remote-control desktops (Windows), OCR the screen
+- Full observability: Prometheus + Grafana + Loki out of the box
+
+## Example Prompts
+
+> "Create a room called standup and invite mario@example.com"
+
+> "Summarize yesterday's planning meeting and extract action items"
+
+> "Is the LiveKit server healthy? How many rooms are active?"
+
+---
+
+## Requirements
+
+Minimal: Windows 10/11 (fleet) or Docker host, Claude Desktop (latest), Ollama + `gemma2` for the
+voice agent, ports 10886/15580 free. Details: [INSTALL.md](INSTALL.md).
 
 ---
 
