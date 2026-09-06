@@ -39,6 +39,10 @@ function Start-BackendDetached {
 
 function Start-WebForeground {
     Write-Host "  webapp   :$FrontendPort" -ForegroundColor Gray
+    # Dev default: no Authentik wall. The webapp redirects to Authentik sign-in
+    # unless AUTH_DISABLED=true; explicit env always wins (prod sets false +
+    # AUTH_SECRET + provider vars).
+    if (-not $env:AUTH_DISABLED) { $env:AUTH_DISABLED = "true" }
     # Bare `npm` (not `& npm`) - the call operator mangles the npm.ps1 shim
     # into `Unknown command: "pm"`.
     npm run dev --workspace=web

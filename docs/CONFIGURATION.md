@@ -28,7 +28,7 @@ All knobs in one place. Copy `.env.example` to `.env` and override what you need
 | `META_API_KEY` | — | Muse Voice Transcribe ($0.18/hr, OpenAI-SDK-compatible endpoint) |
 | `MUSE_TRANSCRIBE_MODEL` | `muse-voice-transcribe-1.0` | Model name on the Meta Model API |
 | `MUSE_TRANSCRIBE_BASE_URL` | `https://api.meta.ai/v1` | Override if Meta moves the endpoint (verify in cookbook) |
-| `AUTH_DISABLED` | `false` | Set `true` to skip OIDC in dev |
+| `AUTH_DISABLED` | `true` in dev (start.ps1/compose default), otherwise `false` | Set `true` to skip OIDC in dev. Production: `false` + `AUTH_SECRET` + provider vars for Authentik sign-in |
 | `AUTH_SECRET` | — | ≥32 random chars when auth is on |
 | `AUTH_AUTHENTIK_ID` / `AUTH_AUTHENTIK_SECRET` / `AUTH_AUTHENTIK_ISSUER` | — | Authentik OIDC (next-auth v5) |
 

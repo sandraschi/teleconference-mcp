@@ -36,6 +36,9 @@ services:
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-dev-secret-0123456789abcdef-0123456789abcdef}
       - HOSTNAME=0.0.0.0
       - OLLAMA_HOST=http://host.docker.internal:11434
+      # Dev default: no Authentik wall (override with AUTH_DISABLED=false +
+      # AUTH_SECRET + provider vars for a secured deployment).
+      - AUTH_DISABLED=${AUTH_DISABLED:-true}
       - PORT=15500
     depends_on:
       - livekit
