@@ -1,29 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { EgressClient, EncodedFileType, RoomServiceClient } from "livekit-server-sdk";
+import { EgressClient, EncodedFileOutput, EncodedFileType, RoomServiceClient } from "livekit-server-sdk";
+import { livekitApiKey, livekitApiSecret, livekitHttpUrl } from "@/lib/livekit-server";
 
-function baseUrl(): string {
-  return (
-    process.env.LIVEKIT_URL?.replace("ws://", "http://").replace("wss://", "https://") ??
-    "http://localhost:15580"
-  );
-}
-const key = () => process.env.LIVEKIT_API_KEY || "devkey";
-const secret = () => process.env.LIVEKIT_API_SECRET || "secret";
+const url = () => livekitHttpUrl();
+const key = () => livekitApiKey();
+const secret = () => livekitApiSecret();
 
 export async function POST(request: NextRequest) {
   try {
     const { room_name } = (await request.json()) as { room_name?: string };
     const roomName = room_name?.trim();
     if (!roomName) return NextResponse.json({ error: "room_name required" }, { status: 400 });
-    const rooms = await new RoomServiceClient(baseUrl(), key(), secret()).listRooms();
+    const rooms = await new RoomServiceClient(url(), key(), secret()).listRooms();
     if (!rooms.some((r) => r.name === roomName))
       return NextResponse.json({ error: `Room "${roomName}" not found` }, { status: 404 });
     try {
-      const info = await new EgressClient(baseUrl(), key(), secret()).createRoomCompositeEgress(
+      const info = await new EgressClient(url(), key(), secret()).startRoomCompositeEgress(
         roomName,
-        {
-          fileOutputs: [{ fileType: EncodedFileType.MP4, filepath: `recordings/${roomName}-{time}.mp4` }],
-        }
+        new EncodedFileOutput({
+          fileType: EncodedFileType.MP4,
+          filepath: `recordings/${roomName}-{time}.mp4`,
+        })
       );
       return NextResponse.json({ status: "recording_started", room_name: roomName, egress_id: info.egressId });
     } catch (e) {

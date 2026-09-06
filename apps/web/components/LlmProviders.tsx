@@ -212,9 +212,9 @@ export default function LlmProviders() {
             className="flex-1 px-2 py-1.5 bg-neutral-900 border border-gray-700 rounded text-sm text-white"
           >
             <option value="">Select model…</option>
-            {modelsByProvider[p.id].models.map((m) => (
+            {(modelsByProvider[p.id]?.models ?? []).map((m) => (
               <option key={m} value={m}>
-                {m} ({modelsByProvider[p.id].source})
+                {m} ({modelsByProvider[p.id]?.source})
               </option>
             ))}
           </select>

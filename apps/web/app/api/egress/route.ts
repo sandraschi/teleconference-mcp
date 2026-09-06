@@ -1,27 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { EgressClient, EncodedFileType, RoomServiceClient } from "livekit-server-sdk";
-
-function baseUrl(): string {
-  const url =
-    process.env.LIVEKIT_URL?.replace("ws://", "http://").replace("wss://", "https://") ??
-    "http://localhost:15580";
-  return url;
-}
+import { EgressClient, EncodedFileOutput, EncodedFileType, RoomServiceClient } from "livekit-server-sdk";
+import { livekitApiKey, livekitApiSecret, livekitHttpUrl } from "@/lib/livekit-server";
 
 function roomClient(): RoomServiceClient {
-  return new RoomServiceClient(
-    baseUrl(),
-    process.env.LIVEKIT_API_KEY || "devkey",
-    process.env.LIVEKIT_API_SECRET || "secret"
-  );
+  return new RoomServiceClient(livekitHttpUrl(), livekitApiKey(), livekitApiSecret());
 }
 
 function egressClient(): EgressClient {
-  return new EgressClient(
-    baseUrl(),
-    process.env.LIVEKIT_API_KEY || "devkey",
-    process.env.LIVEKIT_API_SECRET || "secret"
-  );
+  return new EgressClient(livekitHttpUrl(), livekitApiKey(), livekitApiSecret());
 }
 
 export async function POST(request: NextRequest) {
@@ -50,7 +36,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ status: "recording_stopped", room_name: roomName, stopped });
     }
 
-    // start — Egress v2 (server v1.13.2+): RoomComposite with MP4 file output.
+    // start — RoomComposite with MP4 file output (Egress v2 API on server v1.13.2+).
     // Requires file/S3 output configured server-side; without it LiveKit
     // returns a clear error instead of a fake success (pre-2.3 stub bug).
     const rooms = await roomClient().listRooms();
@@ -58,14 +44,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Room "${roomName}" not found` }, { status: 404 });
     }
     try {
-      const info = await egressClient().createRoomCompositeEgress(roomName, {
-        fileOutputs: [
-          {
-            fileType: EncodedFileType.MP4,
-            filepath: `recordings/${roomName}-{time}.mp4`,
-          },
-        ],
-      });
+      const info = await egressClient().startRoomCompositeEgress(
+        roomName,
+        new EncodedFileOutput({
+          fileType: EncodedFileType.MP4,
+          filepath: `recordings/${roomName}-{time}.mp4`,
+        })
+      );
       return NextResponse.json({
         status: "recording_started",
         room_name: roomName,

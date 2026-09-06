@@ -32,7 +32,8 @@ services:
     environment:
       - NEXT_PUBLIC_LIVEKIT_URL=ws://localhost:15580
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
-      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
+      # Dev default must match keys: in livekit.yaml
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-dev-secret-0123456789abcdef-0123456789abcdef}
       - HOSTNAME=0.0.0.0
       - OLLAMA_HOST=http://host.docker.internal:11434
       - PORT=15500
@@ -49,7 +50,8 @@ services:
     environment:
       - LIVEKIT_URL=ws://livekit:15580
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
-      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
+      # Dev default must match keys: in livekit.yaml
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-dev-secret-0123456789abcdef-0123456789abcdef}
       - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
       - OLLAMA_MODEL=gemma2
     depends_on:
