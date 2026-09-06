@@ -49,5 +49,8 @@ Verify the SFU answers: `Test-NetConnection 127.0.0.1 -Port 15580` should succee
 2. Create room → join → you see yourself. Invite a second browser window — two tiles.
 3. Start the agent (`just agent`): it joins and says "Agent operational."
 4. Say "summarize this meeting" — check the transcript panel.
+5. Cloud LLM keys (optional): Settings → LLM Providers → paste a key
+   (Meta/ OpenAI/Anthropic/DeepSeek/OpenRouter). Keys stay in a 0600 keystore
+   on the backend; local Ollama needs no key.
 
 Still broken? [TROUBLESHOOTING.md](TROUBLESHOOTING.md). LiveKit background: [LIVEKIT_OVERVIEW.md](LIVEKIT_OVERVIEW.md).

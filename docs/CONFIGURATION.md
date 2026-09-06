@@ -12,7 +12,13 @@ All knobs in one place. Copy `.env.example` to `.env` and override what you need
 | `LIVEKIT_API_KEY` | `devkey` | Must match `livekit.yaml` keys |
 | `LIVEKIT_API_SECRET` | (see `.env.example`) | Must match `livekit.yaml`; rotate in production |
 | `NEXT_PUBLIC_LIVEKIT_URL` | `ws://localhost:15580` | Public SFU URL baked into the web client |
-| `MCP_PORT` / `MCP_HOST` | `10720` / `127.0.0.1` | Conferencing MCP listen address |
+| `MCP_PORT` / `MCP_HOST` | `10887` / `127.0.0.1` | Conferencing backend (FastMCP HTTP) listen address |
+| `HEALTH_PORT` | `10891` | Health/diagnostics/metrics + LLM provider proxy listen port |
+| `TELECONF_DATA_DIR` | `<repo>/data` | LLM keystore (`llm_keys.json`, 0600) + provider selection home |
+| `MODEL_API_KEY` | — | Meta chat models via Model API (Muse Spark family) |
+| `ANTHROPIC_API_KEY` | — | Anthropic cloud provider |
+| `DEEPSEEK_API_KEY` | — | DeepSeek cloud provider |
+| `OPENROUTER_API_KEY` | — | OpenRouter cloud provider |
 | `FASTMCP_LOG_LEVEL` | `WARNING` | `DEBUG` for agent/tool tracing |
 | `AGENT_MODE` | `local` | `local` (Ollama/Whisper/Piper) or `cloud` (OpenAI/Deepgram/ElevenLabs) |
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama API (Docker agent: `http://host.docker.internal:11434`) |

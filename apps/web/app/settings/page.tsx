@@ -17,6 +17,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useSettings, getMediaDevices, type AppSettings } from "@/lib/settings";
+import LlmProviders from "@/components/LlmProviders";
 import Toggle from "@/components/ui/Toggle";
 import { cn } from "@/lib/utils";
 
@@ -390,6 +391,22 @@ export default function SettingsPage() {
             </>
           )}
         </div>
+      </section>
+
+      {/* LLM Providers (local + cloud, via backend proxy) */}
+      <section className="bg-neutral-900 border border-gray-800 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 bg-purple-600/20 rounded-lg">
+            <Cpu className="w-5 h-5 text-purple-500" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-white">LLM Providers</h2>
+            <p className="text-gray-500 text-sm">
+              Local engines and cloud APIs. Keys stay on the backend — the browser never sees them.
+            </p>
+          </div>
+        </div>
+        <LlmProviders />
       </section>
 
       {/* Audio/Video Devices */}
