@@ -5,6 +5,7 @@
     "LIVEKIT_API_KEY",
     "LIVEKIT_API_SECRET",
     "OLLAMA_HOST",
+    "BACKEND_URL",
     "NODE_ENV",
     "NEXT_PUBLIC_LIVEKIT_URL",
     "CI"

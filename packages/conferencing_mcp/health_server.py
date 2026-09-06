@@ -23,15 +23,7 @@ SERVER_NAME = "teleconference-mcp"
 
 
 def _tool_count() -> int:
-    try:
-        from conferencing_mcp.tools import __all__  # type: ignore[attr-defined]
-        return len(__all__) if __all__ else 25
-    except Exception:
-        try:
-            import conferencing_mcp.tools as _t
-            return len([n for n in dir(_t) if not n.startswith("_")])
-        except Exception:
-            return 25
+    return len(_list_tools())
 
 
 def _list_tools() -> list[dict[str, str]]:
@@ -71,6 +63,10 @@ class MetricsHandler(BaseHTTPRequestHandler):
                 },
             }
             self._json(200, resp)
+
+        elif self.path == "/api/v1/tools":
+            # Webapp catch-them-all Tools page: live tool list from the MCP server.
+            self._json(200, {"tools": _list_tools()})
 
         elif self.path == "/api/v1/diagnostics":
             lk = check_tcp_port("localhost", 15580)
@@ -118,6 +114,42 @@ class MetricsHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(404)
             self.end_headers()
+
+    def do_POST(self):
+        global _REQUEST_COUNT
+        _REQUEST_COUNT += 1
+
+        if self.path == "/api/v1/tools/invoke":
+            length = int(self.headers.get("Content-Length", "0") or "0")
+            raw = self.rfile.read(length) if length else b"{}"
+            try:
+                body = json.loads(raw.decode("utf-8") or "{}")
+            except json.JSONDecodeError:
+                return self._json(400, {"ok": False, "error": "invalid JSON body"})
+
+            name = str(body.get("name", ""))
+            arguments = body.get("arguments") or {}
+            if not name:
+                return self._json(400, {"ok": False, "error": "name required"})
+
+            try:
+                import asyncio
+
+                from conferencing_mcp.mcp_server import mcp
+
+                result = asyncio.run(mcp.call_tool(name, arguments))
+                is_error = bool(getattr(result, "isError", False))
+                content = getattr(result, "content", None)
+                return self._json(200 if not is_error else 502, {
+                    "ok": not is_error,
+                    "name": name,
+                    "result": content,
+                })
+            except Exception as exc:
+                logger.exception("tool invoke failed: %s", name)
+                return self._json(502, {"ok": False, "name": name, "error": str(exc)})
+
+        return self._json(404, {"ok": False, "error": "not found"})
 
     def _json(self, code: int, data: dict):
         self.send_response(code)

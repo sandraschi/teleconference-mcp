@@ -17,10 +17,13 @@ def _start_health_server(port: int):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("MCP_PORT", os.environ.get("PORT", "10720")))
+    # Fleet-registered backend port (WEBAPP_PORTS.md: 10887). NOT 10720/10721 -
+    # those belong to calibre-mcp and would collide.
+    port = int(os.environ.get("MCP_PORT", os.environ.get("PORT", "10887")))
     host = os.environ.get("MCP_HOST", "127.0.0.1")
 
-    health_port = port + 1
+    # Health/metrics on a dedicated registered port (10891), NOT port+1 (10888 is myai's).
+    health_port = int(os.environ.get("HEALTH_PORT", "10891"))
     _start_health_server(health_port)
 
     from conferencing_mcp.mcp_server import logger, mcp

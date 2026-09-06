@@ -55,6 +55,8 @@ build_agent_log*.txt
 # Lint/test output artifacts (never commit these)
 lint-results.json
 lint_output.txt
+# Runtime / setup logs
+*.log
 # Rust / Zed IDE — rust-analyzer may create target/ at repo root
 target/
 
@@ -65,3 +67,7 @@ lancedb_data/
 contacts_cache.json
 
 _dashboard/
+
+# Timestamped backup specialists (fleet standard - both patterns required)
+*.bak
+*.bak.*

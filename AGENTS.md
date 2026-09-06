@@ -19,7 +19,7 @@ You are working on **Teleconference MCP**, a self-hosted video conferencing plat
 - All tools accept `ctx: Context` for correlation_id logging
 - Test tools with pytest-asyncio, mock `ctx` via `mock_ctx` fixture in conftest
 - Use `cid(ctx)` helper (imported from mcp_server) instead of `getattr(ctx, "correlation_id", "GLOBAL")`
-- Port registry: 10886 (web), 10720 (conferencing), 10725 (remoting), 10887 (agent)
+- Port registry: 10886 (web frontend), 10887 (conferencing backend / FastMCP HTTP), 10891 (health/metrics), 10725 (remoting). NOT 10720/10721 (calibre-mcp) nor 10888 (myai).
 
 ## Key Files
 - `tests/conftest.py` — Shared fixtures (mock_ctx, mock_livekit_api, temp_conference_db, mock_subprocess)

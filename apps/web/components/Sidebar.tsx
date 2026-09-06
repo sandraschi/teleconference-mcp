@@ -12,9 +12,9 @@ import {
   Monitor,
   Activity,
   Calendar,
-  Video,
   Library,
   Paperclip,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +29,7 @@ const navItems = [
   { href: "/meetings", label: "Meetings", icon: Calendar },
   { href: "/recordings", label: "Recordings", icon: Library },
   { href: "/files", label: "Files", icon: Paperclip },
+  { href: "/tools", label: "Tools", icon: Wrench },
   { href: "/health", label: "Health", icon: Activity },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

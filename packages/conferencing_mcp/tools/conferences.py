@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any
@@ -7,8 +8,12 @@ from pydantic import Field
 
 from .. import conference as conf
 from ..mcp_server import _MUTATING, _READ_ONLY, cid, mcp
+from ..notify import notify_meeting_event
 
 logger = logging.getLogger("ag-visio-mcp")
+
+# Keep references to fire-and-forget notify tasks so they are not GC'd (RUF006).
+_notify_tasks: set[asyncio.Task] = set()
 
 
 @mcp.tool(annotations=_MUTATING)
@@ -34,7 +39,7 @@ async def conference_schedule(
     """
     _cid = cid(ctx)
     logger.info("Scheduling conference: %s", title, extra={"correlation_id": _cid})
-    return conf.schedule_conference(
+    result = conf.schedule_conference(
         title=title,
         scheduled_at=scheduled_at,
         organizer=organizer,
@@ -42,6 +47,17 @@ async def conference_schedule(
         duration_min=duration_min,
         max_participants=max_participants,
     )
+    if result.get("id"):
+        room = result.get("room_name") or "ag-visio-conference"
+        task = asyncio.create_task(
+            notify_meeting_event(
+                "SCHEDULED", title, room,
+                organizer=organizer, when=scheduled_at,
+            )
+        )
+        _notify_tasks.add(task)
+        task.add_done_callback(_notify_tasks.discard)
+    return result
 
 
 @mcp.tool(annotations=_READ_ONLY)

@@ -1,0 +1,30 @@
+# Teleconference MCP
+> Self-hosted video conferencing with AI voice agent. Built on LiveKit, Turborepo, FastMCP 3.2.
+
+## Key files
+- README.md: Project overview and quick start
+- CHANGELOG.md: Version history (v2.3.0 latest)
+- AGENTS.md: Agent instructions and conventions
+- tests/conftest.py: Shared test fixtures
+- justfile: Command runner (lint, test, install, deploy commands)
+- pyproject.toml: Python config (fastmcp 3.2, ruff, coverage)
+- livekit.yaml: LiveKit server with 2026 features (OTel, TURN, auto-restart)
+
+## Architecture
+- apps/web/ — Next.js 16 dashboard (port 10886)
+- apps/agent/ — LiveKit voice pipeline (Silero→Whisper→Ollama→Piper)
+- packages/conferencing_mcp/ — 25 MCP tools (conferencing, rooms, diagnostics, intelligence, signaling)
+- packages/remoting_mcp/ — 8 MCP tools (screen capture, mouse/keyboard, screen share)
+
+## Conventions
+- Python 3.12+, Ruff lint 120-char, double quotes
+- FastMCP 3.2: Annotated[Field(...)] params, ## Return Format, ## Examples
+- 68 pytest tests, 27 vitest, 22 Playwright E2E
+- Ports: Web 10886, Conferencing MCP 10720, Remoting MCP 10725, Agent 10887
+
+## Docs
+- docs/ARCHITECTURE.md — Service map, Docker stack, data flows
+- docs/FEATURES.md — Full feature list (18 sections)
+- docs/INSTALL.md — Installation guide
+- docs/USAGE.md — Usage guide
+- docs/LIVEKIT.md — LiveKit configuration (2026 edition)
