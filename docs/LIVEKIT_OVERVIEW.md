@@ -48,8 +48,8 @@ This repo **wraps LiveKit as its media host**: LiveKit is never bundled — inst
 | **OpenAI ChatGPT voice modes** | Realtime voice on LiveKit Cloud |
 | **Apple FaceTime (iOS 18)** | LiveKit embedded for emergency calls |
 | **France's Visio** | Government video-conferencing on the OSS SFU |
-| **Spotify / Oracle / Reddit** | Livestreaming, interactive audio |
-| **Salesforce, Meta, Microsoft** | Voice/video AI features |
+| **Spotify / Oracle / Reddit / AT&T** | Early Cloud adopters: livestreaming, interactive audio |
+| **Salesforce, Meta** | Voice/video AI features (per company disclosures) |
 | **US 911 emergency services** | Real-time emergency-call media |
 | **LiveKit Meet** ([`livekit-examples/meet`](https://github.com/livekit-examples/meet)) | OSS reference conferencing app our web UI descends from |
 | **This fleet** | `teleconference-mcp` (conferencing + Visio agent) and `teleoperator-mcp` (robot video return) |
