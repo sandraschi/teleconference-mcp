@@ -18,6 +18,10 @@ All knobs in one place. Copy `.env.example` to `.env` and override what you need
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama API (Docker agent: `http://host.docker.internal:11434`) |
 | `OLLAMA_MODEL` | `gemma2` | Agent LLM (`gemma2`, `gemma3-27b`, …) |
 | `OPENAI_API_KEY` / `DEEPGRAM_API_KEY` / `ELEVEN_LABS_API_KEY` | — | Cloud mode only |
+| `CLOUD_STT_PROVIDER` | `deepgram` | Cloud STT: `deepgram` (proven) or `muse` (EXPERIMENTAL — Meta Muse Voice Transcribe, bake-off only, falls back to Deepgram) |
+| `META_API_KEY` | — | Muse Voice Transcribe ($0.18/hr, OpenAI-SDK-compatible endpoint) |
+| `MUSE_TRANSCRIBE_MODEL` | `muse-voice-transcribe-1.0` | Model name on the Meta Model API |
+| `MUSE_TRANSCRIBE_BASE_URL` | `https://api.meta.ai/v1` | Override if Meta moves the endpoint (verify in cookbook) |
 | `AUTH_DISABLED` | `false` | Set `true` to skip OIDC in dev |
 | `AUTH_SECRET` | — | ≥32 random chars when auth is on |
 | `AUTH_AUTHENTIK_ID` / `AUTH_AUTHENTIK_SECRET` / `AUTH_AUTHENTIK_ISSUER` | — | Authentik OIDC (next-auth v5) |

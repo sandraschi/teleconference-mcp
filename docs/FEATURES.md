@@ -415,4 +415,4 @@ Auto-provisioned on first start:
 | PII redaction (`lk.pii.*`) + OTel GenAI conventions | Agents v1.7/1.8 | Transcripts stay at DEBUG, safe Loki ingestion |
 | Log key `pID` -> `participantID` | Server v1.10 | Update Grafana/Loki filters |
 
-Future candidates: `useRpc` hook (Components v2.9.21), model swaps via `update_options` (Agents v1.5.10), Answering Machine Detection (Agents v1.5.9).
+Future candidates: `useRpc` hook (Components v2.9.21), model swaps via `update_options` (Agents v1.5.10), Answering Machine Detection (Agents v1.5.9), **Muse Voice Transcribe as cloud STT** (`CLOUD_STT_PROVIDER=muse`, experimental — bake off with `apps/agent/bakeoff_stt.py` before trusting vendor numbers).

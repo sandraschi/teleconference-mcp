@@ -100,6 +100,12 @@ async def check_endpoint(session, url):
 
 AGENT_MODE = os.environ.get("AGENT_MODE", "local").lower()
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+# Cloud STT provider: "deepgram" (default, proven) or "muse" (EXPERIMENTAL —
+# Meta Muse Voice Transcribe, OpenAI-SDK-compatible endpoint, bake-off only;
+# see apps/agent/bakeoff_stt.py and docs/FEATURES.md section 18).
+CLOUD_STT_PROVIDER = os.environ.get("CLOUD_STT_PROVIDER", "deepgram").lower()
+MUSE_TRANSCRIBE_MODEL = os.environ.get("MUSE_TRANSCRIBE_MODEL", "muse-voice-transcribe-1.0")
+MUSE_TRANSCRIBE_BASE_URL = os.environ.get("MUSE_TRANSCRIBE_BASE_URL", "https://api.meta.ai/v1")
 
 
 # ---------------------------------------------------------------------------
@@ -375,10 +381,25 @@ async def entrypoint(ctx: JobContext) -> None:
 
         vad = silero.VAD.load()
         if AGENT_MODE == "cloud":
-            logger.info("Using Cloud providers (Deepgram/OpenAI)")
-            stt = deepgram.STT()
             tts = openai.TTS()
             llm_engine = openai.LLM(model="gpt-4o-mini")
+            if CLOUD_STT_PROVIDER == "muse":
+                # EXPERIMENTAL (2026-09-06): Meta Muse Voice Transcribe via its
+                # OpenAI-SDK-compatible endpoint. Falls back to Deepgram if the
+                # endpoint is unreachable or rejects the request — check logs.
+                try:
+                    stt = openai.STT(
+                        model=MUSE_TRANSCRIBE_MODEL,
+                        base_url=MUSE_TRANSCRIBE_BASE_URL,
+                        api_key=os.environ.get("META_API_KEY", ""),
+                    )
+                    logger.info("Using Cloud STT: Muse Voice Transcribe (experimental)")
+                except Exception as e:
+                    logger.warning("Muse STT init failed (%s); falling back to Deepgram", e)
+                    stt = deepgram.STT()
+            else:
+                logger.info("Using Cloud providers (Deepgram/OpenAI)")
+                stt = deepgram.STT()
         else:
             logger.info("Using Local providers (Whisper via OpenAI/Piper/Ollama)")
             stt = openai.STT(model="whisper-1")
