@@ -1,8 +1,8 @@
-# LiveKit Configuration — SOTA 2026 (Server v1.12)
+# LiveKit Configuration — SOTA 2026 (Server v1.13.6)
 
 ## 2026 Feature Upgrades
 
-Available with LiveKit Server v1.12 (May 2026) and Agents SDK v1.5.12.
+Available with LiveKit Server v1.13.6 (2026-08-26) and Agents SDK v1.8.0.
 
 ### Room Auto-Creation from JWT Grants (v1.12)
 Tokens with `roomCreate` grant auto-create rooms on the first participant join. No separate `room_create` API call needed. Add `grant.roomCreate: true` to your token payload.
@@ -13,14 +13,26 @@ Tokens with `roomCreate` grant auto-create rooms on the first participant join. 
 ### Barge-In Cooldown (Agents v1.5.8)
 Cooldown window after the agent starts speaking prevents rapid successive interruptions. Configured via the voice pipeline.
 
-### TURN Credential TTL (v1.12)
-TURN credentials now carry a `ttl_seconds` (default 300). Rotate TURN secrets periodically to expire stale credentials. Also: `allow_restricted_peer_cidrs` / `deny_peer_cidrs` for private-IP access control.
+### TURN Credential TTL (v1.12+, enforced v1.13.1)
+TURN credentials now carry a `ttl_seconds` (default 300). Rotate TURN secrets periodically to expire stale credentials. Also: `allow_restricted_peer_cidrs` / `deny_peer_cidrs` for private-IP access control. v1.13.1 removed no-TTL compat — old creds stop working after upgrade.
 
 ### OpenTelemetry Tracing (v1.9.11+)
 Send spans to Jaeger or any OTLP-compatible collector. Enables distributed tracing across LiveKit, agent, and MCP tools. Config section in `livekit.yaml`.
 
 ### Agent Auto-Restart (v1.10)
 `AutoRestartPolicy.ALWAYS` on `WorkerOptions` ensures the Visio agent restarts on crash. Enabled in `agent.py`.
+
+### Data Tracks On By Default (v1.11)
+Ordered data tracks replace lossy data-channel for transcripts/intel broadcasts. Existing `publish_data` calls keep working.
+
+### Egress v2 + Participant Capabilities (v1.13.2)
+`EgressClient.createRoomCompositeEgress` v2 API, `ParticipantInfo.capabilities`, join-latency + `rtc_success` Prometheus metrics, async participant attributes (data blob). Wired in `/api/egress`.
+
+### Per-Participant TURN Quota + Body Limits (v1.13.6)
+Relay quota default 12 per participant, WS read-size + API body-size limits enforced, H.264 baseline `42001f` removed from default codecs.
+
+### Log Field Rename (v1.10)
+Participant session ID key changed `pID` -> `participantID`. Update Loki/Grafana filters accordingly. Agents 1.7+ further tag content keys as `lk.pii.*` for redaction.
 
 ---
 
@@ -47,9 +59,9 @@ rtc:
   port_range_end: 60000
   use_external_ip: false
   stun_servers:
-    - stun:stun.l.google.com:19302
-    - stun:stun1.l.google.com:19302
-  # TURN (v1.12 security hardening):
+    - stun.l.google.com:19302
+    - stun1.l.google.com:19302
+  # TURN (v1.12 security hardening, enforced v1.13.1):
   # turn:
   #   enabled: false
   #   secret: rotate-this-regularly
@@ -81,7 +93,7 @@ logging:
 
 ### Starting LiveKit
 
-**Fleet standard (Goliath, 2026-08):** LiveKit runs as a **Windows service** (`LiveKitSFU`) — NSSM-wrapped native `livekit-server` 1.7.0, config from this repo's `livekit.yaml`, auto-start + crash-restart. Docker is NOT required for the fleet SFU.
+**Fleet standard (Goliath, 2026-08):** LiveKit runs as a **Windows service** (`LiveKitSFU`) — NSSM-wrapped native `livekit-server` 1.13.6, config from this repo's `livekit.yaml`, auto-start + crash-restart. Docker is NOT required for the fleet SFU.
 
 ```powershell
 # Verify (should be Running, Automatic)
@@ -164,8 +176,8 @@ For TURN (v1.12+): credentials carry an expiry TTL (`ttl_seconds: 300`). TURN bl
 ```yaml
 rtc:
   stun_servers:
-    - stun:stun.l.google.com:19302
-    - stun:stun1.l.google.com:19302
+    - stun.l.google.com:19302
+    - stun1.l.google.com:19302
 ```
 
 For production deployments behind symmetric NATs, deploy a TURN server separately (e.g. [coturn](https://github.com/coturn/coturn)) and point LiveKit at it. This version of LiveKit does not support TURN configuration via config file — use environment variables or a reverse proxy if needed.

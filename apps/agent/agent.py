@@ -1,7 +1,13 @@
 """
 apps/agent/agent.py — AG-Visio Voice Agent
-LiveKit Agents 1.x compatible. Implements a custom Ollama LLM backend
+LiveKit Agents 1.8 compatible. Implements a custom Ollama LLM backend
 with dynamic MCP tool discovery and delegation.
+
+Notes on Agents 1.7/1.8:
+- PII redaction tags trace/log keys as lk.pii.* — keep transcripts at
+  DEBUG, never INFO, so local logs stay clean for Loki.
+- Expressive mode (AgentSession expressive=True) requires an inference
+  TTS voice; local Piper mode intentionally leaves it off.
 """
 
 import asyncio
@@ -54,7 +60,7 @@ logger = logging.getLogger("ag-visio-agent")
 
 load_dotenv()
 
-# UserTurnLimitOptions added in livekit-agents 1.5.12 (May 2026).
+# UserTurnLimitOptions (Agents 1.5.12+, still current in 1.8.0).
 # Caps user speech duration to prevent long monologues from hijacking the agent.
 try:
     from livekit.agents.voice import UserTurnLimitOptions

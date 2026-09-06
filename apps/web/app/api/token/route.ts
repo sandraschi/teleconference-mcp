@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
 
     at.addGrant({
       roomJoin: true,
+      roomCreate: true, // v1.12+: auto-create room on first join, no room_create call needed
       room: roomName.trim(),
       canPublish: true,
       canSubscribe: true,

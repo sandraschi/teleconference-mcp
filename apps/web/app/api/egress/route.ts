@@ -1,43 +1,84 @@
 import { NextRequest, NextResponse } from "next/server";
-import { RoomServiceClient } from "livekit-server-sdk";
-import type { EgressInfo } from "livekit-server-sdk";
+import { EgressClient, EncodedFileType, RoomServiceClient } from "livekit-server-sdk";
 
-function getClient(): RoomServiceClient {
-  const url = process.env.LIVEKIT_URL
-    ? process.env.LIVEKIT_URL.replace("ws://", "http://").replace("wss://", "https://")
-    : "http://localhost:15580";
-  const key = process.env.LIVEKIT_API_KEY || "devkey";
-  const secret = process.env.LIVEKIT_API_SECRET || "secret";
-  return new RoomServiceClient(url, key, secret);
+function baseUrl(): string {
+  const url =
+    process.env.LIVEKIT_URL?.replace("ws://", "http://").replace("wss://", "https://") ??
+    "http://localhost:15580";
+  return url;
+}
+
+function roomClient(): RoomServiceClient {
+  return new RoomServiceClient(
+    baseUrl(),
+    process.env.LIVEKIT_API_KEY || "devkey",
+    process.env.LIVEKIT_API_SECRET || "secret"
+  );
+}
+
+function egressClient(): EgressClient {
+  return new EgressClient(
+    baseUrl(),
+    process.env.LIVEKIT_API_KEY || "devkey",
+    process.env.LIVEKIT_API_SECRET || "secret"
+  );
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { room_name } = await request.json() as { room_name?: string };
-    if (!room_name) {
+    const body = (await request.json()) as { room_name?: string; action?: string };
+    const roomName = body.room_name?.trim();
+    if (!roomName) {
       return NextResponse.json({ error: "room_name required" }, { status: 400 });
     }
+    const path = request.nextUrl.pathname;
+    const action = body.action ?? (path.endsWith("/stop") ? "stop" : "start");
 
-    const action = request.nextUrl.pathname.endsWith("/stop") ? "stop" : "start";
-
-    if (action === "start") {
-      const lk = getClient();
-      const rooms = await lk.listRooms();
-      const room = rooms.find((r) => r.name === room_name);
-      if (!room) {
-        return NextResponse.json({ error: `Room "${room_name}" not found` }, { status: 404 });
+    if (action === "stop") {
+      const egress = egressClient();
+      const active = await egress.listEgress({ roomName });
+      const running = active.filter((e) => e.status <= 2);
+      const stopped: string[] = [];
+      for (const e of running) {
+        try {
+          await egress.stopEgress(e.egressId);
+          stopped.push(e.egressId);
+        } catch {
+          // best-effort: egress may have finished between list and stop
+        }
       }
+      return NextResponse.json({ status: "recording_stopped", room_name: roomName, stopped });
+    }
+
+    // start — Egress v2 (server v1.13.2+): RoomComposite with MP4 file output.
+    // Requires file/S3 output configured server-side; without it LiveKit
+    // returns a clear error instead of a fake success (pre-2.3 stub bug).
+    const rooms = await roomClient().listRooms();
+    if (!rooms.some((r) => r.name === roomName)) {
+      return NextResponse.json({ error: `Room "${roomName}" not found` }, { status: 404 });
+    }
+    try {
+      const info = await egressClient().createRoomCompositeEgress(roomName, {
+        fileOutputs: [
+          {
+            fileType: EncodedFileType.MP4,
+            filepath: `recordings/${roomName}-{time}.mp4`,
+          },
+        ],
+      });
       return NextResponse.json({
         status: "recording_started",
-        room_name,
-        message: `Recording started for ${room_name}.`,
+        room_name: roomName,
+        egress_id: info.egressId,
       });
-    } else {
-      return NextResponse.json({
-        status: "recording_stopped",
-        room_name,
-        message: `Recording stopped for ${room_name}.`,
-      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return NextResponse.json(
+        {
+          error: `Egress start failed: ${msg}. Configure file/S3 output on the LiveKit server.`,
+        },
+        { status: 502 }
+      );
     }
   } catch (e) {
     return NextResponse.json(
@@ -49,20 +90,31 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const type = request.nextUrl.searchParams.get("type");
-
-    if (type === "recordings") {
-      // Return mock recordings for now — full Egress API wiring
-      // will list from LiveKit's Egress storage when configured
-      return NextResponse.json({
-        recordings: [],
-        message: "No recordings available. Egress storage must be configured in your LiveKit server deployment.",
-      });
+    if (request.nextUrl.searchParams.get("type") === "recordings") {
+      try {
+        const list = await egressClient().listEgress();
+        return NextResponse.json({
+          recordings: list.map((e) => ({
+            id: e.egressId,
+            room_name: e.roomName,
+            started_at: new Date(Number(e.startedAt) / 1_000_000).toISOString(),
+            duration_sec: Math.max(
+              0,
+              Math.round((Number(e.endedAt || BigInt(Date.now() * 1_000_000)) - Number(e.startedAt)) / 1_000_000_000)
+            ),
+            status: e.status === 3 ? "completed" : e.status >= 4 ? "failed" : "recording",
+            url: e.fileResults?.[0]?.location,
+          })),
+        });
+      } catch (e) {
+        return NextResponse.json({
+          recordings: [],
+          message: `Egress list failed: ${e instanceof Error ? e.message : String(e)}. Egress storage must be configured on the LiveKit server.`,
+        });
+      }
     }
 
-    // Default: list active rooms
-    const lk = getClient();
-    const rooms = await lk.listRooms();
+    const rooms = await roomClient().listRooms();
     return NextResponse.json({
       rooms: rooms.map((r) => ({
         name: r.name,

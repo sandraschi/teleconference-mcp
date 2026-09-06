@@ -1,7 +1,13 @@
-# AG-Visio LiveKit Server Configuration — SOTA 2026 (v1.12)
+# AG-Visio LiveKit Server Configuration — SOTA 2026 (v1.13.6, 2026-08-26)
 #
 # Key: https://docs.livekit.io/references/server/config/
 # Ports: WSS 15580, RTC 15581-15582, media 50000-60000
+# Upgrade notes v1.12 -> v1.13.6:
+#   - v1.13.1 REMOVED no-TTL TURN compat. turn.ttl_seconds is mandatory
+#     when TURN is enabled (default 300). Rotate turn.secret regularly.
+#   - v1.11 data tracks on by default; v1.13.6 per-participant TURN quota
+#     default 12, WS read-size + API body-size limits enforced.
+#   - H.264 baseline (42001f) removed from default codecs (v1.13.6).
 
 port: 15580
 

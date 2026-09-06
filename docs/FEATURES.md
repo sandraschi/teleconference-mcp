@@ -399,16 +399,20 @@ Auto-provisioned on first start:
 
 ---
 
-## 18. LiveKit 2026 Upgrades (v2.3.0)
+## 18. LiveKit 2026 Upgrades (v2.4.0 — server v1.13.6, agents v1.8.0)
 
 | Feature | Version | Impact |
 |---------|---------|--------|
-| Room auto-creation from JWT grants | Server v1.12 | Eliminates manual `room_create` — rooms spawn on first join |
-| User turn duration limits | Agents v1.5.12 | Caps user speech at 60s, prevents monologue hijack |
+| Room auto-creation from JWT grants | Server v1.12 | Eliminates manual `room_create` — rooms spawn on first join (wired in `/api/token` via `roomCreate:true`) |
+| User turn duration limits | Agents v1.5.12+ | Caps user speech at 60s, prevents monologue hijack |
 | Barge-in cooldown window | Agents v1.5.8 | Smoother interruptions, prevents rapid re-triggering |
-| TURN credential TTL + CIDR allow/deny | Server v1.12 | Credentials expire; private-IP relay access control |
+| TURN credential TTL + CIDR allow/deny | Server v1.12, enforced v1.13.1 | Credentials expire; private-IP relay access control; no-TTL compat removed |
 | OpenTelemetry tracing | Server v1.9.11 | Distributed spans across LiveKit -> agent -> MCP tools |
 | Agent auto-restart on crash | Server v1.10 | `AutoRestartPolicy.ALWAYS` on Visio agent |
 | Data tracks enabled by default | Server v1.11 | Chat, intel broadcasts, data channels active out of box |
+| Egress v2 + participant capabilities | Server v1.13.2 | Real `createRoomCompositeEgress` in `/api/egress/start|stop`, `listEgress` in `/recordings` |
+| Per-participant TURN quota + body limits | Server v1.13.6 | Relay quota 12, WS/API size limits, H.264 baseline removed |
+| PII redaction (`lk.pii.*`) + OTel GenAI conventions | Agents v1.7/1.8 | Transcripts stay at DEBUG, safe Loki ingestion |
+| Log key `pID` -> `participantID` | Server v1.10 | Update Grafana/Loki filters |
 
 Future candidates: `useRpc` hook (Components v2.9.21), model swaps via `update_options` (Agents v1.5.10), Answering Machine Detection (Agents v1.5.9).
