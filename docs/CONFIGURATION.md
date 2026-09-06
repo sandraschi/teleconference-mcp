@@ -52,6 +52,34 @@ In `claude_desktop_config.json` (Windows: `%APPDATA%\Claude\claude_desktop_confi
 }
 ```
 
+## Authentication — Authentik, explained
+
+**What it is:** [Authentik](https://goauthentik.io/) is a self-hosted identity provider
+(SSO: log in once, use many apps). The dashboard supports it via next-auth v5 OIDC
+(`apps/web/auth.ts`): instead of a local password, an "Sign in with Authentik" button
+hands login to your organization's Authentik instance, which vouches for you back
+to the app. Nobody runs this by default — it exists for secured multi-user/guest
+deployments where meeting links need real identity.
+
+**Why you saw a login wall:** with `AUTH_DISABLED` unset, the middleware (`apps/web/proxy.ts`)
+redirects every page to `/auth/signin`. Previously a missing-secret crash fired first,
+so the wall was invisible; once the crash was fixed, the redirect started working and
+the wall appeared. Dev now defaults to bypass (see below).
+
+**Dev (default):** `start.ps1` and `docker-compose` set `AUTH_DISABLED=true` — no login,
+straight to the dashboard. Explicit env always wins.
+
+**Production with Authentik:**
+
+| Variable | Value |
+|----------|-------|
+| `AUTH_DISABLED` | `false` |
+| `AUTH_SECRET` | ≥32 random chars (Auth.js fails hard without it — by design) |
+| `AUTH_AUTHENTIK_ID` / `AUTH_AUTHENTIK_SECRET` | OIDC client credentials from your Authentik provider |
+| `AUTH_AUTHENTIK_ISSUER` | e.g. `http://localhost:9000/application/o/ag-visio` |
+
+Public paths that never require login: `/auth/*`, `/join/*`, `/api/health`, `/api/discovery`.
+
 ## LiveKit Server (`livekit.yaml`)
 
 Ports: WSS `15580`, RTC TCP `15581-15582`, media UDP `50000-60000`.
