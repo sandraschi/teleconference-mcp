@@ -266,7 +266,7 @@ const helpSections: HelpSection[] = [
             </h5>
             <ul className="mt-2 space-y-1 text-gray-400 text-sm">
               <li>- Verify LiveKit is running: docker compose ps</li>
-              <li>- Check port 7880 is accessible</li>
+              <li>- Check port 15580 is accessible</li>
               <li>- Ensure LIVEKIT_API_KEY matches livekit.yaml</li>
             </ul>
           </div>

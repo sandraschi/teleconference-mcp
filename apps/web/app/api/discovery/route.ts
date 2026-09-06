@@ -1,7 +1,7 @@
 import { RoomServiceClient } from "livekit-server-sdk";
 import { NextRequest, NextResponse } from "next/server";
 
-const LIVEKIT_PORT = 7880;
+const FALLBACK_PORT = 15580; // fleet SFU port (upstream LiveKit default is 7880);
 const DEFAULT_ROOMS = [
   "ag-visio-conference",
   "development",
@@ -17,11 +17,13 @@ function isLocalOrPrivate(hostname: string): boolean {
 }
 
 function getLiveKitHost(request: NextRequest): string {
+  const env = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL;
+  if (env) return env;
   const forwarded = request.headers.get("x-forwarded-host");
   const host = forwarded || request.headers.get("host") || "localhost";
   const hostname = host.split(":")[0] ?? "localhost";
   const protocol = isLocalOrPrivate(hostname) ? "ws" : "wss";
-  return `${protocol}://${hostname}:${LIVEKIT_PORT}`;
+  return `${protocol}://${hostname}:${FALLBACK_PORT}`;
 }
 
 function toHttpUrl(wsUrl: string): string {

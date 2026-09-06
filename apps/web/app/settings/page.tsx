@@ -243,7 +243,7 @@ export default function SettingsPage() {
               type="text"
               value={localSettings.livekitUrl}
               onChange={(e) => updateLocal("livekitUrl", e.target.value)}
-              placeholder="ws://localhost:7880"
+              placeholder="ws://localhost:15580"
               className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -568,7 +568,7 @@ export default function SettingsPage() {
           <div>
             <span className="text-gray-500">LiveKit URL:</span>
             <span className="text-gray-300 ml-2 font-mono text-xs">
-              {process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:7880"}
+              {process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:15580"}
             </span>
           </div>
         </div>

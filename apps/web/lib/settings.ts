@@ -23,7 +23,7 @@ export interface AppSettings {
 const SETTINGS_KEY = "ag-visio-settings";
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  livekitUrl: process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:7880",
+  livekitUrl: process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:15580",
   defaultRoomName: "ag-visio-conference",
   preferredAudioInput: "",
   preferredVideoInput: "",

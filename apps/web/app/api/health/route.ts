@@ -1,13 +1,19 @@
 import { RoomServiceClient } from "livekit-server-sdk";
 import { NextRequest, NextResponse } from "next/server";
 
-const LIVEKIT_PORT = 7880;
+const FALLBACK_PORT = 15580; // fleet SFU port (upstream LiveKit default is 7880)
 
-function getLiveKitHttpUrl(request: NextRequest): string {
+function livekitWsUrl(request: NextRequest): string {
+  const env = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL;
+  if (env) return env;
   const forwarded = request.headers.get("x-forwarded-host");
   const host = forwarded || request.headers.get("host") || "localhost";
   const hostname = host.split(":")[0] ?? "localhost";
-  return `http://${hostname}:${LIVEKIT_PORT}`;
+  return `ws://${hostname}:${FALLBACK_PORT}`;
+}
+
+function getLiveKitHttpUrl(request: NextRequest): string {
+  return livekitWsUrl(request).replace(/^wss?:\/\//, "http://");
 }
 
 export async function GET(request: NextRequest) {
