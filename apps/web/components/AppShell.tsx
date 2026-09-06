@@ -45,7 +45,9 @@ export default function AppShell({ children }: AppShellProps) {
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden">
       <Sidebar onHelpClick={() => setIsHelpOpen(true)} />
-      <main className="flex-1 overflow-hidden">{children}</main>
+      {/* Scroll container: pages taller than the viewport scroll here.
+          (overflow-hidden here used to clip the whole dashboard.) */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );

@@ -55,6 +55,17 @@ auth entirely in dev.
 **Fix**: Expected without egress storage — configure output in the LiveKit server, then retry.
 `GET /api/egress?type=recordings` lists real egresses.
 
+## React hydration mismatch mentioning `data-darkreader-inline-stroke`
+**Cause**: The Dark Reader browser extension rewrites SVG attributes before React
+hydrates. Every diff in the error is an extension-injected attribute — not an app bug.
+**Fix**: Disable Dark Reader for `localhost` (the dashboard is natively dark, the
+extension only adds noise). No code change can prevent extension DOM mutation.
+
+## Dashboard does not scroll
+**Cause**: Fixed in AppShell — `<main>` is the scroll container (`overflow-y-auto`).
+**Fix**: Pull latest; if a single page still clips, check it for its own
+`h-screen overflow-hidden` wrapper fighting the main scroll container.
+
 ## FastEmbed ONNX errors in tests
 **Cause**: Corrupt local `fastembed_cache` (missing `model_optimized.onnx`).
 **Fix**: Clear `%TEMP%\fastembed_cache` and re-run `uv run pytest tests/ -q`. Pre-existing, unrelated to LiveKit.
