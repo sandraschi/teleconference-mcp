@@ -13,9 +13,17 @@ Problem → Cause → Fix, flat list.
 **Fix**: `Get-Service LiveKitSFU` (fleet) or `docker compose ps`; verify `NEXT_PUBLIC_LIVEKIT_URL`
 matches the server (`ws://localhost:15580`); `Test-NetConnection 127.0.0.1 -Port 15580`.
 
-## "Invalid token"
-**Cause**: API key/secret mismatch between web `.env` and `livekit.yaml` keys.
-**Fix**: Align `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` on both sides, restart web.
+## "Invalid token" / 401 from /api/discovery, /api/token, /api/egress
+**Cause**: API key/secret mismatch between web env and `livekit.yaml` keys.
+**Fix**: All web server routes read `lib/livekit-server.ts` (env first, dev default = yaml value).
+Align `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` on both sides, restart web. Compose defaults
+already match the yaml.
+
+## Auth.js MissingSecret / /api/auth/session 500 in dev
+**Cause**: Auth.js requires a secret on every request when `AUTH_SECRET` is unset.
+**Fix**: `auth.ts` falls back to a dev-only insecure secret outside production
+(production without `AUTH_SECRET` still throws). Set `AUTH_DISABLED=true` to bypass
+auth entirely in dev.
 
 ## Agent joins but never speaks
 **Cause**: Ollama unreachable or wrong model.

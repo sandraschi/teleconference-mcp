@@ -10,7 +10,7 @@ All knobs in one place. Copy `.env.example` to `.env` and override what you need
 |----------|---------|-------------|
 | `LIVEKIT_URL` | `ws://localhost:15580` | SFU WebSocket URL (agent + web) |
 | `LIVEKIT_API_KEY` | `devkey` | Must match `livekit.yaml` keys |
-| `LIVEKIT_API_SECRET` | (see `.env.example`) | Must match `livekit.yaml`; rotate in production |
+| `LIVEKIT_API_SECRET` | (see `.env.example`) | Must match `livekit.yaml`; rotate in production. **Dev default everywhere (web routes, compose, helper) is the yaml value — if you change the yaml, set the env to match or every API call 401s** |
 | `NEXT_PUBLIC_LIVEKIT_URL` | `ws://localhost:15580` | Public SFU URL baked into the web client |
 | `MCP_PORT` / `MCP_HOST` | `10887` / `127.0.0.1` | Conferencing backend (FastMCP HTTP) listen address |
 | `HEALTH_PORT` | `10891` | Health/diagnostics/metrics + LLM provider proxy listen port |
