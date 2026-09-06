@@ -1,5 +1,6 @@
 import { RoomServiceClient } from "livekit-server-sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { livekitApiKey, livekitApiSecret } from "@/lib/livekit-server";
 
 const FALLBACK_PORT = 15580; // fleet SFU port (upstream LiveKit default is 7880);
 const DEFAULT_ROOMS = [
@@ -34,8 +35,8 @@ export async function GET(request: NextRequest) {
   try {
     const livekitUrl = getLiveKitHost(request);
     const httpUrl = toHttpUrl(livekitUrl);
-    const apiKey = process.env.LIVEKIT_API_KEY || "devkey";
-    const apiSecret = process.env.LIVEKIT_API_SECRET || "secret";
+    const apiKey = livekitApiKey();
+    const apiSecret = livekitApiSecret();
 
     const roomService = new RoomServiceClient(httpUrl, apiKey, apiSecret);
     const activeRooms = await roomService.listRooms();

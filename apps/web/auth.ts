@@ -51,6 +51,13 @@ const config: NextAuthConfig = {
     error: "/auth/error",
   },
   trustHost: true,
+  // Dev fallback: Auth.js asserts a secret on EVERY request (even for the
+  // AUTH_DISABLED bypass or public pages), so without this the dev server
+  // 500s with MissingSecret when AUTH_SECRET is unset. Production without
+  // AUTH_SECRET still throws — as it should.
+  secret:
+    process.env.AUTH_SECRET ||
+    (process.env.NODE_ENV !== "production" ? "dev-only-insecure-secret" : undefined),
 };
 
 const authInstance = NextAuth(config);

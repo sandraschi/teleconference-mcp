@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AccessToken } from "livekit-server-sdk";
+import { livekitApiKey, livekitApiSecret } from "@/lib/livekit-server";
 import { auth } from "@/auth";
 
 export async function POST(request: NextRequest) {
@@ -20,8 +21,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Could not determine identity" }, { status: 400 });
     }
 
-    const apiKey = process.env.LIVEKIT_API_KEY || "devkey";
-    const apiSecret = process.env.LIVEKIT_API_SECRET || "secret";
+  const apiKey = livekitApiKey();
+  const apiSecret = livekitApiSecret();
 
     const at = new AccessToken(apiKey, apiSecret, {
       identity,
