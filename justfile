@@ -11,18 +11,15 @@ default:
 
 # Launch the native remoting substrate
 remoting:
-    Set-Location '{{justfile_directory()}}/packages/remoting_mcp'
-    .\start.ps1
+    Set-Location '{{justfile_directory()}}/packages/remoting_mcp'; .\start.ps1
 
 # Launch the meeting intelligence server
 conferencing:
-    Set-Location '{{justfile_directory()}}/packages/conferencing_mcp'
-    .\start.ps1
+    Set-Location '{{justfile_directory()}}/packages/conferencing_mcp'; .\start.ps1
 
 # Launch the Visio AI agent
 agent:
-    Set-Location '{{justfile_directory()}}/apps/agent'
-    uv run python agent.py dev
+    Set-Location '{{justfile_directory()}}/apps/agent'; uv run python agent.py dev
 
 # Launch the Next.js dashboard (production)
 web:
@@ -93,15 +90,11 @@ setup:
 
 # --- Build the NSIS desktop installer  full pipeline frontend  PyInstaller  Rust  NSIS ---
 build-native:
-    Set-Location '{{justfile_directory()}}\native'
-    $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
-    .\build.ps1
+    Set-Location '{{justfile_directory()}}\native'; $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"; .\build.ps1
 
 # Build Tauri native app in debug mode (skip PyInstaller)
 build-native-debug:
-    Set-Location '{{justfile_directory()}}\native'
-    $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
-    npx @tauri-apps/cli build --debug
+    Set-Location '{{justfile_directory()}}\native'; $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"; npx @tauri-apps/cli build --debug
 
 # Bootstrap: install dev deps + pre-commit hook
 bootstrap:
