@@ -1,17 +1,8 @@
 "use client";
 
+import { AlertTriangle, Bot, ChevronRight, ExternalLink, Keyboard, Rocket, Search, Users } from "lucide-react";
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
-import {
-  Search,
-  Rocket,
-  Users,
-  Keyboard,
-  Bot,
-  AlertTriangle,
-  ChevronRight,
-  ExternalLink,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HelpModalProps {
@@ -34,28 +25,23 @@ const helpSections: HelpSection[] = [
     content: (
       <div className="space-y-4">
         <p className="text-gray-300">
-          AG-Visio is a real-time voice conferencing system with an AI agent
-          (Visio) that participates in conversations using a materialist and
-          reductionist approach.
+          AG-Visio is a real-time voice conferencing system with an AI agent (Visio) that participates in conversations
+          using a materialist and reductionist approach.
         </p>
 
         <h4 className="font-semibold text-white mt-4">Prerequisites</h4>
         <ul className="list-disc list-inside space-y-2 text-gray-400">
           <li>
-            <strong className="text-gray-300">Docker</strong> - Required for
-            LiveKit server and Redis
+            <strong className="text-gray-300">Docker</strong> - Required for LiveKit server and Redis
           </li>
           <li>
-            <strong className="text-gray-300">Ollama</strong> - Local LLM
-            runtime (with gemma2 or similar model)
+            <strong className="text-gray-300">Ollama</strong> - Local LLM runtime (with gemma2 or similar model)
           </li>
           <li>
-            <strong className="text-gray-300">Python 3.11+</strong> - For the
-            Visio agent
+            <strong className="text-gray-300">Python 3.11+</strong> - For the Visio agent
           </li>
           <li>
-            <strong className="text-gray-300">Node.js 18+</strong> - For this
-            web application
+            <strong className="text-gray-300">Node.js 18+</strong> - For this web application
           </li>
         </ul>
 
@@ -79,28 +65,21 @@ const helpSections: HelpSection[] = [
     icon: Users,
     content: (
       <div className="space-y-4">
-        <p className="text-gray-300">
-          Joining a conference room is straightforward:
-        </p>
+        <p className="text-gray-300">Joining a conference room is straightforward:</p>
 
         <ol className="list-decimal list-inside space-y-3 text-gray-400">
           <li>
-            <strong className="text-gray-300">Enter your name</strong> in the
-            input field on the dashboard
+            <strong className="text-gray-300">Enter your name</strong> in the input field on the dashboard
           </li>
           <li>
-            <strong className="text-gray-300">
-              Click &quot;Initialize Mode Cons&quot;
-            </strong>{" "}
-            to request a room token
+            <strong className="text-gray-300">Click &quot;Initialize Mode Cons&quot;</strong> to request a room token
           </li>
           <li>
-            <strong className="text-gray-300">Allow camera/microphone</strong>{" "}
-            when prompted by your browser
+            <strong className="text-gray-300">Allow camera/microphone</strong> when prompted by your browser
           </li>
           <li>
-            <strong className="text-gray-300">You&apos;re connected!</strong> Other
-            participants (including Visio) will appear in the grid
+            <strong className="text-gray-300">You&apos;re connected!</strong> Other participants (including Visio) will
+            appear in the grid
           </li>
         </ol>
 
@@ -110,36 +89,27 @@ const helpSections: HelpSection[] = [
             Important
           </h5>
           <p className="text-gray-400 text-sm mt-2">
-            Make sure the LiveKit server is running (docker compose up -d)
-            before attempting to join. If connection fails, check the browser
-            console for errors.
+            Make sure the LiveKit server is running (docker compose up -d) before attempting to join. If connection
+            fails, check the browser console for errors.
           </p>
         </div>
 
         <h4 className="font-semibold text-white mt-4">Room Controls</h4>
         <ul className="space-y-2 text-gray-400">
           <li className="flex items-center gap-2">
-            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">
-              Mic
-            </span>
+            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">Mic</span>
             Toggle your microphone on/off
           </li>
           <li className="flex items-center gap-2">
-            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">
-              Camera
-            </span>
+            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">Camera</span>
             Toggle your camera on/off
           </li>
           <li className="flex items-center gap-2">
-            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">
-              Screen
-            </span>
+            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">Screen</span>
             Share your screen with participants
           </li>
           <li className="flex items-center gap-2">
-            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">
-              Leave
-            </span>
+            <span className="bg-neutral-700 px-2 py-1 rounded text-xs">Leave</span>
             Disconnect from the room
           </li>
         </ul>
@@ -152,9 +122,7 @@ const helpSections: HelpSection[] = [
     icon: Keyboard,
     content: (
       <div className="space-y-4">
-        <p className="text-gray-300">
-          Navigate efficiently with these keyboard shortcuts:
-        </p>
+        <p className="text-gray-300">Navigate efficiently with these keyboard shortcuts:</p>
 
         <div className="grid gap-3">
           {[
@@ -164,14 +132,9 @@ const helpSections: HelpSection[] = [
             { key: "V", action: "Toggle camera (when in room)" },
             { key: "S", action: "Toggle screen share (when in room)" },
           ].map((shortcut) => (
-            <div
-              key={shortcut.key}
-              className="flex items-center justify-between bg-neutral-800 rounded-lg px-4 py-3"
-            >
+            <div key={shortcut.key} className="flex items-center justify-between bg-neutral-800 rounded-lg px-4 py-3">
               <span className="text-gray-300">{shortcut.action}</span>
-              <kbd className="bg-neutral-700 px-3 py-1 rounded text-sm font-mono text-gray-300">
-                {shortcut.key}
-              </kbd>
+              <kbd className="bg-neutral-700 px-3 py-1 rounded text-sm font-mono text-gray-300">{shortcut.key}</kbd>
             </div>
           ))}
         </div>
@@ -185,9 +148,8 @@ const helpSections: HelpSection[] = [
     content: (
       <div className="space-y-4">
         <p className="text-gray-300">
-          Visio is an AI agent that participates in conferences with a
-          materialist and reductionist philosophy. It monitors conversations
-          and responds strategically.
+          Visio is an AI agent that participates in conferences with a materialist and reductionist philosophy. It
+          monitors conversations and responds strategically.
         </p>
 
         <h4 className="font-semibold text-white mt-4">Core Principles</h4>
@@ -195,37 +157,30 @@ const helpSections: HelpSection[] = [
           <li className="flex items-start gap-2">
             <ChevronRight className="w-4 h-4 mt-1 text-blue-500 flex-shrink-0" />
             <span>
-              <strong className="text-gray-300">Data is reality</strong> - Visio
-              prioritizes empirical evidence over speculation
+              <strong className="text-gray-300">Data is reality</strong> - Visio prioritizes empirical evidence over
+              speculation
             </span>
           </li>
           <li className="flex items-start gap-2">
             <ChevronRight className="w-4 h-4 mt-1 text-blue-500 flex-shrink-0" />
             <span>
-              <strong className="text-gray-300">LDDO Detection</strong> - Rejects
-              Low-Density Discourse Objects (corporate jargon, meaningless
-              buzzwords)
+              <strong className="text-gray-300">LDDO Detection</strong> - Rejects Low-Density Discourse Objects
+              (corporate jargon, meaningless buzzwords)
             </span>
           </li>
           <li className="flex items-start gap-2">
             <ChevronRight className="w-4 h-4 mt-1 text-blue-500 flex-shrink-0" />
             <span>
-              <strong className="text-gray-300">Strategic Silence</strong> -
-              Remains quiet unless addressed directly or detecting high-entropy
-              nonsense
+              <strong className="text-gray-300">Strategic Silence</strong> - Remains quiet unless addressed directly or
+              detecting high-entropy nonsense
             </span>
           </li>
         </ul>
 
         <h4 className="font-semibold text-white mt-4">When Visio Responds</h4>
         <div className="bg-neutral-800 rounded-lg p-4 space-y-2 text-gray-400">
-          <p>
-            1. When explicitly addressed (&quot;Visio, what do you think...&quot;)
-          </p>
-          <p>
-            2. When jargon score exceeds threshold (synergy, paradigm, holistic,
-            etc.)
-          </p>
+          <p>1. When explicitly addressed (&quot;Visio, what do you think...&quot;)</p>
+          <p>2. When jargon score exceeds threshold (synergy, paradigm, holistic, etc.)</p>
           <p>3. When detecting ontological drift in the conversation</p>
         </div>
 
@@ -239,10 +194,7 @@ const helpSections: HelpSection[] = [
             { word: "alignment", weight: "0.3" },
             { word: "manifest", weight: "0.7" },
           ].map((item) => (
-            <div
-              key={item.word}
-              className="flex justify-between bg-neutral-800 rounded px-3 py-2"
-            >
+            <div key={item.word} className="flex justify-between bg-neutral-800 rounded px-3 py-2">
               <span className="text-gray-300">{item.word}</span>
               <span className="text-red-400 font-mono">{item.weight}</span>
             </div>
@@ -261,9 +213,7 @@ const helpSections: HelpSection[] = [
 
         <div className="space-y-4">
           <div className="bg-neutral-800 rounded-lg p-4">
-            <h5 className="font-medium text-white">
-              &quot;Connection failed&quot; when joining
-            </h5>
+            <h5 className="font-medium text-white">&quot;Connection failed&quot; when joining</h5>
             <ul className="mt-2 space-y-1 text-gray-400 text-sm">
               <li>- Verify LiveKit is running: docker compose ps</li>
               <li>- Check port 15580 is accessible</li>
@@ -272,9 +222,7 @@ const helpSections: HelpSection[] = [
           </div>
 
           <div className="bg-neutral-800 rounded-lg p-4">
-            <h5 className="font-medium text-white">
-              Visio agent not joining the room
-            </h5>
+            <h5 className="font-medium text-white">Visio agent not joining the room</h5>
             <ul className="mt-2 space-y-1 text-gray-400 text-sm">
               <li>- Verify Ollama is running with a model loaded</li>
               <li>- Check agent logs: python apps/agent/agent.py dev</li>
@@ -322,9 +270,7 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredSections = helpSections.filter(
-    (section) =>
-      section.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      searchQuery === ""
+    (section) => section.title.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery === "",
   );
 
   const currentSection = helpSections.find((s) => s.id === activeSection);
@@ -352,13 +298,14 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
               const Icon = section.icon;
               return (
                 <button
+                  type="button"
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
                   className={cn(
                     "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-left text-sm transition-colors",
                     activeSection === section.id
                       ? "bg-blue-600 text-white"
-                      : "text-gray-400 hover:bg-neutral-800 hover:text-white"
+                      : "text-gray-400 hover:bg-neutral-800 hover:text-white",
                   )}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
@@ -377,9 +324,7 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 <div className="p-2 bg-blue-600/20 rounded-lg">
                   <currentSection.icon className="w-6 h-6 text-blue-500" />
                 </div>
-                <h3 className="text-xl font-semibold text-white">
-                  {currentSection.title}
-                </h3>
+                <h3 className="text-xl font-semibold text-white">{currentSection.title}</h3>
               </div>
               {currentSection.content}
             </>

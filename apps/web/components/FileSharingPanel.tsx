@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Upload, Download, File, Loader2, Paperclip } from "lucide-react";
 import { useRoomContext } from "@livekit/components-react";
+import { Download, File, Loader2, Paperclip, Upload } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface FileEntry {
   id: string;
@@ -129,9 +129,15 @@ export default function FileSharingPanel() {
         <span className="text-xs text-gray-400">{files.length} files</span>
       </div>
 
-      {/* Upload area */}
+      {/* Upload area: mouse/drag affordance on the div; keyboard path is the
+          Browse files button below (WCAG-conformant, no redundant key handler). */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: keyboard equivalent is Browse button */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard equivalent is Browse button */}
       <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         className={`mx-3 mt-3 p-4 border-2 border-dashed rounded-xl text-center transition-all cursor-pointer ${
@@ -145,6 +151,7 @@ export default function FileSharingPanel() {
           onChange={handleFileSelect}
           className="hidden"
           accept="*/*"
+          aria-label="Upload files"
         />
         {isUploading ? (
           <div className="flex flex-col items-center gap-2">
@@ -156,6 +163,17 @@ export default function FileSharingPanel() {
             <Upload className="w-5 h-5 text-gray-500" />
             <span className="text-xs text-gray-400">Drop files or click to upload</span>
             <span className="text-xs text-gray-400">Max 50MB</span>
+            <button
+              type="button"
+              data-testid="files-browse"
+              onClick={(e) => {
+                e.stopPropagation();
+                inputRef.current?.click();
+              }}
+              className="mt-1 px-3 py-1 text-xs bg-neutral-800 hover:bg-neutral-700 rounded-lg"
+            >
+              Browse files
+            </button>
           </div>
         )}
       </div>

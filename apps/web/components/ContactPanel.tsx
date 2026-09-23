@@ -1,17 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Building, ChevronRight, Globe, Mail, RefreshCw, Search, ShieldCheck, Users } from "lucide-react";
 import Image from "next/image";
-import {
-  Users,
-  RefreshCw,
-  Search,
-  Mail,
-  Building,
-  ChevronRight,
-  ShieldCheck,
-  Globe
-} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Contact {
   id: string;
@@ -28,11 +19,7 @@ export default function ContactPanel() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchContacts();
-  }, []);
-
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     setIsLoading(true);
     try {
       const resp = await fetch("/api/contacts");
@@ -43,12 +30,17 @@ export default function ContactPanel() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const filteredContacts = contacts.filter(c => 
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.email?.toLowerCase().includes(search.toLowerCase()) ||
-    c.company?.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
+
+  const filteredContacts = contacts.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.email?.toLowerCase().includes(search.toLowerCase()) ||
+      c.company?.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -59,12 +51,13 @@ export default function ContactPanel() {
           <Users className="w-4 h-4 text-blue-400" />
           <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Address Book</h3>
         </div>
-        <button 
+        <button
+          type="button"
           onClick={fetchContacts}
           className="p-1.5 hover:bg-white/5 rounded-lg transition-colors text-gray-400 hover:text-white"
           disabled={isLoading}
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
         </button>
       </div>
 
@@ -96,8 +89,8 @@ export default function ContactPanel() {
             <p className="text-xs text-gray-400 mt-1">Try refreshing or changing your search</p>
           </div>
         ) : (
-          filteredContacts.map(contact => (
-            <div 
+          filteredContacts.map((contact) => (
+            <div
               key={contact.id}
               className="group flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/5"
             >
@@ -155,9 +148,7 @@ export default function ContactPanel() {
 
       {/* Footer Info */}
       <div className="p-3 bg-white/[0.01] border-top border-white/5">
-        <p className="text-xs text-gray-400 font-mono text-center">
-          Materialist Substrate Sync: Verified
-        </p>
+        <p className="text-xs text-gray-400 font-mono text-center">Materialist Substrate Sync: Verified</p>
       </div>
     </div>
   );

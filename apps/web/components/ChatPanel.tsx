@@ -1,14 +1,16 @@
 "use client";
 
-import { useRef, useEffect } from "react";
 import { useChat } from "@livekit/components-react";
 import { MessageSquare, Send } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 export default function ChatPanel() {
   const { chatMessages, send, isSending } = useChat();
   const listRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Scroll on new messages (chatMessages dep is the trigger by design).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on new messages intentionally
   useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
@@ -18,7 +20,7 @@ export default function ChatPanel() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const input = inputRef.current;
-    if (!input || !input.value.trim() || isSending) return;
+    if (!input?.value.trim() || isSending) return;
     const text = input.value.trim();
     input.value = "";
     await send(text);
@@ -29,32 +31,18 @@ export default function ChatPanel() {
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 px-2 py-2 border-b border-gray-700">
         <MessageSquare className="w-4 h-4 text-blue-500" />
-        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-          Chat
-        </span>
+        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Chat</span>
       </div>
-      <ul
-        ref={listRef}
-        className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0 font-mono text-sm"
-      >
-        {chatMessages.length === 0 && (
-          <li className="text-gray-400 text-center py-4">
-            No messages yet. Say hello!
-          </li>
-        )}
+      <ul ref={listRef} className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0 font-mono text-sm">
+        {chatMessages.length === 0 && <li className="text-gray-400 text-center py-4">No messages yet. Say hello!</li>}
         {chatMessages.map((msg) => (
           <li key={msg.id ?? msg.timestamp} className="break-words">
-            <span className="text-blue-400 font-medium">
-              {msg.from?.identity ?? "Unknown"}:
-            </span>{" "}
+            <span className="text-blue-400 font-medium">{msg.from?.identity ?? "Unknown"}:</span>{" "}
             <span className="text-gray-300">{msg.message}</span>
           </li>
         ))}
       </ul>
-      <form
-        onSubmit={handleSubmit}
-        className="p-2 border-t border-gray-700 flex gap-2"
-      >
+      <form onSubmit={handleSubmit} className="p-2 border-t border-gray-700 flex gap-2">
         <input
           ref={inputRef}
           type="text"
