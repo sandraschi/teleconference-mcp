@@ -71,7 +71,7 @@ export default function Sidebar({ onHelpClick }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-4">
+      <nav className="flex-1 py-4" data-testid="sidebar-nav">
         <ul className="space-y-1 px-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
