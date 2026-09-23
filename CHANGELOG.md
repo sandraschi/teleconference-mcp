@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] - 2026-09-23 LLM contract migration
+### Added (fleet canonical LLM stack)
+- Backend `/api/llm/*` + `/api/settings/llm*` REST on the Starlette parent:
+  providers (with live detection), models (with `key_missing`), test (no-save,
+  honest 401), settings get/post (BUG-043 `select:false`), key delete, chat +
+  SSE stream, onboarding, active pair, one-click install (+status).
+- `test_provider()` + `key_missing` flag in `llm_providers.py`; local base URLs
+  fixed to 127.0.0.1 (localhost trap: LM Studio 404s IPv6 localhost).
+- Frontend vendored from mcp-central-docs templates: `lib/llm.ts`, `LlmProviderCards`
+  (with `select:false` key saves), `LlmOnboarding` (banner under hero with red
+  `onboarding-cue` + full in settings), `PageLoading`, `LlmSettingsSection`
+  (active-pair row: `llm-provider-select`/`llm-model-select`), catch-all proxies
+  (`/api/llm/*`, `/api/settings/*` → :10887). Bespoke `LlmProviders.tsx` retired.
+- E2E: settings LLM section (pair selects + ollama card) green against live backend.
+
 ## [Unreleased] - 2026-09-23 assfix
 ### Fixed (fleet assfix, SOTA pass)
 - **Launcher**: `python -m teleconference_mcp --serve` now boots the dual-surface backend

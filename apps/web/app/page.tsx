@@ -12,6 +12,7 @@ import ChatPanel from "@/components/ChatPanel";
 import ContactPanel from "@/components/ContactPanel";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import FileSharingPanel from "@/components/FileSharingPanel";
+import { LlmOnboarding } from "@/components/LlmOnboarding";
 import LogViewer from "@/components/LogViewer";
 import { MeetingIntelligencePanel } from "@/components/MeetingIntelligencePanel";
 import ReconnectionBanner from "@/components/ReconnectionBanner";
@@ -22,7 +23,7 @@ import ScreenShareControl from "@/components/ScreenShareControl";
 import Topbar from "@/components/Topbar";
 import { useDiscovery } from "@/lib/discovery";
 import { usePreJoinValidation } from "@/lib/prejoin-validation";
-import { useSettings } from "@/lib/settings";
+import { DEFAULT_LIVEKIT_URL, useSettings } from "@/lib/settings";
 import { telemetry } from "@/lib/telemetry";
 
 interface TranscriptEntry {
@@ -50,7 +51,7 @@ export default function ModConsDashboard() {
   const hasAppliedRoomParam = useRef(false);
   const deviceValidation = usePreJoinValidation(settings);
 
-  const livekitUrl = discoveredUrl ?? settings.livekitUrl ?? "ws://localhost:15580";
+  const livekitUrl = discoveredUrl ?? settings.livekitUrl ?? DEFAULT_LIVEKIT_URL;
 
   useEffect(() => {
     setCurrentRoom(settings.defaultRoomName);
@@ -341,6 +342,9 @@ export default function ModConsDashboard() {
                       </a>
                       .
                     </p>
+                    <div className="mt-4 text-left">
+                      <LlmOnboarding mode="banner" />
+                    </div>
                   </div>
                   <div className="text-center">
                     <h2 className="text-xl font-semibold text-white mb-2">Join Conference</h2>

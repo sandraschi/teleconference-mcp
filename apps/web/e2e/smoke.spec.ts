@@ -91,4 +91,11 @@ test.describe("AG-Visio smoke", () => {
     await page.goto("/settings");
     await expect(page.getByRole("button", { name: /reset/i })).toBeVisible();
   });
+
+  test("settings LLM section shows active pair and provider cards", async ({ page }) => {
+    await page.goto("/settings");
+    await expect(page.getByTestId("llm-provider-select")).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId("llm-model-select")).toBeVisible();
+    await expect(page.getByTestId("llm-provider-card-ollama")).toBeVisible();
+  });
 });
