@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
 import { AccessToken } from "livekit-server-sdk";
-import { livekitApiKey, livekitApiSecret } from "@/lib/livekit-server";
+import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { livekitApiKey, livekitApiSecret } from "@/lib/livekit-server";
 
 export async function POST(request: NextRequest) {
   try {
     const session = process.env.AUTH_DISABLED === "true" ? null : await auth();
-    const { roomName, participantName } = await request.json() as {
+    const { roomName, participantName } = (await request.json()) as {
       roomName?: string;
       participantName?: string;
     };
 
-    if (!roomName || !roomName.trim()) {
+    if (!roomName?.trim()) {
       return NextResponse.json({ error: "roomName is required" }, { status: 400 });
     }
 
@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Could not determine identity" }, { status: 400 });
     }
 
-  const apiKey = livekitApiKey();
-  const apiSecret = livekitApiSecret();
+    const apiKey = livekitApiKey();
+    const apiSecret = livekitApiSecret();
 
     const at = new AccessToken(apiKey, apiSecret, {
       identity,
@@ -45,9 +45,6 @@ export async function POST(request: NextRequest) {
     // await serializes to {"token":{}} and every join 401s with [object Object].
     return NextResponse.json({ token: await at.toJwt() });
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Token generation failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : "Token generation failed" }, { status: 500 });
   }
 }

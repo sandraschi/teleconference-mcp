@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function AuthErrorPage() {
   return (
@@ -10,8 +10,7 @@ export default function AuthErrorPage() {
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
         <h1 className="text-xl font-semibold text-white">Authentication Error</h1>
         <p className="text-sm text-gray-400">
-          Could not sign in. This might be because the authentication provider is
-          not configured or unreachable.
+          Could not sign in. This might be because the authentication provider is not configured or unreachable.
         </p>
         <Link
           href="/auth/signin"

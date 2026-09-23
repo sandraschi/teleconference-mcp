@@ -1,9 +1,9 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { Loader2, Monitor } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Suspense } from "react";
-import { Monitor, Loader2 } from "lucide-react";
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -36,11 +36,13 @@ function SignInContent() {
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+        </div>
+      }
+    >
       <SignInContent />
     </Suspense>
   );

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { ArrowLeft, Download, File, Loader2, Paperclip, Upload } from "lucide-react";
 import Link from "next/link";
-import { ArrowLeft, Upload, Download, File, Paperclip, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface FileEntry {
   id: string;
@@ -20,7 +20,12 @@ function formatSize(bytes: number): string {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function FilesPage() {
@@ -36,13 +41,22 @@ export default function FilesPage() {
       const data: { files?: FileEntry[] } = await res.json();
       setFiles(data.files ?? []);
       // eslint-disable-next-line no-empty -- empty list state already renders below
-    } catch {} finally { setIsLoading(false); }
+    } catch {
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  useEffect(() => { loadFiles(); }, [loadFiles]);
+  useEffect(() => {
+    loadFiles();
+  }, [loadFiles]);
 
   const handleUpload = async (file: File) => {
-    if (file.size > 50 * 1024 * 1024) { setStatus("Max 50MB"); setTimeout(() => setStatus(null), 3000); return; }
+    if (file.size > 50 * 1024 * 1024) {
+      setStatus("Max 50MB");
+      setTimeout(() => setStatus(null), 3000);
+      return;
+    }
     setIsUploading(true);
     setStatus(`Uploading ${file.name}...`);
     try {
@@ -54,8 +68,12 @@ export default function FilesPage() {
       const entry: FileEntry = await res.json();
       setFiles((p) => [entry, ...p]);
       setStatus("Uploaded!");
-    } catch { setStatus("Failed"); }
-    finally { setIsUploading(false); setTimeout(() => setStatus(null), 2000); }
+    } catch {
+      setStatus("Failed");
+    } finally {
+      setIsUploading(false);
+      setTimeout(() => setStatus(null), 2000);
+    }
   };
 
   return (
@@ -63,23 +81,43 @@ export default function FilesPage() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white"><ArrowLeft className="w-4 h-4" />Back</Link>
+            <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white">
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Link>
             <h1 className="text-2xl font-bold">Files</h1>
           </div>
           <div className="flex items-center gap-2">
-            <input ref={inputRef} type="file" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); e.target.value = ""; }} className="hidden" />
-            <button type="button" onClick={() => inputRef.current?.click()} disabled={isUploading}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors">
+            <input
+              ref={inputRef}
+              type="file"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleUpload(f);
+                e.target.value = "";
+              }}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={isUploading}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
+            >
               {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               Upload
             </button>
           </div>
         </div>
 
-        {status && <div className="mb-4 px-4 py-2 bg-neutral-800 rounded-lg text-sm text-gray-300 text-center">{status}</div>}
+        {status && (
+          <div className="mb-4 px-4 py-2 bg-neutral-800 rounded-lg text-sm text-gray-300 text-center">{status}</div>
+        )}
 
         {isLoading ? (
-          <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-gray-500" /></div>
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+          </div>
         ) : files.length === 0 ? (
           <div className="text-center py-20 text-gray-500">
             <Paperclip className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -89,14 +127,23 @@ export default function FilesPage() {
         ) : (
           <div className="space-y-2">
             {files.map((f) => (
-              <div key={f.id} className="flex items-center gap-4 bg-neutral-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+              <div
+                key={f.id}
+                className="flex items-center gap-4 bg-neutral-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors"
+              >
                 <File className="w-6 h-6 text-blue-400 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{f.name}</p>
-                  <p className="text-xs text-gray-500">{formatSize(f.size)} &middot; {f.uploaded_by} &middot; {formatDate(f.uploaded_at)}</p>
+                  <p className="text-xs text-gray-500">
+                    {formatSize(f.size)} &middot; {f.uploaded_by} &middot; {formatDate(f.uploaded_at)}
+                  </p>
                 </div>
-                <a href={`/api/files/${f.id}`} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-xs font-medium transition-colors">
+                <a
+                  href={`/api/files/${f.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-xs font-medium transition-colors"
+                >
                   <Download className="w-3.5 h-3.5" /> Download
                 </a>
               </div>

@@ -9,16 +9,10 @@ export async function GET() {
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) {
-      return NextResponse.json(
-        { ok: false, error: `Ollama returned ${res.status}` },
-        { status: 200 }
-      );
+      return NextResponse.json({ ok: false, error: `Ollama returned ${res.status}` }, { status: 200 });
     }
     return NextResponse.json({ ok: true });
   } catch (e) {
-    return NextResponse.json(
-      { ok: false, error: e instanceof Error ? e.message : String(e) },
-      { status: 200 }
-    );
+    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : String(e) }, { status: 200 });
   }
 }
