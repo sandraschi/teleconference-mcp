@@ -1,0 +1,867 @@
+[
+  {
+    "tool": "conference_schedule",
+    "arguments": {
+      "title": "Sprint Planning",
+      "scheduled_at": "2026-10-01T14:00:00Z",
+      "organizer": "maria@example.com",
+      "description": "Sprint 42 planning",
+      "duration_min": 60,
+      "max_participants": 12
+    },
+    "description": "Schedule a sprint planning session",
+    "expected": "Entity dict with id/permalink, 201 on create"
+  },
+  {
+    "tool": "conference_schedule",
+    "arguments": {
+      "title": "Board Review",
+      "scheduled_at": "2026-10-15T09:00:00Z",
+      "organizer": "ceo@example.com",
+      "duration_min": 90,
+      "max_participants": 8
+    },
+    "description": "Schedule a board review",
+    "expected": "Entity dict with id/permalink"
+  },
+  {
+    "tool": "conference_schedule",
+    "arguments": {
+      "title": "Daily Standup",
+      "scheduled_at": "2026-10-01T14:00:00Z",
+      "organizer": "bot"
+    },
+    "description": "Minimal schedule call",
+    "expected": "Entity dict, defaults filled"
+  },
+  {
+    "tool": "conference_get",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001"
+    },
+    "description": "Fetch one conference",
+    "expected": "Entity dict or error dict"
+  },
+  {
+    "tool": "conference_get",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0002"
+    },
+    "description": "Fetch by UUID variant",
+    "expected": "Entity dict or error dict"
+  },
+  {
+    "tool": "conference_list",
+    "arguments": {
+      "status": "upcoming",
+      "after": "2026-10-01T00:00:00Z",
+      "before": "2026-11-01T00:00:00Z",
+      "limit": 20
+    },
+    "description": "List with filters",
+    "expected": "List of entity dicts"
+  },
+  {
+    "tool": "conference_list",
+    "arguments": {
+      "status": "",
+      "after": "",
+      "before": "",
+      "limit": 50
+    },
+    "description": "List everything",
+    "expected": "List of entity dicts"
+  },
+  {
+    "tool": "conference_update",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001",
+      "title": "Sprint Planning (moved)",
+      "scheduled_at": "2026-10-02T14:00:00Z"
+    },
+    "description": "Move a conference",
+    "expected": "Updated entity dict"
+  },
+  {
+    "tool": "conference_update",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001",
+      "description": "Now with backlog grooming"
+    },
+    "description": "Patch description",
+    "expected": "Updated entity dict"
+  },
+  {
+    "tool": "conference_cancel",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001"
+    },
+    "description": "Cancel, keep audit row",
+    "expected": "Cancelled entity dict"
+  },
+  {
+    "tool": "conference_cancel",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0009"
+    },
+    "description": "Cancel a no-show",
+    "expected": "Cancelled entity dict"
+  },
+  {
+    "tool": "conference_upcoming",
+    "arguments": {
+      "days": 7
+    },
+    "description": "Week view",
+    "expected": "List of upcoming conferences"
+  },
+  {
+    "tool": "conference_upcoming",
+    "arguments": {
+      "days": 1
+    },
+    "description": "Today view",
+    "expected": "List of upcoming conferences"
+  },
+  {
+    "tool": "participant_invite",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001",
+      "identity": "bob@example.com",
+      "display_name": "Bob",
+      "role": "PARTICIPANT"
+    },
+    "description": "Invite participant",
+    "expected": "List with invitation row"
+  },
+  {
+    "tool": "participant_invite",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001",
+      "identity": "ceo@example.com",
+      "display_name": "CEO",
+      "role": "HOST"
+    },
+    "description": "Invite host",
+    "expected": "List with invitation row"
+  },
+  {
+    "tool": "participant_invite",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001",
+      "identity": "auditor@example.com",
+      "role": "OBSERVER"
+    },
+    "description": "Invite observer",
+    "expected": "List with invitation row"
+  },
+  {
+    "tool": "participant_list_invited",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001"
+    },
+    "description": "List invitees",
+    "expected": "List of invitation dicts"
+  },
+  {
+    "tool": "participant_list_invited",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0002"
+    },
+    "description": "List invitees, other room",
+    "expected": "List of invitation dicts"
+  },
+  {
+    "tool": "participant_remove_invited",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0001",
+      "identity": "bob@example.com"
+    },
+    "description": "Uninvite",
+    "expected": "Updated invitation list"
+  },
+  {
+    "tool": "room_create",
+    "arguments": {
+      "name": "standup",
+      "max_participants": 20
+    },
+    "description": "Create standup room",
+    "expected": "Room dict with id/name"
+  },
+  {
+    "tool": "room_create",
+    "arguments": {
+      "name": "war-room",
+      "empty_timeout": 600,
+      "metadata": "{\"topic\":\"incident\"}"
+    },
+    "description": "Create incident room",
+    "expected": "Room dict with id/name"
+  },
+  {
+    "tool": "room_create",
+    "arguments": {
+      "name": "board-review",
+      "max_participants": 8,
+      "empty_timeout": 1800,
+      "metadata": "{}"
+    },
+    "description": "Create board room",
+    "expected": "Room dict with id/name"
+  },
+  {
+    "tool": "room_list",
+    "arguments": {
+      "filter_names": ""
+    },
+    "description": "List all rooms",
+    "expected": "List of room dicts"
+  },
+  {
+    "tool": "room_list",
+    "arguments": {
+      "filter_names": "standup,war-room"
+    },
+    "description": "Filtered list",
+    "expected": "List of room dicts"
+  },
+  {
+    "tool": "room_update_metadata",
+    "arguments": {
+      "name": "standup",
+      "metadata": "{\"topic\":\"sprint-42\"}"
+    },
+    "description": "Retitle live room",
+    "expected": "Updated room dict"
+  },
+  {
+    "tool": "room_update_metadata",
+    "arguments": {
+      "name": "war-room",
+      "metadata": "{\"severity\":\"P1\"}"
+    },
+    "description": "Tag incident room",
+    "expected": "Updated room dict"
+  },
+  {
+    "tool": "room_participant_list",
+    "arguments": {
+      "room_name": "standup"
+    },
+    "description": "Roll call",
+    "expected": "List of participant dicts"
+  },
+  {
+    "tool": "room_participant_list",
+    "arguments": {
+      "room_name": "war-room"
+    },
+    "description": "Roll call, incident",
+    "expected": "List of participant dicts"
+  },
+  {
+    "tool": "room_participant_kick",
+    "arguments": {
+      "room_name": "standup",
+      "identity": "zoombomber"
+    },
+    "description": "Eject disruptor",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_participant_kick",
+    "arguments": {
+      "room_name": "war-room",
+      "identity": "stale-bot"
+    },
+    "description": "Eject stale bot",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_participant_mute",
+    "arguments": {
+      "room_name": "standup",
+      "identity": "bob@example.com",
+      "muted": true
+    },
+    "description": "Mute noise",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_participant_mute",
+    "arguments": {
+      "room_name": "standup",
+      "identity": "bob@example.com",
+      "muted": false
+    },
+    "description": "Unmute",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_send_data",
+    "arguments": {
+      "room_name": "standup",
+      "data": "poll: ship Thursday? react now",
+      "destination_identities": ""
+    },
+    "description": "Broadcast nudge",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_send_data",
+    "arguments": {
+      "room_name": "war-room",
+      "data": "mitigation deployed, verify",
+      "destination_identities": "oncall"
+    },
+    "description": "Targeted nudge",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_delete",
+    "arguments": {
+      "name": "standup"
+    },
+    "description": "End for everyone",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_delete",
+    "arguments": {
+      "name": "test-room"
+    },
+    "description": "Delete test room",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "generate_meeting_summary",
+    "arguments": {
+      "room_name": "standup",
+      "transcript": "Alice: kicking off sprint planning. Bob: capacity is 6 points. DECISION: ship Thursday. Maria: I own the release notes."
+    },
+    "description": "Summarize + persist",
+    "expected": "{success, summary, room_name, persisted}"
+  },
+  {
+    "tool": "generate_meeting_summary",
+    "arguments": {
+      "room_name": "planning",
+      "transcript": "Maria: roadmap approved. Bob: hiring two backend engineers."
+    },
+    "description": "Summarize planning",
+    "expected": "{success, summary, room_name, persisted}"
+  },
+  {
+    "tool": "extract_action_items",
+    "arguments": {
+      "room_name": "standup",
+      "transcript": "Alice: kicking off sprint planning. Bob: capacity is 6 points. DECISION: ship Thursday. Maria: I own the release notes."
+    },
+    "description": "Action items with owners",
+    "expected": "List-ish dict, owners guessed"
+  },
+  {
+    "tool": "extract_action_items",
+    "arguments": {
+      "room_name": "war-room",
+      "transcript": "Oncall: rollback done. Maria: verify payments flow."
+    },
+    "description": "Incident actions",
+    "expected": "List-ish dict"
+  },
+  {
+    "tool": "set_translation_language",
+    "arguments": {
+      "language": "German"
+    },
+    "description": "Room default German",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "set_translation_language",
+    "arguments": {
+      "language": "Japanese"
+    },
+    "description": "Room default Japanese",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "inter_agent_ping",
+    "arguments": {
+      "target_agent": "ALL"
+    },
+    "description": "Presence broadcast",
+    "expected": "Signal confirmation string"
+  },
+  {
+    "tool": "inter_agent_ping",
+    "arguments": {
+      "target_agent": "scribe"
+    },
+    "description": "Handoff ping",
+    "expected": "Signal confirmation string"
+  },
+  {
+    "tool": "notify_conference_active",
+    "arguments": {
+      "room_id": "standup",
+      "participant_count": 6
+    },
+    "description": "Arm hooks on start",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "notify_conference_active",
+    "arguments": {
+      "room_id": "war-room",
+      "participant_count": 4
+    },
+    "description": "Arm hooks, incident",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "list_active_conferences",
+    "arguments": {},
+    "description": "Live rooms now",
+    "expected": "Dict of active conferences"
+  },
+  {
+    "tool": "list_active_conferences",
+    "arguments": {},
+    "description": "Pre-meeting check",
+    "expected": "Dict of active conferences"
+  },
+  {
+    "tool": "status",
+    "arguments": {},
+    "description": "One-line fleet verdict",
+    "expected": "{success, message, data{version, backend, health, livekit, remoting, frontend}}"
+  },
+  {
+    "tool": "status",
+    "arguments": {},
+    "description": "Pre-question paste",
+    "expected": "{success, message, data}"
+  },
+  {
+    "tool": "get_substrate_heartbeat",
+    "arguments": {},
+    "description": "Fast liveness",
+    "expected": "Heartbeat dict"
+  },
+  {
+    "tool": "get_substrate_heartbeat",
+    "arguments": {},
+    "description": "Monitoring tick",
+    "expected": "Heartbeat dict"
+  },
+  {
+    "tool": "get_dev_stats",
+    "arguments": {},
+    "description": "Repo + storage context",
+    "expected": "Multi-line git/storage report string"
+  },
+  {
+    "tool": "query_system_logs",
+    "arguments": {
+      "pattern": "ERROR.*livekit",
+      "limit": 10
+    },
+    "description": "Error hunt",
+    "expected": "Matching log entries"
+  },
+  {
+    "tool": "query_system_logs",
+    "arguments": {
+      "pattern": "StaleDataError",
+      "limit": 5
+    },
+    "description": "Race hunt",
+    "expected": "Matching log entries"
+  },
+  {
+    "tool": "sample_log_analysis",
+    "arguments": {
+      "pattern": "bind.*15580",
+      "iterations": 3
+    },
+    "description": "Iterative sampling",
+    "expected": "Analysis string"
+  },
+  {
+    "tool": "sample_log_analysis",
+    "arguments": {
+      "pattern": "timeout",
+      "iterations": 2
+    },
+    "description": "Timeout sampling",
+    "expected": "Analysis string"
+  },
+  {
+    "tool": "sample_system_forensics",
+    "arguments": {
+      "anomaly": "LiveKit server unreachable on port 15580"
+    },
+    "description": "LLM deep-dive",
+    "expected": "FORENSIC_REPORT string"
+  },
+  {
+    "tool": "sample_system_forensics",
+    "arguments": {
+      "anomaly": "Rooms empty but service up"
+    },
+    "description": "Ghost-room forensics",
+    "expected": "FORENSIC_REPORT string"
+  },
+  {
+    "tool": "orchestrate_industrial_diagnostics",
+    "arguments": {},
+    "description": "Full-stack sweep (slow, background it)",
+    "expected": "Diagnostics dict"
+  },
+  {
+    "tool": "orchestrate_remote_support",
+    "arguments": {
+      "action": "start"
+    },
+    "description": "Guided support start",
+    "expected": "{success, ...} or error dict"
+  },
+  {
+    "tool": "orchestrate_remote_support",
+    "arguments": {
+      "action": "status"
+    },
+    "description": "Support session status",
+    "expected": "{success, ...} or error dict"
+  },
+  {
+    "tool": "move_mouse",
+    "arguments": {
+      "x": 960,
+      "y": 540
+    },
+    "description": "Center cursor",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "move_mouse",
+    "arguments": {
+      "x": 100,
+      "y": 100
+    },
+    "description": "Corner cursor",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "click_mouse",
+    "arguments": {
+      "button": "left"
+    },
+    "description": "Left click",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "click_mouse",
+    "arguments": {
+      "button": "right"
+    },
+    "description": "Right click",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "type_text",
+    "arguments": {
+      "text": "hello world"
+    },
+    "description": "Type short string",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "type_text",
+    "arguments": {
+      "text": "https://example.com/room/standup"
+    },
+    "description": "Type a URL",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "press_key",
+    "arguments": {
+      "key": "Enter"
+    },
+    "description": "Press Enter",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "press_key",
+    "arguments": {
+      "key": "Escape"
+    },
+    "description": "Press Escape",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "screen_resolution",
+    "arguments": {},
+    "description": "Resolution first (multi-monitor offsets!)",
+    "expected": "Dict with width/height"
+  },
+  {
+    "tool": "screen_resolution",
+    "arguments": {},
+    "description": "Pre-click calibration",
+    "expected": "Dict with width/height"
+  },
+  {
+    "tool": "join_meeting",
+    "arguments": {
+      "room": "standup"
+    },
+    "description": "Sidecar joins",
+    "expected": "Result string/dict"
+  },
+  {
+    "tool": "join_meeting",
+    "arguments": {
+      "room": "war-room"
+    },
+    "description": "Sidecar joins incident",
+    "expected": "Result string/dict"
+  },
+  {
+    "tool": "leave_meeting",
+    "arguments": {},
+    "description": "Leave + stop tracks (never orphan loops)",
+    "expected": "Result string"
+  },
+  {
+    "tool": "leave_meeting",
+    "arguments": {},
+    "description": "End publishing",
+    "expected": "Result string"
+  },
+  {
+    "tool": "get_status",
+    "arguments": {},
+    "description": "Room? publishing?",
+    "expected": "Status dict"
+  },
+  {
+    "tool": "get_status",
+    "arguments": {},
+    "description": "Pre-flight check",
+    "expected": "Status dict"
+  },
+  {
+    "tool": "conference_schedule",
+    "arguments": {
+      "title": "Retro",
+      "scheduled_at": "2026-10-03T15:00:00Z",
+      "organizer": "maria@example.com",
+      "duration_min": 45
+    },
+    "description": "Schedule retro",
+    "expected": "Entity dict"
+  },
+  {
+    "tool": "conference_list",
+    "arguments": {
+      "status": "done",
+      "after": "2026-09-01T00:00:00Z",
+      "before": "2026-10-01T00:00:00Z",
+      "limit": 100
+    },
+    "description": "History page",
+    "expected": "List of entity dicts"
+  },
+  {
+    "tool": "conference_update",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0002",
+      "max_participants": 100
+    },
+    "description": "Raise cap",
+    "expected": "Updated entity dict"
+  },
+  {
+    "tool": "conference_cancel",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0003"
+    },
+    "description": "Cancel single",
+    "expected": "Cancelled entity dict"
+  },
+  {
+    "tool": "conference_upcoming",
+    "arguments": {
+      "days": 30
+    },
+    "description": "Month view",
+    "expected": "List of upcoming conferences"
+  },
+  {
+    "tool": "participant_invite",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0002",
+      "identity": "guest@example.com",
+      "display_name": "Guest"
+    },
+    "description": "Invite with defaults",
+    "expected": "List with invitation row"
+  },
+  {
+    "tool": "participant_list_invited",
+    "arguments": {
+      "conference_id": "c0nference-uuid-0003"
+    },
+    "description": "Third room roll",
+    "expected": "List of invitation dicts"
+  },
+  {
+    "tool": "room_create",
+    "arguments": {
+      "name": "retro",
+      "max_participants": 15
+    },
+    "description": "Retro room",
+    "expected": "Room dict"
+  },
+  {
+    "tool": "room_list",
+    "arguments": {
+      "filter_names": "retro"
+    },
+    "description": "Single filter",
+    "expected": "List of room dicts"
+  },
+  {
+    "tool": "room_participant_list",
+    "arguments": {
+      "room_name": "retro"
+    },
+    "description": "Retro roll",
+    "expected": "List of participant dicts"
+  },
+  {
+    "tool": "room_send_data",
+    "arguments": {
+      "room_name": "retro",
+      "data": "retro board: go wild",
+      "destination_identities": ""
+    },
+    "description": "Retro nudge",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "room_delete",
+    "arguments": {
+      "name": "retro"
+    },
+    "description": "Cleanup",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "generate_meeting_summary",
+    "arguments": {
+      "room_name": "retro",
+      "transcript": "Maria: went well. Bob: deploy pipeline slow."
+    },
+    "description": "Retro summary",
+    "expected": "{success, summary, room_name, persisted}"
+  },
+  {
+    "tool": "extract_action_items",
+    "arguments": {
+      "room_name": "retro",
+      "transcript": "Maria: fix pipeline. Bob: own it by Friday."
+    },
+    "description": "Retro actions",
+    "expected": "List-ish dict"
+  },
+  {
+    "tool": "set_translation_language",
+    "arguments": {
+      "language": "Spanish"
+    },
+    "description": "Spanish default",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "inter_agent_ping",
+    "arguments": {
+      "target_agent": "recorder"
+    },
+    "description": "Recorder ping",
+    "expected": "Signal confirmation string"
+  },
+  {
+    "tool": "notify_conference_active",
+    "arguments": {
+      "room_id": "retro",
+      "participant_count": 8
+    },
+    "description": "Retro start",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "query_system_logs",
+    "arguments": {
+      "pattern": "WARN.*token",
+      "limit": 20
+    },
+    "description": "Token warnings",
+    "expected": "Matching log entries"
+  },
+  {
+    "tool": "sample_log_analysis",
+    "arguments": {
+      "pattern": "Room .* created",
+      "iterations": 1
+    },
+    "description": "Creation trace",
+    "expected": "Analysis string"
+  },
+  {
+    "tool": "move_mouse",
+    "arguments": {
+      "x": 1920,
+      "y": 540
+    },
+    "description": "Second monitor",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "click_mouse",
+    "arguments": {
+      "button": "middle"
+    },
+    "description": "Middle click",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "type_text",
+    "arguments": {
+      "text": "standup-2026-10-01"
+    },
+    "description": "Type slug",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "press_key",
+    "arguments": {
+      "key": "Tab"
+    },
+    "description": "Press Tab",
+    "expected": "Result dict"
+  },
+  {
+    "tool": "join_meeting",
+    "arguments": {
+      "room": "retro"
+    },
+    "description": "Join retro",
+    "expected": "Result string/dict"
+  }
+]
