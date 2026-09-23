@@ -5,6 +5,7 @@ Screen capture, mouse/keyboard injection, and LiveKit screen publishing.
 
 import asyncio
 import logging
+import os
 from typing import Annotated, Literal
 
 import mss
@@ -184,7 +185,7 @@ async def publish_screen_loop(video_source: rtc.VideoSource):
             )
             video_source.capture_frame(frame)
         except Exception as e:
-            logger.error(f"Screen capture frame error: {e}")
+            logger.exception(f"Screen capture frame error: {e}")
 
         elapsed = asyncio.get_event_loop().time() - loop_start
         sleep_time = max(0, frame_interval - elapsed)
@@ -275,4 +276,8 @@ def get_status(ctx: Context) -> dict:
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    # Port from env (default 11069, fleet-registered). NEVER 10725 (mcp-studio)
+    # and never the FastMCP SSE default 8000 (fleet forbidden range).
+    _port = int(os.environ.get("REMOTING_PORT", "11069"))
+    _host = os.environ.get("REMOTING_HOST", "127.0.0.1")
+    mcp.run(transport="sse", host=_host, port=_port)

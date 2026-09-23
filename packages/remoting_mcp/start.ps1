@@ -9,11 +9,13 @@ $WindowStyle = if ($Headless) { 'Hidden' } else { 'Normal' }
 # ------------------------------
 
 # SOTA 2026: remoting-mcp startup
-# Standardized port: 10725
+# Fleet-registered port: 11069 (WEBAPP_PORTS.md). Was 10725 (mcp-studio's port -
+# this script used to kill mcp-studio's process!) and the server itself bound the
+# forbidden FastMCP SSE default 8000. Both fixed 2026-09-23.
 # ---------------------------------------------------------------------------
 
-$PORT = 10725
-$HOST = "0.0.0.0"
+$PORT = 11069
+$HOST = "127.0.0.1"
 
 # 1. Kill existing squatters
 $zombies = Get-NetTCPConnection -LocalPort $PORT -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
@@ -30,8 +32,10 @@ if (-not (Test-Path ".venv")) {
     ./.venv/Scripts/python -m pip install -r requirements.txt
 }
 
-# 3. Start FastMCP on port 10725 (SSE)
-Write-Host "Targeting Port Substrate 10725..." -ForegroundColor Cyan
+# 3. Start FastMCP SSE on the registered port
+Write-Host "Targeting Port Substrate $PORT..." -ForegroundColor Cyan
+$env:REMOTING_PORT = "$PORT"
+$env:REMOTING_HOST = $HOST
 ./.venv/Scripts/python mcp_server.py
 
 

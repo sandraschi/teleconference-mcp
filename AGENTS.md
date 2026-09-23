@@ -7,7 +7,7 @@ You are working on **Teleconference MCP**, a self-hosted video conferencing plat
 - `teleconference_mcp/` — Entry point & health utilities
 - `apps/agent/` — Visio AI voice agent (Python, livekit-agents)
 - `apps/web/` — Next.js 16 dashboard (port 10886)
-- `packages/conferencing_mcp/` — FastMCP 3.2 server with 25 tools in 5 modules (`tools/`)
+- `packages/conferencing_mcp/` — FastMCP 3.4 server with 31 tools in 5 modules (`tools/`)
 - `packages/remoting_mcp/` — Screen capture + input injection MCP server
 - `tests/` — Python pytest suite (95 tests)
 - `mcp-central-docs/` — Fleet central docs (sibling repo)
@@ -19,7 +19,7 @@ You are working on **Teleconference MCP**, a self-hosted video conferencing plat
 - All tools accept `ctx: Context` for correlation_id logging
 - Test tools with pytest-asyncio, mock `ctx` via `mock_ctx` fixture in conftest
 - Use `cid(ctx)` helper (imported from mcp_server) instead of `getattr(ctx, "correlation_id", "GLOBAL")`
-- Port registry: 10886 (web frontend), 10887 (conferencing backend / FastMCP HTTP), 10891 (health/metrics), 10725 (remoting). NOT 10720/10721 (calibre-mcp) nor 10888 (myai).
+- Port registry: 10886 (web frontend), 10887 (conferencing backend / FastMCP HTTP), 10891 (health/metrics), 11069 (remoting SSE). NOT 10720/10721 (calibre-mcp) nor 10888 (myai). Remoting was moved off 10725 (mcp-studio) on 2026-09-23.
 
 ## Key Files
 - `tests/conftest.py` — Shared fixtures (mock_ctx, mock_livekit_api, temp_conference_db, mock_subprocess)
