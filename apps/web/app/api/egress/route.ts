@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { EgressClient, EncodedFileOutput, EncodedFileType, RoomServiceClient } from "livekit-server-sdk";
+import { type NextRequest, NextResponse } from "next/server";
 import { livekitApiKey, livekitApiSecret, livekitHttpUrl } from "@/lib/livekit-server";
 
 function roomClient(): RoomServiceClient {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         new EncodedFileOutput({
           fileType: EncodedFileType.MP4,
           filepath: `recordings/${roomName}-{time}.mp4`,
-        })
+        }),
       );
       return NextResponse.json({
         status: "recording_started",
@@ -62,14 +62,11 @@ export async function POST(request: NextRequest) {
         {
           error: `Egress start failed: ${msg}. Configure file/S3 output on the LiveKit server.`,
         },
-        { status: 502 }
+        { status: 502 },
       );
     }
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : String(e) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
   }
 }
 
@@ -85,7 +82,7 @@ export async function GET(request: NextRequest) {
             started_at: new Date(Number(e.startedAt) / 1_000_000).toISOString(),
             duration_sec: Math.max(
               0,
-              Math.round((Number(e.endedAt || BigInt(Date.now() * 1_000_000)) - Number(e.startedAt)) / 1_000_000_000)
+              Math.round((Number(e.endedAt || BigInt(Date.now() * 1_000_000)) - Number(e.startedAt)) / 1_000_000_000),
             ),
             status: e.status === 3 ? "completed" : e.status >= 4 ? "failed" : "recording",
             url: e.fileResults?.[0]?.location,
@@ -108,9 +105,6 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : String(e) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
   }
 }

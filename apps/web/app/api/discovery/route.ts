@@ -1,14 +1,9 @@
 import { RoomServiceClient } from "livekit-server-sdk";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { livekitApiKey, livekitApiSecret } from "@/lib/livekit-server";
 
 const FALLBACK_PORT = 15580; // fleet SFU port (upstream LiveKit default is 7880);
-const DEFAULT_ROOMS = [
-  "ag-visio-conference",
-  "development",
-  "testing",
-  "demo",
-];
+const DEFAULT_ROOMS = ["ag-visio-conference", "development", "testing", "demo"];
 
 function isLocalOrPrivate(hostname: string): boolean {
   if (hostname === "localhost" || hostname === "127.0.0.1") return true;
@@ -42,9 +37,7 @@ export async function GET(request: NextRequest) {
     const activeRooms = await roomService.listRooms();
 
     const activeNames = activeRooms.map((r) => r.name);
-    const suggestedRooms = [
-      ...new Set([...DEFAULT_ROOMS, ...activeNames]),
-    ];
+    const suggestedRooms = [...new Set([...DEFAULT_ROOMS, ...activeNames])];
 
     return NextResponse.json({
       livekitUrl,

@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { EgressClient, EncodedFileOutput, EncodedFileType, RoomServiceClient } from "livekit-server-sdk";
+import { type NextRequest, NextResponse } from "next/server";
 import { livekitApiKey, livekitApiSecret, livekitHttpUrl } from "@/lib/livekit-server";
 
 const url = () => livekitHttpUrl();
@@ -20,14 +20,14 @@ export async function POST(request: NextRequest) {
         new EncodedFileOutput({
           fileType: EncodedFileType.MP4,
           filepath: `recordings/${roomName}-{time}.mp4`,
-        })
+        }),
       );
       return NextResponse.json({ status: "recording_started", room_name: roomName, egress_id: info.egressId });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       return NextResponse.json(
         { error: `Egress start failed: ${msg}. Configure file/S3 output on the LiveKit server.` },
-        { status: 502 }
+        { status: 502 },
       );
     }
   } catch (e) {

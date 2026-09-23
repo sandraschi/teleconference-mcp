@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { EgressClient } from "livekit-server-sdk";
+import { type NextRequest, NextResponse } from "next/server";
 import { livekitApiKey, livekitApiSecret, livekitHttpUrl } from "@/lib/livekit-server";
 
 export async function POST(request: NextRequest) {
