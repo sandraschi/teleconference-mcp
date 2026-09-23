@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Play, Square, Clock, Calendar, Monitor, Loader2 } from "lucide-react";
+import { ArrowLeft, Play, Clock, Calendar, Monitor, Loader2 } from "lucide-react";
 
 interface Recording {
   id: string;
