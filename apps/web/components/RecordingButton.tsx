@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Circle, Square, Loader2 } from "lucide-react";
 import { useRoomContext } from "@livekit/components-react";
+import { Circle, Loader2, Square } from "lucide-react";
+import { useCallback, useState } from "react";
 
 export default function RecordingButton() {
   const room = useRoomContext();

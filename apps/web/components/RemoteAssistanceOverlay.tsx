@@ -1,9 +1,9 @@
 "use client";
 
 import { useRoomContext } from "@livekit/components-react";
-import { RoomEvent, type RemoteParticipant } from "livekit-client";
+import { type RemoteParticipant, RoomEvent } from "livekit-client";
+import { ChevronRight, Monitor, Shield, ShieldAlert, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Shield, ShieldAlert, X, Monitor, ChevronRight } from "lucide-react";
 
 export default function RemoteAssistanceOverlay() {
   const room = useRoomContext();
@@ -65,14 +65,14 @@ export default function RemoteAssistanceOverlay() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-white tracking-tight">Active Remote Request</h3>
-              <p className="text-xs text-blue-400/70 font-mono uppercase tracking-widest">{request.sender} is asking for control</p>
+              <p className="text-xs text-blue-400/70 font-mono uppercase tracking-widest">
+                {request.sender} is asking for control
+              </p>
             </div>
           </div>
 
           <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/5">
-            <p className="text-sm text-gray-300 leading-relaxed italic">
-              &ldquo;{request.reason}&rdquo;
-            </p>
+            <p className="text-sm text-gray-300 leading-relaxed italic">&ldquo;{request.reason}&rdquo;</p>
           </div>
 
           <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/5 flex items-center gap-3">
@@ -87,6 +87,7 @@ export default function RemoteAssistanceOverlay() {
 
           <div className="flex gap-3 mt-8">
             <button
+              type="button"
               onClick={() => setRequest(null)}
               className="px-6 py-3 flex-1 bg-neutral-800 hover:bg-neutral-700 text-gray-300 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
             >
@@ -94,6 +95,7 @@ export default function RemoteAssistanceOverlay() {
               Decline
             </button>
             <button
+              type="button"
               onClick={handleGrant}
               disabled={isSending}
               className="px-6 py-3 flex-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Room } from "livekit-client";
-import { Brain, ListTodo, FileText, Zap } from "lucide-react";
+import type { Room } from "livekit-client";
+import { Brain, FileText, ListTodo, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface IntelligenceItem {
   type: "summary" | "action_items";
@@ -32,7 +32,7 @@ export const MeetingIntelligencePanel = ({ room }: { room: Room }) => {
         } else if (data.type === "intelligence_busy") {
           setIsAnalyzing(true);
         }
-      // eslint-disable-next-line no-empty -- non-JSON packets belong to other features
+        // eslint-disable-next-line no-empty -- non-JSON packets belong to other features
       } catch {}
     };
 
@@ -62,28 +62,20 @@ export const MeetingIntelligencePanel = ({ room }: { room: Room }) => {
           <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-2 opacity-70">
             <Brain className="w-12 h-12 mb-2" />
             <p className="text-sm">No intelligence captured yet.</p>
-            <p className="text-xs text-center px-4">
-              Visio is listening for key insights and action items.
-            </p>
+            <p className="text-xs text-center px-4">Visio is listening for key insights and action items.</p>
           </div>
         ) : (
-          items.map((item, i) => (
+          items.map((item) => (
             <div
-              key={i}
+              key={`${item.timestamp}-${item.type}-${item.content.length}`}
               className="bg-slate-800/80 rounded-xl p-4 border border-slate-700/50 shadow-xl transition-all hover:scale-[1.02] hover:bg-slate-800"
             >
               <div className="flex items-center gap-2 mb-2 text-xs font-medium uppercase tracking-wider text-indigo-300">
-                {item.type === "summary" ? (
-                  <FileText className="w-3 h-3" />
-                ) : (
-                  <ListTodo className="w-3 h-3" />
-                )}
+                {item.type === "summary" ? <FileText className="w-3 h-3" /> : <ListTodo className="w-3 h-3" />}
                 <span>{item.type.replace("_", " ")}</span>
                 <span className="ml-auto text-slate-300 font-normal">{item.timestamp}</span>
               </div>
-              <div className="text-sm leading-relaxed whitespace-pre-wrap text-slate-300">
-                {item.content}
-              </div>
+              <div className="text-sm leading-relaxed whitespace-pre-wrap text-slate-300">{item.content}</div>
             </div>
           ))
         )}
@@ -91,11 +83,12 @@ export const MeetingIntelligencePanel = ({ room }: { room: Room }) => {
 
       <div className="p-4 border-t border-slate-700/50 bg-slate-950/30">
         <button
+          type="button"
           onClick={() => {
             // Trigger manual intelligence pull if needed
             room.localParticipant.publishData(
               new TextEncoder().encode(JSON.stringify({ type: "request_intelligence" })),
-              { reliable: true }
+              { reliable: true },
             );
           }}
           className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20"

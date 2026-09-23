@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * LLM provider cards (vendored arxiv-mcp pilot pattern).
@@ -8,8 +8,7 @@ import { useState, useEffect, useCallback } from "react";
  * never talks to providers directly and never sees key bytes.
  */
 
-const BACKEND =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:10891";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:10891";
 
 interface Provider {
   id: string;
@@ -135,8 +134,8 @@ export default function LlmProviders() {
   if (backendUp === false) {
     return (
       <p className="text-sm text-yellow-500">
-        Backend unreachable at {BACKEND} — start it with <code className="bg-neutral-800 px-1 rounded">.\start.ps1 all</code> to
-        manage LLM providers.
+        Backend unreachable at {BACKEND} — start it with{" "}
+        <code className="bg-neutral-800 px-1 rounded">.\start.ps1 all</code> to manage LLM providers.
       </p>
     );
   }
@@ -178,6 +177,7 @@ export default function LlmProviders() {
             className="flex-1 px-3 py-1.5 bg-neutral-900 border border-gray-700 rounded text-sm text-white placeholder-gray-500"
           />
           <button
+            type="button"
             onClick={() => saveKey(p.id)}
             disabled={busy[p.id] || !(keys[p.id] || "").trim()}
             className="px-3 py-1.5 bg-blue-700 hover:bg-blue-600 rounded text-sm disabled:opacity-50"
@@ -186,6 +186,7 @@ export default function LlmProviders() {
           </button>
           {p.configured && (
             <button
+              type="button"
               onClick={() => clearKey(p.id)}
               disabled={busy[p.id]}
               className="px-3 py-1.5 bg-neutral-700 hover:bg-neutral-600 rounded text-sm disabled:opacity-50"
@@ -197,6 +198,7 @@ export default function LlmProviders() {
       )}
       <div className="flex items-center gap-2 mt-2">
         <button
+          type="button"
           data-testid={`llm-test-${p.id}`}
           onClick={() => testProvider(p.id)}
           disabled={busy[p.id]}
@@ -247,8 +249,8 @@ export default function LlmProviders() {
       <h3 className="text-sm font-semibold text-gray-300 mt-4 mb-2">Cloud APIs</h3>
       <div className="grid gap-3 md:grid-cols-2">{clouds.map(card)}</div>
       <p className="text-xs text-gray-500 mt-3">
-        Keys are stored in a 0600 keystore on the backend (or env vars, which win) and never
-        shown again. The browser never contacts providers directly.
+        Keys are stored in a 0600 keystore on the backend (or env vars, which win) and never shown again. The browser
+        never contacts providers directly.
       </p>
     </div>
   );
