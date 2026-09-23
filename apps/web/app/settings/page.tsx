@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import {
-  Save,
-  RotateCcw,
-  Server,
-  Mic,
-  Video,
-  Volume2,
-  Palette,
-  Shield,
   CheckCircle,
   Cpu,
   Download,
-  Loader2,
   ExternalLink,
+  Loader2,
+  Mic,
+  Palette,
+  RotateCcw,
+  Save,
+  Server,
+  Shield,
+  Video,
+  Volume2,
 } from "lucide-react";
-import { useSettings, getMediaDevices, DEFAULT_LIVEKIT_URL, type AppSettings } from "@/lib/settings";
+import { useCallback, useEffect, useState } from "react";
 import LlmProviders from "@/components/LlmProviders";
 import Toggle from "@/components/ui/Toggle";
+import { type AppSettings, DEFAULT_LIVEKIT_URL, getMediaDevices, useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
 interface MediaDevices {
@@ -183,12 +183,11 @@ export default function SettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Settings</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Configure your AG-Visio experience
-          </p>
+          <p className="text-gray-500 text-sm mt-1">Configure your AG-Visio experience</p>
         </div>
         <div className="flex gap-2">
           <button
+            type="button"
             data-testid="settings-reset"
             onClick={handleReset}
             className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
@@ -197,13 +196,12 @@ export default function SettingsPage() {
             Reset
           </button>
           <button
+            type="button"
             data-testid="settings-save"
             onClick={handleSave}
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
-              isSaved
-                ? "bg-green-600 text-white"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+              isSaved ? "bg-green-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white",
             )}
           >
             {isSaved ? (
@@ -228,22 +226,19 @@ export default function SettingsPage() {
             <Server className="w-5 h-5 text-blue-500" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-white">
-              LiveKit Configuration
-            </h2>
-            <p className="text-gray-500 text-sm">
-              Connection settings for the real-time server
-            </p>
+            <h2 className="text-lg font-semibold text-white">LiveKit Configuration</h2>
+            <p className="text-gray-500 text-sm">Connection settings for the real-time server</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="settings-livekit-url" className="block text-sm font-medium text-gray-300 mb-2">
               LiveKit Server URL
             </label>
             <input
               type="text"
+              id="settings-livekit-url"
               data-testid="settings-livekit-url"
               value={localSettings.livekitUrl}
               onChange={(e) => updateLocal("livekitUrl", e.target.value)}
@@ -251,26 +246,24 @@ export default function SettingsPage() {
               className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Override for LiveKit server. When discovery is available, the server
-              is auto-detected from your connection (works when joining from
-              another device on the same network).
+              Override for LiveKit server. When discovery is available, the server is auto-detected from your connection
+              (works when joining from another device on the same network).
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="settings-room" className="block text-sm font-medium text-gray-300 mb-2">
               Default Room Name
             </label>
             <input
               type="text"
+              id="settings-room"
               value={localSettings.defaultRoomName}
               onChange={(e) => updateLocal("defaultRoomName", e.target.value)}
               placeholder="ag-visio-conference"
               className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Room name used when joining a conference
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Room name used when joining a conference</p>
           </div>
         </div>
       </section>
@@ -316,7 +309,8 @@ export default function SettingsPage() {
 
           {!ollamaOk && (
             <div className="rounded-lg bg-amber-900/20 border border-amber-800/50 p-4 text-sm text-amber-200">
-              Ollama is not running. Start it on your PC (e.g. <code className="bg-neutral-800 px-1 rounded">ollama serve</code>) or install it.
+              Ollama is not running. Start it on your PC (e.g.{" "}
+              <code className="bg-neutral-800 px-1 rounded">ollama serve</code>) or install it.
               <a
                 href="https://ollama.com/download"
                 target="_blank"
@@ -331,9 +325,7 @@ export default function SettingsPage() {
           {ollamaOk && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Installed models
-                </label>
+                <p className="block text-sm font-medium text-gray-300 mb-2">Installed models</p>
                 <div className="flex items-center gap-2 mb-2">
                   <button
                     type="button"
@@ -356,12 +348,13 @@ export default function SettingsPage() {
                 </ul>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="settings-pull-model" className="block text-sm font-medium text-gray-300 mb-2">
                   Load (pull) a model
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
+                    id="settings-pull-model"
                     value={ollamaPullName}
                     onChange={(e) => setOllamaPullName(e.target.value)}
                     placeholder="e.g. gemma2, llama3.2"
@@ -373,20 +366,12 @@ export default function SettingsPage() {
                     disabled={ollamaPulling || !ollamaPullName.trim()}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none text-white rounded-lg transition-colors"
                   >
-                    {ollamaPulling ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Download className="w-4 h-4" />
-                    )}
+                    {ollamaPulling ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                     Load
                   </button>
                 </div>
-                {ollamaPullProgress && (
-                  <p className="text-sm text-gray-400 mt-2">{ollamaPullProgress}</p>
-                )}
-                {ollamaPullError && (
-                  <p className="text-sm text-red-400 mt-2">{ollamaPullError}</p>
-                )}
+                {ollamaPullProgress && <p className="text-sm text-gray-400 mt-2">{ollamaPullProgress}</p>}
+                {ollamaPullError && <p className="text-sm text-red-400 mt-2">{ollamaPullError}</p>}
                 <p className="text-xs text-gray-500 mt-2">
                   Agent uses OLLAMA_MODEL (e.g. gemma2); set in agent env or docker-compose.
                 </p>
@@ -420,15 +405,12 @@ export default function SettingsPage() {
               <Mic className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">
-                Audio & Video Devices
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Select your preferred input/output devices
-              </p>
+              <h2 className="text-lg font-semibold text-white">Audio & Video Devices</h2>
+              <p className="text-gray-500 text-sm">Select your preferred input/output devices</p>
             </div>
           </div>
           <button
+            type="button"
             onClick={loadDevices}
             disabled={isLoadingDevices}
             className="px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 text-gray-300 rounded-lg transition-colors disabled:opacity-50"
@@ -439,11 +421,12 @@ export default function SettingsPage() {
 
         <div className="space-y-4">
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="settings-mic" className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
               <Mic className="w-4 h-4" />
               Microphone
             </label>
             <select
+              id="settings-mic"
               value={localSettings.preferredAudioInput}
               onChange={(e) => updateLocal("preferredAudioInput", e.target.value)}
               className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
@@ -459,11 +442,12 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="settings-camera" className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
               <Video className="w-4 h-4" />
               Camera
             </label>
             <select
+              id="settings-camera"
               value={localSettings.preferredVideoInput}
               onChange={(e) => updateLocal("preferredVideoInput", e.target.value)}
               className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
@@ -479,11 +463,15 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+            <label
+              htmlFor="settings-speaker"
+              className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2"
+            >
               <Volume2 className="w-4 h-4" />
               Speaker
             </label>
             <select
+              id="settings-speaker"
               value={localSettings.preferredAudioOutput}
               onChange={(e) => updateLocal("preferredAudioOutput", e.target.value)}
               className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
@@ -500,9 +488,9 @@ export default function SettingsPage() {
         </div>
 
         {devices.audioInputs.length === 0 && (
-          <p className="text-xs text-gray-500 mt-4">
-            Click &quot;Detect Devices&quot; to load available audio/video devices. You may
-            need to grant browser permissions.
+          <p className="text-xs text-gray-400 mt-4">
+            Click &quot;Detect Devices&quot; to load available audio/video devices. You may need to grant browser
+            permissions.
           </p>
         )}
       </section>
@@ -515,35 +503,30 @@ export default function SettingsPage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white">Appearance</h2>
-            <p className="text-gray-500 text-sm">
-              Customize the look and feel
-            </p>
+            <p className="text-gray-500 text-sm">Customize the look and feel</p>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Theme
-          </label>
+          <p className="block text-sm font-medium text-gray-300 mb-2">Theme</p>
           <div className="flex gap-2">
             {(["dark", "light", "system"] as const).map((theme) => (
               <button
+                type="button"
                 key={theme}
                 onClick={() => updateLocal("theme", theme)}
                 className={cn(
                   "px-4 py-2 rounded-lg capitalize transition-colors",
                   localSettings.theme === theme
                     ? "bg-blue-600 text-white"
-                    : "bg-neutral-800 text-gray-400 hover:text-white"
+                    : "bg-neutral-800 text-gray-400 hover:text-white",
                 )}
               >
                 {theme}
               </button>
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            System uses your OS preference when set to system.
-          </p>
+          <p className="text-xs text-gray-500 mt-2">System uses your OS preference when set to system.</p>
         </div>
       </section>
 
@@ -555,9 +538,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white">Privacy</h2>
-            <p className="text-gray-500 text-sm">
-              Control data collection and privacy settings
-            </p>
+            <p className="text-gray-500 text-sm">Control data collection and privacy settings</p>
           </div>
         </div>
 
@@ -581,9 +562,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <span className="text-gray-500">Environment:</span>
-            <span className="text-gray-300 ml-2">
-              {process.env.NODE_ENV || "development"}
-            </span>
+            <span className="text-gray-300 ml-2">{process.env.NODE_ENV || "development"}</span>
           </div>
           <div>
             <span className="text-gray-400">LiveKit URL:</span>

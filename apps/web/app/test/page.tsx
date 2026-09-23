@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Video, VideoOff, Mic, MicOff, Volume2, VolumeX, ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft, CheckCircle2, Mic, MicOff, Video, VideoOff, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { telemetry } from "@/lib/telemetry";
+import { cn } from "@/lib/utils";
 
 interface DeviceInfo {
   deviceId: string;
@@ -52,23 +52,28 @@ export default function VideoTestPage() {
     checkLevel();
   }, []);
 
-  const setupAudioMonitoring = useCallback((stream: MediaStream) => {
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    const microphone = audioContext.createMediaStreamSource(stream);
+  const setupAudioMonitoring = useCallback(
+    (stream: MediaStream) => {
+      const audioContext = new AudioContext();
+      const analyser = audioContext.createAnalyser();
+      const microphone = audioContext.createMediaStreamSource(stream);
 
-    analyser.fftSize = 256;
-    microphone.connect(analyser);
+      analyser.fftSize = 256;
+      microphone.connect(analyser);
 
-    audioContextRef.current = audioContext;
-    analyserRef.current = analyser;
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
 
-    monitorAudioLevel();
-  }, [monitorAudioLevel]);
+      monitorAudioLevel();
+    },
+    [monitorAudioLevel],
+  );
 
   const cleanupMedia = useCallback(() => {
     if (mediaStream) {
-      mediaStream.getTracks().forEach(track => track.stop());
+      mediaStream.getTracks().forEach((track) => {
+        track.stop();
+      });
       setMediaStream(null);
     }
 
@@ -84,7 +89,7 @@ export default function VideoTestPage() {
 
     analyserRef.current = null;
     setAudioLevel(0);
-  }, [mediaStream, setMediaStream, setAudioLevel]);
+  }, [mediaStream]);
 
   const loadDevices = useCallback(async () => {
     try {
@@ -93,23 +98,29 @@ export default function VideoTestPage() {
 
       const devices = await navigator.mediaDevices.enumerateDevices();
 
-      const videoDevs = devices.filter(d => d.kind === "videoinput").map(d => ({
-        deviceId: d.deviceId,
-        label: d.label || `Camera ${d.deviceId.slice(0, 5)}`,
-        kind: d.kind,
-      }));
+      const videoDevs = devices
+        .filter((d) => d.kind === "videoinput")
+        .map((d) => ({
+          deviceId: d.deviceId,
+          label: d.label || `Camera ${d.deviceId.slice(0, 5)}`,
+          kind: d.kind,
+        }));
 
-      const audioInputDevs = devices.filter(d => d.kind === "audioinput").map(d => ({
-        deviceId: d.deviceId,
-        label: d.label || `Microphone ${d.deviceId.slice(0, 5)}`,
-        kind: d.kind,
-      }));
+      const audioInputDevs = devices
+        .filter((d) => d.kind === "audioinput")
+        .map((d) => ({
+          deviceId: d.deviceId,
+          label: d.label || `Microphone ${d.deviceId.slice(0, 5)}`,
+          kind: d.kind,
+        }));
 
-      const audioOutputDevs = devices.filter(d => d.kind === "audiooutput").map(d => ({
-        deviceId: d.deviceId,
-        label: d.label || `Speaker ${d.deviceId.slice(0, 5)}`,
-        kind: d.kind,
-      }));
+      const audioOutputDevs = devices
+        .filter((d) => d.kind === "audiooutput")
+        .map((d) => ({
+          deviceId: d.deviceId,
+          label: d.label || `Speaker ${d.deviceId.slice(0, 5)}`,
+          kind: d.kind,
+        }));
 
       setVideoDevices(videoDevs);
       setAudioInputDevices(audioInputDevs);
@@ -139,7 +150,7 @@ export default function VideoTestPage() {
       setError(msg);
       telemetry.log("DEVICE_ENUMERATION_FAILED", { error: msg });
     }
-  }, [selectedVideoDevice, selectedAudioInput, selectedAudioOutput, setVideoDevices, setAudioInputDevices, setAudioOutputDevices, setSelectedVideoDevice, setSelectedAudioInput, setSelectedAudioOutput, setError]);
+  }, [selectedVideoDevice, selectedAudioInput, selectedAudioOutput]);
 
   const startMediaStream = useCallback(async () => {
     try {
@@ -172,7 +183,7 @@ export default function VideoTestPage() {
       setError(msg);
       telemetry.log("MEDIA_STREAM_FAILED", { error: msg });
     }
-  }, [cleanupMedia, isAudioEnabled, isVideoEnabled, selectedAudioInput, selectedVideoDevice, setupAudioMonitoring, setMediaStream, setError]);
+  }, [cleanupMedia, isAudioEnabled, isVideoEnabled, selectedAudioInput, selectedVideoDevice, setupAudioMonitoring]);
 
   // Load available devices
   useEffect(() => {
@@ -185,12 +196,14 @@ export default function VideoTestPage() {
     };
   }, [loadDevices, cleanupMedia]);
 
-  // Start media stream when device selections change
+  // Start media stream when device selections change. isVideoEnabled/isAudioEnabled
+  // stay out: the effect body doesn't read them, and startMediaStream (which
+  // does) refreshes via its own useCallback deps.
   useEffect(() => {
     if (selectedVideoDevice || selectedAudioInput) {
       startMediaStream();
     }
-  }, [selectedVideoDevice, selectedAudioInput, isVideoEnabled, isAudioEnabled, startMediaStream]);
+  }, [selectedVideoDevice, selectedAudioInput, startMediaStream]);
 
   const toggleVideo = () => {
     if (mediaStream) {
@@ -232,18 +245,15 @@ export default function VideoTestPage() {
     setTimeout(() => setIsSpeakerEnabled(false), 1000);
   };
 
-  const hasVideo = mediaStream?.getVideoTracks().length ?? 0 > 0;
-  const hasAudio = mediaStream?.getAudioTracks().length ?? 0 > 0;
+  const hasVideo = (mediaStream?.getVideoTracks().length ?? 0) > 0;
+  const hasAudio = (mediaStream?.getAudioTracks().length ?? 0) > 0;
 
   return (
     <div className="flex h-screen flex-col bg-neutral-950">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
         <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-          >
+          <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>
@@ -258,13 +268,7 @@ export default function VideoTestPage() {
           <div className="relative bg-neutral-900 rounded-xl overflow-hidden border border-gray-800">
             <div className="aspect-video relative bg-black">
               {isVideoEnabled && hasVideo ? (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover mirror"
-                />
+                <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover mirror" />
               ) : (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
@@ -276,18 +280,22 @@ export default function VideoTestPage() {
 
               {/* Status Indicators */}
               <div className="absolute top-4 left-4 flex gap-2">
-                <div className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-lg backdrop-blur-sm",
-                  hasVideo ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"
-                )}>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg backdrop-blur-sm",
+                    hasVideo ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400",
+                  )}
+                >
                   {hasVideo ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   <span className="text-xs font-medium">Video</span>
                 </div>
 
-                <div className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-lg backdrop-blur-sm",
-                  hasAudio ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400"
-                )}>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg backdrop-blur-sm",
+                    hasAudio ? "bg-green-900/50 text-green-400" : "bg-red-900/50 text-red-400",
+                  )}
+                >
                   {hasAudio ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   <span className="text-xs font-medium">Audio</span>
                 </div>
@@ -297,12 +305,13 @@ export default function VideoTestPage() {
             {/* Controls */}
             <div className="p-4 flex items-center justify-center gap-4">
               <button
+                type="button"
                 onClick={toggleVideo}
                 className={cn(
                   "p-4 rounded-full transition-colors",
                   isVideoEnabled
                     ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-red-600 hover:bg-red-700 text-white",
                 )}
                 title={isVideoEnabled ? "Turn off camera" : "Turn on camera"}
               >
@@ -310,12 +319,13 @@ export default function VideoTestPage() {
               </button>
 
               <button
+                type="button"
                 onClick={toggleAudio}
                 className={cn(
                   "p-4 rounded-full transition-colors",
                   isAudioEnabled
                     ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                    : "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-red-600 hover:bg-red-700 text-white",
                 )}
                 title={isAudioEnabled ? "Mute microphone" : "Unmute microphone"}
               >
@@ -334,19 +344,15 @@ export default function VideoTestPage() {
                     <div
                       className={cn(
                         "h-full transition-all duration-100",
-                        audioLevel > 70 ? "bg-red-500" : audioLevel > 40 ? "bg-yellow-500" : "bg-green-500"
+                        audioLevel > 70 ? "bg-red-500" : audioLevel > 40 ? "bg-yellow-500" : "bg-green-500",
                       )}
                       style={{ width: `${audioLevel}%` }}
                     />
                   </div>
                 </div>
-                <span className="text-xs text-gray-500 w-12 text-right">
-                  {Math.round(audioLevel)}%
-                </span>
+                <span className="text-xs text-gray-500 w-12 text-right">{Math.round(audioLevel)}%</span>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Speak to test your microphone
-              </p>
+              <p className="text-xs text-gray-500 mt-2">Speak to test your microphone</p>
             </div>
           )}
 
@@ -354,15 +360,16 @@ export default function VideoTestPage() {
           <div className="grid md:grid-cols-3 gap-4">
             {/* Camera */}
             <div className="bg-neutral-900 rounded-xl p-4 border border-gray-800">
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label htmlFor="test-camera" className="block text-sm font-medium text-gray-400 mb-2">
                 Camera
               </label>
               <select
+                id="test-camera"
                 value={selectedVideoDevice}
                 onChange={(e) => setSelectedVideoDevice(e.target.value)}
                 className="w-full px-3 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               >
-                {videoDevices.map(device => (
+                {videoDevices.map((device) => (
                   <option key={device.deviceId} value={device.deviceId}>
                     {device.label}
                   </option>
@@ -372,15 +379,16 @@ export default function VideoTestPage() {
 
             {/* Microphone */}
             <div className="bg-neutral-900 rounded-xl p-4 border border-gray-800">
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label htmlFor="test-mic" className="block text-sm font-medium text-gray-400 mb-2">
                 Microphone
               </label>
               <select
+                id="test-mic"
                 value={selectedAudioInput}
                 onChange={(e) => setSelectedAudioInput(e.target.value)}
                 className="w-full px-3 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               >
-                {audioInputDevices.map(device => (
+                {audioInputDevices.map((device) => (
                   <option key={device.deviceId} value={device.deviceId}>
                     {device.label}
                   </option>
@@ -390,21 +398,23 @@ export default function VideoTestPage() {
 
             {/* Speakers */}
             <div className="bg-neutral-900 rounded-xl p-4 border border-gray-800">
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label htmlFor="test-speaker" className="block text-sm font-medium text-gray-400 mb-2">
                 Speakers
               </label>
               <select
+                id="test-speaker"
                 value={selectedAudioOutput}
                 onChange={(e) => setSelectedAudioOutput(e.target.value)}
                 className="w-full px-3 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500 mb-2"
               >
-                {audioOutputDevices.map(device => (
+                {audioOutputDevices.map((device) => (
                   <option key={device.deviceId} value={device.deviceId}>
                     {device.label}
                   </option>
                 ))}
               </select>
               <button
+                type="button"
                 onClick={playTestSound}
                 className="w-full px-3 py-1.5 bg-neutral-700 hover:bg-neutral-600 rounded text-sm transition-colors flex items-center justify-center gap-2"
               >

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { ArrowLeft, Calendar, Clock, Loader2, Monitor, Play } from "lucide-react";
 import Link from "next/link";
-import { ArrowLeft, Play, Clock, Calendar, Monitor, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Recording {
   id: string;
@@ -17,7 +17,7 @@ export default function RecordingsPage() {
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadRecordings = async () => {
+  const loadRecordings = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await fetch("/api/egress?type=recordings");
@@ -28,11 +28,11 @@ export default function RecordingsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadRecordings();
-  }, []);
+  }, [loadRecordings]);
 
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -78,7 +78,10 @@ export default function RecordingsPage() {
         ) : (
           <div className="space-y-3">
             {recordings.map((rec) => (
-              <div key={rec.id} className="bg-neutral-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+              <div
+                key={rec.id}
+                className="bg-neutral-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-white truncate">{rec.room_name}</h3>
@@ -91,9 +94,13 @@ export default function RecordingsPage() {
                         <Clock className="w-3.5 h-3.5" />
                         {formatDuration(rec.duration_sec)}
                       </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        rec.status === "completed" ? "bg-green-900/50 text-green-400" : "bg-yellow-900/50 text-yellow-400"
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${
+                          rec.status === "completed"
+                            ? "bg-green-900/50 text-green-400"
+                            : "bg-yellow-900/50 text-yellow-400"
+                        }`}
+                      >
                         {rec.status}
                       </span>
                     </div>

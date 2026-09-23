@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Calendar, Copy, Loader2, Link2 } from "lucide-react";
+import { Calendar, Copy, Link2, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface Meeting {
@@ -64,9 +64,9 @@ export default function SchedulePage() {
       });
       if (res.ok) {
         const created = (await res.json()) as Meeting;
-        setMeetings((prev) => [created, ...prev].sort(
-          (a, b) => new Date(a.start_utc).getTime() - new Date(b.start_utc).getTime()
-        ));
+        setMeetings((prev) =>
+          [created, ...prev].sort((a, b) => new Date(a.start_utc).getTime() - new Date(b.start_utc).getTime()),
+        );
         setTitle("");
         setDate("");
         setTime("14:00");
@@ -113,8 +113,11 @@ export default function SchedulePage() {
         </h2>
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Title</label>
+            <label htmlFor="sched-title" className="block text-sm font-medium text-gray-300 mb-1">
+              Title
+            </label>
             <input
+              id="sched-title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -125,8 +128,11 @@ export default function SchedulePage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Date</label>
+              <label htmlFor="sched-date" className="block text-sm font-medium text-gray-300 mb-1">
+                Date
+              </label>
               <input
+                id="sched-date"
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
@@ -134,8 +140,11 @@ export default function SchedulePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Time</label>
+              <label htmlFor="sched-time" className="block text-sm font-medium text-gray-300 mb-1">
+                Time
+              </label>
               <input
+                id="sched-time"
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
@@ -145,8 +154,11 @@ export default function SchedulePage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Duration (min)</label>
+              <label htmlFor="sched-duration" className="block text-sm font-medium text-gray-300 mb-1">
+                Duration (min)
+              </label>
               <select
+                id="sched-duration"
                 value={durationMin}
                 onChange={(e) => setDurationMin(Number(e.target.value))}
                 className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
@@ -158,8 +170,11 @@ export default function SchedulePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Room name</label>
+              <label htmlFor="sched-room" className="block text-sm font-medium text-gray-300 mb-1">
+                Room name
+              </label>
               <input
+                id="sched-room"
                 type="text"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
@@ -175,7 +190,7 @@ export default function SchedulePage() {
               "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
               creating || !title.trim()
                 ? "bg-neutral-700 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-blue-600 hover:bg-blue-700 text-white",
             )}
           >
             {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

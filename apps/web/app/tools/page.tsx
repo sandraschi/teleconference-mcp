@@ -1,7 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { RefreshCw, Loader2, Wrench, Play, ChevronDown, ChevronUp, Terminal, CheckCircle2, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  Play,
+  RefreshCw,
+  Terminal,
+  Wrench,
+  XCircle,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface BackendHealth {
   status: string;
@@ -18,11 +28,38 @@ interface InvokeResult {
 }
 
 const TOOL_GROUPS: Record<string, string[]> = {
-  Conferences: ["conference_schedule", "conference_get", "conference_list", "conference_update", "conference_cancel", "conference_upcoming", "list_active_conferences", "notify_conference_active"],
+  Conferences: [
+    "conference_schedule",
+    "conference_get",
+    "conference_list",
+    "conference_update",
+    "conference_cancel",
+    "conference_upcoming",
+    "list_active_conferences",
+    "notify_conference_active",
+  ],
   Participants: ["participant_invite", "participant_list_invited", "participant_remove_invited"],
-  Rooms: ["room_create", "room_list", "room_delete", "room_update_metadata", "room_participant_list", "room_participant_kick", "room_participant_mute", "room_send_data"],
+  Rooms: [
+    "room_create",
+    "room_list",
+    "room_delete",
+    "room_update_metadata",
+    "room_participant_list",
+    "room_participant_kick",
+    "room_participant_mute",
+    "room_send_data",
+  ],
   Intelligence: ["generate_meeting_summary", "extract_action_items", "set_translation_language"],
-  System: ["inter_agent_ping", "get_dev_stats", "query_system_logs", "sample_log_analysis", "get_substrate_heartbeat", "orchestrate_industrial_diagnostics", "orchestrate_remote_support", "sample_system_forensics"],
+  System: [
+    "inter_agent_ping",
+    "get_dev_stats",
+    "query_system_logs",
+    "sample_log_analysis",
+    "get_substrate_heartbeat",
+    "orchestrate_industrial_diagnostics",
+    "orchestrate_remote_support",
+    "sample_system_forensics",
+  ],
 };
 
 export default function ToolsPage() {
@@ -38,10 +75,7 @@ export default function ToolsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const [toolsRes, healthRes] = await Promise.all([
-        fetch("/api/backend/tools"),
-        fetch("/api/backend/health"),
-      ]);
+      const [toolsRes, healthRes] = await Promise.all([fetch("/api/backend/tools"), fetch("/api/backend/health")]);
       const toolsData = await toolsRes.json();
       const healthData = await healthRes.json();
       setTools((toolsData.tools ?? []).map((t: { name: string }) => t.name));
@@ -91,6 +125,7 @@ export default function ToolsPage() {
             <h1 className="text-2xl font-bold">MCP Tools</h1>
           </div>
           <button
+            type="button"
             data-testid="tools-refresh"
             onClick={fetchAll}
             disabled={isLoading}
@@ -120,9 +155,7 @@ export default function ToolsPage() {
                 <XCircle className="w-4 h-4 text-red-500" />
               )}
               <span className="text-gray-400">Backend:</span>
-              <span className={backendAlive ? "text-green-400" : "text-red-400"}>
-                {health.status}
-              </span>
+              <span className={backendAlive ? "text-green-400" : "text-red-400"}>{health.status}</span>
             </span>
             <span className="text-gray-400">
               Tools: <span className="text-white">{health.tool_count ?? tools.length}</span>
@@ -157,6 +190,7 @@ export default function ToolsPage() {
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <code className="text-sm text-blue-400 truncate">{name}</code>
                         <button
+                          type="button"
                           data-testid={`tool-invoke-${name}`}
                           onClick={() => invoke(name)}
                           disabled={running === name}
@@ -173,6 +207,7 @@ export default function ToolsPage() {
                       {result && (
                         <div className="mt-2">
                           <button
+                            type="button"
                             data-testid={`tool-expand-${name}`}
                             onClick={() => setExpanded((p) => ({ ...p, [name]: !p[name] }))}
                             className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300"
