@@ -7,7 +7,9 @@
     "dev": "next dev --turbo --port 10886",
     "build": "next build",
     "start": "next start --port 10886",
-    "lint": "eslint --max-warnings 0",
+    "lint": "biome check .",
+    "biome:ci": "biome check .",
+    "biome:ci": "biome check .",
     "check-types": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -32,8 +34,8 @@
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
     "@playwright/test": "^1.49.0",
-    "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.6.3",
@@ -43,7 +45,6 @@
     "@types/react-dom": "19.2.2",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-v8": "^2.1.6",
-    "eslint": "^9.39.1",
     "jsdom": "^25.0.1",
     "postcss": "latest",
     "tailwindcss": "^4.1.18",
