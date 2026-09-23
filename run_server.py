@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
 
 import uvicorn  # noqa: E402
 from conferencing_mcp.health_server import run_health_server  # noqa: E402
+from conferencing_mcp.llm_router import llm_router  # noqa: E402
 from starlette.applications import Starlette  # noqa: E402
 from starlette.middleware.cors import CORSMiddleware  # noqa: E402
 from starlette.responses import JSONResponse  # noqa: E402
@@ -70,6 +71,7 @@ def build_app():
         routes=[
             Route("/health", health_endpoint, methods=["GET"]),
             Route("/api/shutdown", shutdown_endpoint, methods=["POST"]),
+            *llm_router,
             Mount("/mcp", app=mcp_app),
         ],
     )

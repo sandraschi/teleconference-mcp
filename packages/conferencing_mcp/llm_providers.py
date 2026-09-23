@@ -41,7 +41,7 @@ PROVIDERS: tuple[dict[str, Any], ...] = (
         "id": "ollama",
         "label": "Ollama",
         "kind": "local",
-        "base_url": "http://localhost:11434",
+        "base_url": "http://127.0.0.1:11434",
         "chat_path": "/v1/chat/completions",
         "models_path": "/api/tags",
         "tag_style": "ollama",
@@ -52,7 +52,7 @@ PROVIDERS: tuple[dict[str, Any], ...] = (
         "id": "lmstudio",
         "label": "LM Studio",
         "kind": "local",
-        "base_url": "http://localhost:1234",
+        "base_url": "http://127.0.0.1:1234",
         "chat_path": "/v1/chat/completions",
         "models_path": "/v1/models",
         "tag_style": "openai",
@@ -63,7 +63,8 @@ PROVIDERS: tuple[dict[str, Any], ...] = (
         "id": "vllm",
         "label": "vLLM",
         "kind": "local",
-        "base_url": "http://localhost:8000",
+        # NOTE: vLLM's own default port; this is an outbound default, not a bind.
+        "base_url": "http://127.0.0.1:8000",
         "chat_path": "/v1/chat/completions",
         "models_path": "/v1/models",
         "tag_style": "openai",
@@ -314,12 +315,12 @@ async def _fetch_json(
         raise RuntimeError(f"provider unreachable ({exc})") from exc
 
 
-async def probe_local(provider_id: str) -> tuple[bool, list[str]]:
+async def probe_local(provider_id: str, base_url: str = "") -> tuple[bool, list[str]]:
     """Probe a local engine (fast timeout). Returns (reachable, models)."""
     row = require_provider(provider_id)
     if row["kind"] != "local":
         raise ValueError(f"Provider '{provider_id}' is not local")
-    url = row["base_url"] + row["models_path"]
+    url = (base_url.strip() or row["base_url"]) + row["models_path"]
     try:
         async with aiohttp.ClientSession() as session:
             status, body = await _fetch_json(session, "GET", url, LOCAL_PROBE_TIMEOUT)
@@ -342,7 +343,12 @@ async def list_models(provider_id: str) -> dict[str, Any]:
         return {"provider": provider_id, "models": models, "source": "live" if reachable else "none"}
     key = get_key(provider_id)
     if not key:
-        return {"provider": provider_id, "models": list(row["curated"]), "source": "curated"}
+        return {
+            "provider": provider_id,
+            "models": list(row["curated"]),
+            "source": "curated",
+            "key_missing": True,
+        }
     url = row["base_url"] + row["models_path"]
     headers = _auth_headers(row, key)
     try:
@@ -357,6 +363,70 @@ async def list_models(provider_id: str) -> dict[str, Any]:
     if not models:
         return {"provider": provider_id, "models": list(row["curated"]), "source": "curated"}
     return {"provider": provider_id, "models": models, "source": "live"}
+
+
+async def test_provider(provider_id: str, api_key: str = "", endpoint: str = "") -> dict[str, Any]:
+    """Validate a provider WITHOUT saving anything.
+
+    Local: probe the engine (endpoint override allowed). Cloud: list models with
+    the given key (falling back to the stored/env key); honest failures — a 401
+    comes back as ok:false with a key-rejected note, never a silent curated
+    fallback reported as success. Typed keys travel in the POST body only.
+    """
+    row = require_provider(provider_id)
+    key = api_key.strip() or get_key(provider_id)
+    if row["kind"] == "local":
+        base = endpoint.strip() or row["base_url"]
+        reachable, models = await probe_local(provider_id, base_url=base)
+        return {
+            "provider": provider_id,
+            "ok": reachable,
+            "models": models,
+            "source": "live" if reachable else "none",
+            "note": "" if reachable else f"No engine answering at {base}",
+        }
+    if not key:
+        return {
+            "provider": provider_id,
+            "ok": False,
+            "models": list(row["curated"]),
+            "source": "curated",
+            "key_missing": True,
+            "note": "No API key provided or stored",
+        }
+    url = (endpoint.strip() or row["base_url"]) + row["models_path"]
+    headers = _auth_headers(row, key)
+    try:
+        async with aiohttp.ClientSession() as session:
+            status, body = await _fetch_json(session, "GET", url, CLOUD_TIMEOUT, headers=headers)
+            if status in (401, 403):
+                return {
+                    "provider": provider_id,
+                    "ok": False,
+                    "models": list(row["curated"]),
+                    "source": "curated",
+                    "note": f"Key rejected by vendor (HTTP {status})",
+                }
+            if status >= 400:
+                raise RuntimeError(f"HTTP {status}")
+            models = _parse_model_list(row["tag_style"], body)
+    except Exception as exc:
+        return {
+            "provider": provider_id,
+            "ok": False,
+            "models": list(row["curated"]),
+            "source": "curated",
+            "note": f"Validation failed: {exc}",
+        }
+    if not models:
+        return {
+            "provider": provider_id,
+            "ok": False,
+            "models": list(row["curated"]),
+            "source": "curated",
+            "note": "Vendor returned an empty model list",
+        }
+    return {"provider": provider_id, "ok": True, "models": models, "source": "live", "note": ""}
 
 
 def _auth_headers(row: dict[str, Any], api_key: str) -> dict[str, str]:
