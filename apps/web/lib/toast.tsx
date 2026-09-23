@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  ReactNode,
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useState } from "react";
 
 type ToastType = "success" | "error" | "info" | "warning";
 
@@ -40,7 +34,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         setTimeout(() => dismiss(id), duration);
       }
     },
-    [dismiss]
+    [dismiss],
   );
 
   return (
@@ -57,13 +51,7 @@ export function useToast() {
   return ctx;
 }
 
-function ToastContainer({
-  toasts,
-  onDismiss,
-}: {
-  toasts: Toast[];
-  onDismiss: (id: string) => void;
-}) {
+function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id: string) => void }) {
   if (toasts.length === 0) return null;
 
   return (
@@ -77,11 +65,12 @@ function ToastContainer({
             t.type === "success" && "bg-green-900/90 border-green-700 text-green-100",
             t.type === "error" && "bg-red-900/90 border-red-700 text-red-100",
             t.type === "warning" && "bg-yellow-900/90 border-yellow-700 text-yellow-100",
-            t.type === "info" && "bg-neutral-800/95 border-neutral-600 text-neutral-100"
+            t.type === "info" && "bg-neutral-800/95 border-neutral-600 text-neutral-100",
           )}
         >
           <span className="text-sm">{t.message}</span>
           <button
+            type="button"
             onClick={() => onDismiss(t.id)}
             className="text-current opacity-70 hover:opacity-100 p-1"
             aria-label="Dismiss"
