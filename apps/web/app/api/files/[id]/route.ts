@@ -13,8 +13,8 @@ export async function GET(
     const { id } = await params;
     const INDEX_FILE = join(FILES_DIR, "_index.json");
     const raw = await readFile(INDEX_FILE, "utf-8");
-    const index = JSON.parse(raw);
-    const entry = index.find((e: any) => e.id === id);
+    const index: Array<{ id: string; type?: string; name?: string; size?: number }> = JSON.parse(raw);
+    const entry = index.find((e) => e.id === id);
 
     if (!entry) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });

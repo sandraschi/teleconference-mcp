@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
-import type { NextAuthConfig } from "next-auth";
+import type { NextAuthConfig, Profile, Session } from "next-auth";
 import type { DefaultSession } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
   interface Session {
@@ -22,24 +23,24 @@ const config: NextAuthConfig = {
       authorization: {
         params: { scope: "openid email profile" },
       },
-      profile(profile: any) {
+      profile(profile: Profile) {
         return {
-          id: profile.sub,
-          name: profile.name || profile.preferred_username || profile.email,
-          email: profile.email,
-          image: profile.picture,
+          id: profile.sub ?? undefined,
+          name: profile.name || profile.preferred_username || profile.email || undefined,
+          email: profile.email ?? undefined,
+          image: profile.picture ?? undefined,
         };
       },
     },
   ],
   callbacks: {
-    async jwt({ token, profile }: { token: any; profile?: any }) {
+    async jwt({ token, profile }: { token: JWT; profile?: Profile }) {
       if (profile) {
         token.id = profile.sub;
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         session.user.id = token.id as string;
       }
@@ -66,6 +67,9 @@ export const handlers = authInstance.handlers as {
   GET: (req: Request) => Promise<Response>;
   POST: (req: Request) => Promise<Response>;
 };
-export const signIn = authInstance.signIn as (provider?: string, options?: any) => Promise<void>;
-export const signOut = authInstance.signOut as (options?: any) => Promise<void>;
-export const auth = authInstance.auth as (req?: any) => Promise<any>;
+export const signIn = authInstance.signIn as (
+  provider?: string,
+  options?: Record<string, unknown>
+) => Promise<void>;
+export const signOut = authInstance.signOut as (options?: Record<string, unknown>) => Promise<void>;
+export const auth = authInstance.auth as (req?: Request) => Promise<Session | null>;

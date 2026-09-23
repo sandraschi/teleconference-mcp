@@ -33,8 +33,9 @@ export default function FilesPage() {
   const loadFiles = useCallback(async () => {
     try {
       const res = await fetch("/api/files");
-      const data = await res.json();
+      const data: { files?: FileEntry[] } = await res.json();
       setFiles(data.files ?? []);
+      // eslint-disable-next-line no-empty -- empty list state already renders below
     } catch {} finally { setIsLoading(false); }
   }, []);
 
