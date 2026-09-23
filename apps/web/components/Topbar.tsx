@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import {
+  ChevronDown,
   HelpCircle,
-  Terminal,
-  User,
   LogOut,
   Settings as SettingsIcon,
-  ChevronDown,
   Share2,
+  Terminal,
+  User,
   Users as UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import ShareRoomModal from "./ShareRoomModal";
 
@@ -51,22 +51,15 @@ export default function Topbar({
   const userMenuRef = useRef<HTMLDivElement>(null);
   const roomMenuRef = useRef<HTMLDivElement>(null);
 
-  const getParticipantCount = (roomName: string) =>
-    roomsWithCount.find((r) => r.name === roomName)?.participantCount;
+  const getParticipantCount = (roomName: string) => roomsWithCount.find((r) => r.name === roomName)?.participantCount;
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target as Node)
-      ) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
       }
-      if (
-        roomMenuRef.current &&
-        !roomMenuRef.current.contains(event.target as Node)
-      ) {
+      if (roomMenuRef.current && !roomMenuRef.current.contains(event.target as Node)) {
         setIsRoomMenuOpen(false);
       }
     };
@@ -82,6 +75,7 @@ export default function Topbar({
         {isConnected && currentRoom && onRoomChange && (
           <div className="relative" ref={roomMenuRef}>
             <button
+              type="button"
               onClick={() => setIsRoomMenuOpen(!isRoomMenuOpen)}
               className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors text-sm"
             >
@@ -96,13 +90,12 @@ export default function Topbar({
             {isRoomMenuOpen && (
               <div className="absolute top-full left-0 mt-2 w-64 bg-neutral-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
                 <div className="px-3 py-2 border-b border-gray-700">
-                  <p className="text-xs text-gray-400 uppercase font-semibold">
-                    Switch Room
-                  </p>
+                  <p className="text-xs text-gray-400 uppercase font-semibold">Switch Room</p>
                 </div>
                 <div className="py-1">
                   {availableRooms.map((room) => (
                     <button
+                      type="button"
                       key={room}
                       onClick={() => {
                         onRoomChange(room);
@@ -110,23 +103,15 @@ export default function Topbar({
                       }}
                       className={cn(
                         "w-full px-3 py-2 text-left text-sm transition-colors flex justify-between items-center",
-                        room === currentRoom
-                          ? "bg-blue-600 text-white"
-                          : "text-gray-300 hover:bg-neutral-700"
+                        room === currentRoom ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-neutral-700",
                       )}
                     >
                       <span>
                         {room}
-                        {room === currentRoom && (
-                          <span className="ml-2 text-xs text-blue-300">
-                            (current)
-                          </span>
-                        )}
+                        {room === currentRoom && <span className="ml-2 text-xs text-blue-300">(current)</span>}
                       </span>
                       {getParticipantCount(room) !== undefined && (
-                        <span className="text-xs text-gray-400">
-                          {getParticipantCount(room)} in room
-                        </span>
+                        <span className="text-xs text-gray-400">{getParticipantCount(room)} in room</span>
                       )}
                     </button>
                   ))}
@@ -149,6 +134,7 @@ export default function Topbar({
         {/* Share Room Button */}
         {isConnected && currentRoom && (
           <button
+            type="button"
             onClick={() => setIsShareModalOpen(true)}
             className="p-2 text-gray-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
             title="Share room link"
@@ -159,6 +145,7 @@ export default function Topbar({
 
         {/* Help Button */}
         <button
+          type="button"
           onClick={onHelpClick}
           className="p-2 text-gray-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
           title="Help (Press ?)"
@@ -168,6 +155,7 @@ export default function Topbar({
 
         {/* Logger Button */}
         <button
+          type="button"
           onClick={onLoggerClick}
           className="p-2 text-gray-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
           title="View Logs"
@@ -177,6 +165,7 @@ export default function Topbar({
 
         {/* Contacts Button */}
         <button
+          type="button"
           onClick={onContactsClick}
           className="p-2 text-gray-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
           title="Address Book"
@@ -188,15 +177,14 @@ export default function Topbar({
         {userName ? (
           <div className="relative" ref={userMenuRef}>
             <button
+              type="button"
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-lg transition-colors"
             >
               <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                 {(userName[0] ?? "?").toUpperCase()}
               </div>
-              <span className="text-sm text-white hidden md:inline">
-                {userName}
-              </span>
+              <span className="text-sm text-white hidden md:inline">{userName}</span>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
 
@@ -204,9 +192,7 @@ export default function Topbar({
               <div className="absolute top-full right-0 mt-2 w-56 bg-neutral-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
                 <div className="px-3 py-3 border-b border-gray-700">
                   <p className="text-sm font-medium text-white">{userName}</p>
-                  <p className="text-xs text-gray-400">
-                    {isConnected ? "Connected" : "Offline"}
-                  </p>
+                  <p className="text-xs text-gray-400">{isConnected ? "Connected" : "Offline"}</p>
                 </div>
 
                 <div className="py-1">
@@ -221,6 +207,7 @@ export default function Topbar({
 
                   {onLogout && (
                     <button
+                      type="button"
                       onClick={() => {
                         onLogout();
                         setIsUserMenuOpen(false);
@@ -234,9 +221,7 @@ export default function Topbar({
                 </div>
 
                 <div className="px-3 py-2 border-t border-gray-700">
-                  <p className="text-xs text-gray-400">
-                    AG-Visio v0.1.0-SOTA
-                  </p>
+                  <p className="text-xs text-gray-400">AG-Visio v0.1.0-SOTA</p>
                 </div>
               </div>
             )}

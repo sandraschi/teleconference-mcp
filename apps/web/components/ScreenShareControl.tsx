@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback } from "react";
-import { Monitor, MonitorOff } from "lucide-react";
 import { useRoomContext } from "@livekit/components-react";
 import { Track } from "livekit-client";
+import { Monitor, MonitorOff } from "lucide-react";
+import { useCallback } from "react";
 
 export default function ScreenShareControl() {
   const room = useRoomContext();
 
   const isSharing = Array.from(room.localParticipant?.trackPublications.values() ?? []).some(
-    (pub) => pub.source === Track.Source.ScreenShare
+    (pub) => pub.source === Track.Source.ScreenShare,
   );
 
   const handleClick = useCallback(async () => {
@@ -40,9 +40,7 @@ export default function ScreenShareControl() {
       type="button"
       onClick={handleClick}
       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-        isSharing
-          ? "bg-green-600 text-white hover:bg-green-700"
-          : "bg-neutral-800 text-gray-300 hover:bg-neutral-700"
+        isSharing ? "bg-green-600 text-white hover:bg-green-700" : "bg-neutral-800 text-gray-300 hover:bg-neutral-700"
       }`}
       title={isSharing ? "Stop sharing screen" : "Share screen"}
     >
