@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { telemetry } from "@/lib/telemetry";
 
 describe("telemetry", () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => { });
+    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
   it("log() calls console.log with JSON payload", () => {

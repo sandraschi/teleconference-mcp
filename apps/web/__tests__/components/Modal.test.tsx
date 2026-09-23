@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import Modal from "@/components/ui/Modal";
 
 describe("Modal", () => {
@@ -12,7 +12,7 @@ describe("Modal", () => {
     const { container } = render(
       <Modal isOpen={false} onClose={() => {}}>
         <p>Content</p>
-      </Modal>
+      </Modal>,
     );
     expect(container.firstChild).toBeNull();
   });
@@ -21,7 +21,7 @@ describe("Modal", () => {
     render(
       <Modal isOpen={true} onClose={() => {}} title="Test Modal">
         <p>Modal body</p>
-      </Modal>
+      </Modal>,
     );
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByText("Test Modal")).toBeInTheDocument();
@@ -33,7 +33,7 @@ describe("Modal", () => {
     render(
       <Modal isOpen={true} onClose={onClose} title="Test">
         <p>Body</p>
-      </Modal>
+      </Modal>,
     );
     const closeButton = screen.getByRole("button", { name: /close modal/i });
     fireEvent.click(closeButton);
@@ -44,7 +44,7 @@ describe("Modal", () => {
     render(
       <Modal isOpen={true} onClose={() => {}} title="A11y">
         <p>Body</p>
-      </Modal>
+      </Modal>,
     );
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("aria-modal", "true");

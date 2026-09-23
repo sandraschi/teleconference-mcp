@@ -1,10 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  getSettings,
-  saveSettings,
-  resetSettings,
-  DEFAULT_SETTINGS,
-} from "@/lib/settings";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DEFAULT_SETTINGS, getSettings, resetSettings, saveSettings } from "@/lib/settings";
 
 const STORAGE_KEY = "ag-visio-settings"; // must match SETTINGS_KEY in settings.ts
 

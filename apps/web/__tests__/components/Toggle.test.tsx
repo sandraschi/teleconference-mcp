@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, within, fireEvent } from "@testing-library/react";
+import { fireEvent, render, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import Toggle from "@/components/ui/Toggle";
 
 describe("Toggle", () => {
@@ -30,12 +30,7 @@ describe("Toggle", () => {
 
   it("renders label and description", () => {
     const { container } = render(
-      <Toggle
-        checked={false}
-        onChange={() => {}}
-        label="Enable feature"
-        description="Turn this on to enable."
-      />
+      <Toggle checked={false} onChange={() => {}} label="Enable feature" description="Turn this on to enable." />,
     );
     expect(within(container).getByText("Enable feature")).toBeInTheDocument();
     expect(within(container).getByText("Turn this on to enable.")).toBeInTheDocument();
