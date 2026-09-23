@@ -19,9 +19,6 @@ export function livekitApiSecret(): string {
 }
 
 export function livekitHttpUrl(): string {
-  const ws =
-    process.env.LIVEKIT_URL ||
-    process.env.NEXT_PUBLIC_LIVEKIT_URL ||
-    "ws://localhost:15580";
+  const ws = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:15580";
   return ws.replace(/^wss?:\/\//, "http://");
 }

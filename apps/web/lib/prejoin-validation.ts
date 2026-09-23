@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { AppSettings } from "./settings";
 
 export interface PreJoinValidationState {
@@ -53,7 +53,9 @@ export function usePreJoinValidation(settings: AppSettings) {
         isChecking: false,
       });
     } finally {
-      stream?.getTracks().forEach((t) => t.stop());
+      stream?.getTracks().forEach((t) => {
+        t.stop();
+      });
     }
   }, [settings.preferredVideoInput, settings.preferredAudioInput]);
 
