@@ -1,9 +1,9 @@
-# Teleconference MCP — Project Health Assessment
+# Teleconference MCP -- Project Health Assessment
 
 **Date:** 2026-06-12
 **Version:** 2.2.0 (pyproject) / 2.3.0 (CHANGELOG, unreleased)
 **Method:** Full repo scan + live ruff/pytest/git runs on Goliath
-**Supersedes:** 2026-05-23 assessment (which listed "no CI" as the critical gap — CI now exists but cannot pass, see P1-1/P1-2)
+**Supersedes:** 2026-05-23 assessment (which listed "no CI" as the critical gap -- CI now exists but cannot pass, see P1-1/P1-2)
 
 ---
 
@@ -14,7 +14,7 @@
 | `ruff check apps/agent/ packages/ myconf/ tests/` | ✅ **All checks passed** |
 | `pytest tests/ apps/agent/tests/` | ⚠️ **90 passed, 5 ERRORS** (61s) |
 | Git working tree | ❌ **43 dirty entries** (25 modified, ~18 untracked) |
-| Branch vs origin | ❌ **master ahead 1, behind 3** — diverged |
+| Branch vs origin | ❌ **master ahead 1, behind 3** -- diverged |
 | CI on GitHub | ❌ **Cannot pass as written** (P1-1, P1-2) |
 
 Headline: code quality is genuinely good, but **the entire 2.3.0 body of work
@@ -25,7 +25,7 @@ that has meanwhile diverged from origin. One careless reset or IDE crash loses
 
 ---
 
-## 2. Bugs — P1 (break things now)
+## 2. Bugs -- P1 (break things now)
 
 ### P1-1: CI python job cannot succeed on ubuntu-latest
 `pyproject.toml` declares `pywin32>=306`, `pywinctl`, `pynput`, `mss` as
@@ -41,18 +41,18 @@ test runs.
 "mss>=9.0.1; sys_platform == 'win32'",
 ```
 Then verify lazy-import fallbacks in remoting/contacts/vision modules (some
-already exist — check each). Alternative: `runs-on: windows-latest` for the
+already exist -- check each). Alternative: `runs-on: windows-latest` for the
 python job, but markers are the correct fix since conferencing_mcp is
 platform-neutral.
 
-### P1-2: CI web job — `npm ci` in `apps/web` with no lockfile there
+### P1-2: CI web job -- `npm ci` in `apps/web` with no lockfile there
 The lockfile lives at the monorepo root (npm workspaces). `npm ci` with
 `working-directory: apps/web` has no `package-lock.json` in scope.
 **Fix:** install at repo root: `npm ci`, then
 `npm run lint --workspace=web`, `npx tsc --noEmit -p apps/web`,
 `npm run test --workspace=web`.
 
-### P1-3: 5 test errors — `temp_lancedb` fixture out of scope
+### P1-3: 5 test errors -- `temp_lancedb` fixture out of scope
 The 2.3.0 dedup removed `temp_lancedb` from `apps/agent/tests/conftest.py`,
 keeping it only in root `tests/conftest.py`. pytest conftest scoping is
 directory-based: the root fixture is **not visible** to
@@ -69,9 +69,9 @@ like the FleetStartMode vendoring round-trip).
 
 ### P1-5: Runtime artifacts tracked in git
 Tracked (gitignore was added *after* the fact, which does not untrack):
-- `apps/agent/lancedb_data/**` — binary .lance vector data
-- `packages/conferencing_mcp/conference.db` — live SQLite db
-- `apps/agent/contacts_cache.json` — **personal contact data in a public repo**
+- `apps/agent/lancedb_data/**` -- binary .lance vector data
+- `packages/conferencing_mcp/conference.db` -- live SQLite db
+- `apps/agent/contacts_cache.json` -- **personal contact data in a public repo**
 - `apps/web/lint_output.txt`
 
 **Fix:**
@@ -84,7 +84,7 @@ decide on history rewrite vs. accept.
 
 ---
 
-## 3. Bugs — P2 (traps and drift)
+## 3. Bugs -- P2 (traps and drift)
 
 - **P2-1: Duplicate compose files.** `docker-compose.yaml` (full 8-container
   stack, Redis on 16379) vs stale `docker-compose.yml` (Redis only, port
@@ -124,7 +124,7 @@ strict select set (E, F, W, I, B, S, UP, RUF); shared fixture architecture
 (when in scope); 90 real passing tests with parametrization; observability
 stack provisioned; AGENTS.md present; honest changelog entries (the June 4
 STUN `host:port` format catch was a good one). Nothing wrong here is
-architectural — it's repo discipline and CI plumbing.
+architectural -- it's repo discipline and CI plumbing.
 
 ---
 
