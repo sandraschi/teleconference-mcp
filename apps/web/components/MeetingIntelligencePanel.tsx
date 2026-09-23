@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Room, DataPacket_Kind } from "livekit-client";
+import { Room } from "livekit-client";
 import { Brain, ListTodo, FileText, Zap } from "lucide-react";
 
 interface IntelligenceItem {
@@ -15,7 +15,7 @@ export const MeetingIntelligencePanel = ({ room }: { room: Room }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
-    const onDataReceived = (payload: Uint8Array, participant?: any, kind?: DataPacket_Kind) => {
+    const onDataReceived = (payload: Uint8Array) => {
       const str = new TextDecoder().decode(payload);
       try {
         const data = JSON.parse(str);
@@ -32,9 +32,8 @@ export const MeetingIntelligencePanel = ({ room }: { room: Room }) => {
         } else if (data.type === "intelligence_busy") {
           setIsAnalyzing(true);
         }
-      } catch (e) {
-        // Not a JSON packet for us
-      }
+      // eslint-disable-next-line no-empty -- non-JSON packets belong to other features
+      } catch {}
     };
 
     room.on("dataReceived", onDataReceived);
@@ -60,7 +59,7 @@ export const MeetingIntelligencePanel = ({ room }: { room: Room }) => {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-slate-500 space-y-2 opacity-50">
+          <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-2 opacity-70">
             <Brain className="w-12 h-12 mb-2" />
             <p className="text-sm">No intelligence captured yet.</p>
             <p className="text-xs text-center px-4">
@@ -80,7 +79,7 @@ export const MeetingIntelligencePanel = ({ room }: { room: Room }) => {
                   <ListTodo className="w-3 h-3" />
                 )}
                 <span>{item.type.replace("_", " ")}</span>
-                <span className="ml-auto text-slate-500 font-normal">{item.timestamp}</span>
+                <span className="ml-auto text-slate-300 font-normal">{item.timestamp}</span>
               </div>
               <div className="text-sm leading-relaxed whitespace-pre-wrap text-slate-300">
                 {item.content}

@@ -12,6 +12,7 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Track } from "livekit-client";
+import { DEFAULT_LIVEKIT_URL } from "@/lib/settings";
 
 export default function GuestJoinPage() {
   const params = useParams();
@@ -20,7 +21,7 @@ export default function GuestJoinPage() {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:15580";
+  const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || DEFAULT_LIVEKIT_URL;
 
   useEffect(() => {
     document.title = `Join ${roomName} — AG-Visio`;

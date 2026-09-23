@@ -22,8 +22,11 @@ export interface AppSettings {
 
 const SETTINGS_KEY = "ag-visio-settings";
 
+// Single source of truth for the LiveKit URL fallback (fleet-registered native :15580).
+export const DEFAULT_LIVEKIT_URL = "ws://localhost:15580";
+
 export const DEFAULT_SETTINGS: AppSettings = {
-  livekitUrl: process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:15580",
+  livekitUrl: process.env.NEXT_PUBLIC_LIVEKIT_URL || DEFAULT_LIVEKIT_URL,
   defaultRoomName: "ag-visio-conference",
   preferredAudioInput: "",
   preferredVideoInput: "",

@@ -61,14 +61,14 @@ const helpSections: HelpSection[] = [
 
         <h4 className="font-semibold text-white mt-4">Quick Start</h4>
         <div className="bg-neutral-800 rounded-lg p-4 font-mono text-sm text-gray-300 space-y-2">
-          <p className="text-gray-500"># 1. Start infrastructure</p>
+          <p className="text-gray-400"># 1. Start infrastructure</p>
           <p>docker compose up -d</p>
-          <p className="text-gray-500 mt-2"># 2. Start Ollama with a model</p>
+          <p className="text-gray-400 mt-2"># 2. Start Ollama with a model</p>
           <p>ollama run gemma2</p>
-          <p className="text-gray-500 mt-2"># 3. Activate agent venv and run</p>
+          <p className="text-gray-400 mt-2"># 3. Activate agent venv and run</p>
           <p>apps\agent\venv\Scripts\activate</p>
           <p>python apps/agent/agent.py dev</p>
-          <p className="text-gray-500 mt-2"># 4. Open http://localhost:10800</p>
+          <p className="text-gray-400 mt-2"># 4. Open http://localhost:10886</p>
         </div>
       </div>
     ),

@@ -16,7 +16,7 @@ import {
   Loader2,
   ExternalLink,
 } from "lucide-react";
-import { useSettings, getMediaDevices, type AppSettings } from "@/lib/settings";
+import { useSettings, getMediaDevices, DEFAULT_LIVEKIT_URL, type AppSettings } from "@/lib/settings";
 import LlmProviders from "@/components/LlmProviders";
 import Toggle from "@/components/ui/Toggle";
 import { cn } from "@/lib/utils";
@@ -189,6 +189,7 @@ export default function SettingsPage() {
         </div>
         <div className="flex gap-2">
           <button
+            data-testid="settings-reset"
             onClick={handleReset}
             className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
           >
@@ -196,6 +197,7 @@ export default function SettingsPage() {
             Reset
           </button>
           <button
+            data-testid="settings-save"
             onClick={handleSave}
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
@@ -242,6 +244,7 @@ export default function SettingsPage() {
             </label>
             <input
               type="text"
+              data-testid="settings-livekit-url"
               value={localSettings.livekitUrl}
               onChange={(e) => updateLocal("livekitUrl", e.target.value)}
               placeholder="ws://localhost:15580"
@@ -583,9 +586,9 @@ export default function SettingsPage() {
             </span>
           </div>
           <div>
-            <span className="text-gray-500">LiveKit URL:</span>
+            <span className="text-gray-400">LiveKit URL:</span>
             <span className="text-gray-300 ml-2 font-mono text-xs">
-              {process.env.NEXT_PUBLIC_LIVEKIT_URL || "ws://localhost:15580"}
+              {process.env.NEXT_PUBLIC_LIVEKIT_URL || DEFAULT_LIVEKIT_URL}
             </span>
           </div>
         </div>
