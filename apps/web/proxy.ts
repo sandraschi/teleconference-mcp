@@ -1,5 +1,5 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { NextResponse, type NextRequest } from "next/server";
 
 // Session-getter middleware: uses the repo's casted `auth()` session signature
 // (next-auth v5 beta.31 types carry no middleware-handler overload). Public paths
@@ -10,10 +10,7 @@ export default async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const publicPaths = [
-    "/auth/signin", "/auth/error", "/api/auth",
-    "/icon.svg", "/favicon.ico", "/manifest.json",
-  ];
+  const publicPaths = ["/auth/signin", "/auth/error", "/api/auth", "/icon.svg", "/favicon.ico", "/manifest.json"];
 
   if (publicPaths.some((p) => pathname.startsWith(p))) return NextResponse.next();
   if (pathname.startsWith("/join/")) return NextResponse.next();

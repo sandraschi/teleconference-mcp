@@ -1,14 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import { existsSync } from "fs";
-import { join } from "path";
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { type NextRequest, NextResponse } from "next/server";
 
 const FILES_DIR = join(process.cwd(), "data", "files");
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const INDEX_FILE = join(FILES_DIR, "_index.json");
