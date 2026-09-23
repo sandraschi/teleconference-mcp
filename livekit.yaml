@@ -43,6 +43,8 @@ rtc:
 #   job_restart_policy: always   # restart Visio agent on crash (v1.10)
 
 keys:
+  # DEV DEFAULT. Production: replace with a fresh secret AND update every client
+  # (apps/web .env LIVEKIT_API_SECRET, compose defaults) or tokens are rejected.
   devkey: dev-secret-0123456789abcdef-0123456789abcdef
 
 logging:

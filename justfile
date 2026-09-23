@@ -26,6 +26,22 @@ web:
     Set-Location '{{justfile_directory()}}'
     npm run start --workspace=web
 
+# Serve the stack via the fleet launcher (backend :10887 + frontend :10886, no browser)
+serve:
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File '{{justfile_directory()}}/start.ps1' -NoBrowser
+
+# Run Playwright e2e (frontend dev server boots via webServer; backend must run: just serve)
+e2e:
+    Set-Location '{{justfile_directory()}}/apps/web'
+    npm run test:e2e
+
+# All green gates in one go (lint + typecheck + tests)
+gates-green:
+    Set-Location '{{justfile_directory()}}'
+    uv run ruff check apps/ packages/ teleconference_mcp/ tests/ run_server.py; \
+    uv run ruff format --check apps/ packages/ teleconference_mcp/ tests/ run_server.py; \
+    uv run pytest tests/ apps/agent/tests/ -q
+
 # Build the Next.js dashboard for production
 build-web:
     Set-Location '{{justfile_directory()}}'

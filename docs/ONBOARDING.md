@@ -35,7 +35,10 @@ Open `http://localhost:10886`, create a room, join with camera/mic. Done.
 ## From scratch (LiveKit not running yet)
 
 ```powershell
-docker compose up -d livekit redis
+# LiveKit runs NATIVELY (NSSM service LiveKitSFU) - never `docker compose up livekit`
+# (a compose livekit service steals :15580 and kills the native service; removed 2026-09-23).
+sc.exe start LiveKitSFU
+docker compose up -d redis
 .\start.ps1 all
 ```
 

@@ -4,10 +4,17 @@
   "globalEnv": [
     "LIVEKIT_API_KEY",
     "LIVEKIT_API_SECRET",
+    "LIVEKIT_URL",
     "OLLAMA_HOST",
     "BACKEND_URL",
+    "AUTH_DISABLED",
+    "AUTH_SECRET",
+    "AUTH_AUTHENTIK_ISSUER",
+    "AUTH_AUTHENTIK_ID",
+    "AUTH_AUTHENTIK_SECRET",
     "NODE_ENV",
     "NEXT_PUBLIC_LIVEKIT_URL",
+    "NEXT_PUBLIC_BACKEND_URL",
     "CI"
   ],
   "tasks": {
