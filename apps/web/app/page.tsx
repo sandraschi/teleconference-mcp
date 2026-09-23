@@ -1,35 +1,29 @@
 "use client";
 
-import {
-  LiveKitRoom,
-  ParticipantTile,
-  ControlBar,
-  useTracks,
-  useRoomContext,
-} from "@livekit/components-react";
+import { ControlBar, LiveKitRoom, ParticipantTile, useRoomContext, useTracks } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track, RoomEvent, Participant, TranscriptionSegment } from "livekit-client";
-import { useState, useEffect, useRef } from "react";
+import { type Participant, RoomEvent, Track, type TranscriptionSegment } from "livekit-client";
 import { Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AgentFleetPanel } from "@/components/AgentFleetPanel";
+import AgentStatus from "@/components/AgentStatus";
+import BackgroundBlurToggle from "@/components/BackgroundBlurToggle";
+import ChatPanel from "@/components/ChatPanel";
+import ContactPanel from "@/components/ContactPanel";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import Topbar from "@/components/Topbar";
+import FileSharingPanel from "@/components/FileSharingPanel";
 import LogViewer from "@/components/LogViewer";
 import { MeetingIntelligencePanel } from "@/components/MeetingIntelligencePanel";
-import AgentStatus from "@/components/AgentStatus";
 import ReconnectionBanner from "@/components/ReconnectionBanner";
-import ChatPanel from "@/components/ChatPanel";
-import RustDeskPanel from "@/components/RustDeskPanel";
-import RemoteAssistanceOverlay from "@/components/RemoteAssistanceOverlay";
-import { AgentFleetPanel } from "@/components/AgentFleetPanel";
-import ContactPanel from "@/components/ContactPanel";
-import FileSharingPanel from "@/components/FileSharingPanel";
-import ScreenShareControl from "@/components/ScreenShareControl";
 import RecordingButton from "@/components/RecordingButton";
-import BackgroundBlurToggle from "@/components/BackgroundBlurToggle";
-import { telemetry } from "@/lib/telemetry";
-import { useSettings } from "@/lib/settings";
+import RemoteAssistanceOverlay from "@/components/RemoteAssistanceOverlay";
+import RustDeskPanel from "@/components/RustDeskPanel";
+import ScreenShareControl from "@/components/ScreenShareControl";
+import Topbar from "@/components/Topbar";
 import { useDiscovery } from "@/lib/discovery";
 import { usePreJoinValidation } from "@/lib/prejoin-validation";
+import { useSettings } from "@/lib/settings";
+import { telemetry } from "@/lib/telemetry";
 
 interface TranscriptEntry {
   id: string;
@@ -40,12 +34,7 @@ interface TranscriptEntry {
 
 export default function ModConsDashboard() {
   const { settings, isLoaded } = useSettings();
-  const {
-    livekitUrl: discoveredUrl,
-    suggestedRooms,
-    rooms: discoveryRooms,
-    discoveryError,
-  } = useDiscovery(30000);
+  const { livekitUrl: discoveredUrl, suggestedRooms, rooms: discoveryRooms, discoveryError } = useDiscovery(30000);
   const [token, setToken] = useState<string | null>(null);
   const [participantName, setParticipantName] = useState("");
   const [currentRoom, setCurrentRoom] = useState(settings.defaultRoomName);
@@ -54,13 +43,14 @@ export default function ModConsDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
-  const [rightPanelTab, setRightPanelTab] = useState<"transcript" | "chat" | "remote" | "fleet" | "files" | "contacts" | "intelligence">("intelligence");
+  const [rightPanelTab, setRightPanelTab] = useState<
+    "transcript" | "chat" | "remote" | "fleet" | "files" | "contacts" | "intelligence"
+  >("intelligence");
   const [focusedTrackSid, setFocusedTrackSid] = useState<string | null>(null);
   const hasAppliedRoomParam = useRef(false);
   const deviceValidation = usePreJoinValidation(settings);
 
-  const livekitUrl =
-    discoveredUrl ?? settings.livekitUrl ?? "ws://localhost:15580";
+  const livekitUrl = discoveredUrl ?? settings.livekitUrl ?? "ws://localhost:15580";
 
   useEffect(() => {
     setCurrentRoom(settings.defaultRoomName);
@@ -179,16 +169,8 @@ export default function ModConsDashboard() {
         <div className="dashboard-container">
           {token ? (
             <LiveKitRoom
-              video={
-                settings.preferredVideoInput
-                  ? { deviceId: { ideal: settings.preferredVideoInput } }
-                  : true
-              }
-              audio={
-                settings.preferredAudioInput
-                  ? { deviceId: { ideal: settings.preferredAudioInput } }
-                  : true
-              }
+              video={settings.preferredVideoInput ? { deviceId: { ideal: settings.preferredVideoInput } } : true}
+              audio={settings.preferredAudioInput ? { deviceId: { ideal: settings.preferredAudioInput } } : true}
               token={token}
               serverUrl={livekitUrl}
               onDisconnected={() => {
@@ -209,9 +191,9 @@ export default function ModConsDashboard() {
                   <AgentStatus />
                 </div>
                 <div className="flex-1 min-h-0">
-                  <ModConsGrid 
-                    focusedTrackSid={focusedTrackSid} 
-                    onTrackFocus={(sid) => setFocusedTrackSid(sid === focusedTrackSid ? null : sid)} 
+                  <ModConsGrid
+                    focusedTrackSid={focusedTrackSid}
+                    onTrackFocus={(sid) => setFocusedTrackSid(sid === focusedTrackSid ? null : sid)}
                   />
                 </div>
                 <div className="mt-4 p-2 glass-panel rounded-2xl">
@@ -238,70 +220,77 @@ export default function ModConsDashboard() {
                   <button
                     type="button"
                     onClick={() => setRightPanelTab("transcript")}
-                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${rightPanelTab === "transcript"
-                      ? "bg-neutral-800 text-white border-b-2 border-blue-500"
-                      : "text-gray-500 hover:text-gray-300"
-                      }`}
+                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      rightPanelTab === "transcript"
+                        ? "bg-neutral-800 text-white border-b-2 border-blue-500"
+                        : "text-gray-500 hover:text-gray-300"
+                    }`}
                   >
                     Transcript
                   </button>
                   <button
                     type="button"
                     onClick={() => setRightPanelTab("remote")}
-                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${rightPanelTab === "remote"
-                      ? "bg-neutral-800 text-white border-b-2 border-blue-500"
-                      : "text-gray-500 hover:text-gray-300"
-                      }`}
+                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      rightPanelTab === "remote"
+                        ? "bg-neutral-800 text-white border-b-2 border-blue-500"
+                        : "text-gray-500 hover:text-gray-300"
+                    }`}
                   >
                     Remote
                   </button>
                   <button
                     type="button"
                     onClick={() => setRightPanelTab("fleet")}
-                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${rightPanelTab === "fleet"
-                      ? "bg-neutral-800 text-white border-b-2 border-blue-500"
-                      : "text-gray-500 hover:text-gray-300"
-                      }`}
+                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      rightPanelTab === "fleet"
+                        ? "bg-neutral-800 text-white border-b-2 border-blue-500"
+                        : "text-gray-500 hover:text-gray-300"
+                    }`}
                   >
                     Fleet
                   </button>
                   <button
                     type="button"
                     onClick={() => setRightPanelTab("files")}
-                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${rightPanelTab === "files"
-                      ? "bg-neutral-800 text-white border-b-2 border-blue-500"
-                      : "text-gray-500 hover:text-gray-300"
-                      }`}
+                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      rightPanelTab === "files"
+                        ? "bg-neutral-800 text-white border-b-2 border-blue-500"
+                        : "text-gray-500 hover:text-gray-300"
+                    }`}
                   >
                     Files
                   </button>
                   <button
                     type="button"
                     onClick={() => setRightPanelTab("chat")}
-                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${rightPanelTab === "chat"
-                      ? "bg-neutral-800 text-white border-b-2 border-blue-500"
-                      : "text-gray-500 hover:text-gray-300"
-                      }`}
+                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      rightPanelTab === "chat"
+                        ? "bg-neutral-800 text-white border-b-2 border-blue-500"
+                        : "text-gray-500 hover:text-gray-300"
+                    }`}
                   >
                     Chat
                   </button>
                   <button
                     type="button"
                     onClick={() => setRightPanelTab("contacts")}
-                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${rightPanelTab === "contacts"
-                      ? "bg-neutral-800 text-white border-b-2 border-blue-500"
-                      : "text-gray-500 hover:text-gray-300"
-                      }`}
+                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      rightPanelTab === "contacts"
+                        ? "bg-neutral-800 text-white border-b-2 border-blue-500"
+                        : "text-gray-500 hover:text-gray-300"
+                    }`}
                   >
                     Contacts
                   </button>
                   <button
                     type="button"
                     onClick={() => setRightPanelTab("intelligence")}
-                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${rightPanelTab === "intelligence"
-                      ? "bg-neutral-800 text-white border-b-2 border-indigo-500"
-                      : "text-gray-500 hover:text-gray-300"
-                      }`}
+                    className={`flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      rightPanelTab === "intelligence"
+                        ? "bg-neutral-800 text-white border-b-2 border-indigo-500"
+                        : "text-gray-500 hover:text-gray-300"
+                    }`}
                   >
                     Intelligence
                   </button>
@@ -325,7 +314,7 @@ export default function ModConsDashboard() {
                     <IntelligenceTab />
                   ) : (
                     <div className="h-full p-2">
-                       <ContactPanel />
+                      <ContactPanel />
                     </div>
                   )}
                 </div>
@@ -336,31 +325,35 @@ export default function ModConsDashboard() {
               <div className="relative flex-1 p-4 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-6 w-full max-w-md p-8 glass-panel rounded-3xl animate-glow">
                   <div className="text-center" data-testid="dashboard-hero">
-                    <h1 className="text-2xl font-bold text-white mb-1">
-                      AG-Visio Conference
-                    </h1>
+                    <h1 className="text-2xl font-bold text-white mb-1">AG-Visio Conference</h1>
                     <p className="text-gray-400 text-sm" data-testid="dashboard-subtitle">
-                      Self-hosted video conferencing with AI assistance — pick a room
-                      below, or browse <a className="text-blue-400 hover:text-blue-300" href="/tools">MCP tools</a>,{" "}
-                      <a className="text-blue-400 hover:text-blue-300" href="/schedule">schedule</a> and{" "}
-                      <a className="text-blue-400 hover:text-blue-300" href="/health">system health</a>.
+                      Self-hosted video conferencing with AI assistance — pick a room below, or browse{" "}
+                      <a className="text-blue-400 hover:text-blue-300" href="/tools">
+                        MCP tools
+                      </a>
+                      ,{" "}
+                      <a className="text-blue-400 hover:text-blue-300" href="/schedule">
+                        schedule
+                      </a>{" "}
+                      and{" "}
+                      <a className="text-blue-400 hover:text-blue-300" href="/health">
+                        system health
+                      </a>
+                      .
                     </p>
                   </div>
                   <div className="text-center">
-                    <h2 className="text-xl font-semibold text-white mb-2">
-                      Join Conference
-                    </h2>
-                    <p className="text-gray-400 text-sm">
-                      Enter your name to join the AG-Visio conference room
-                    </p>
+                    <h2 className="text-xl font-semibold text-white mb-2">Join Conference</h2>
+                    <p className="text-gray-400 text-sm">Enter your name to join the AG-Visio conference room</p>
                   </div>
 
                   <div className="w-full space-y-4">
                     <div>
-                      <label className="block text-sm text-gray-400 mb-1">
+                      <label htmlFor="room-select" className="block text-sm text-gray-400 mb-1">
                         Room
                       </label>
                       <select
+                        id="room-select"
                         data-testid="room-select"
                         value={useCustomRoom ? "__custom__" : currentRoom}
                         onChange={(e) => {
@@ -374,17 +367,14 @@ export default function ModConsDashboard() {
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-accent-primary/50 transition-all"
                         title="Select Room"
                       >
-                        {(
-                          suggestedRooms.length > 0
-                            ? [...new Set([currentRoom, ...suggestedRooms])]
-                            : ["ag-visio-conference", "development", "testing", "demo"]
-                        ).map(
-                          (room) => (
-                            <option key={room} value={room}>
-                              {room}
-                            </option>
-                          )
-                        )}
+                        {(suggestedRooms.length > 0
+                          ? [...new Set([currentRoom, ...suggestedRooms])]
+                          : ["ag-visio-conference", "development", "testing", "demo"]
+                        ).map((room) => (
+                          <option key={room} value={room}>
+                            {room}
+                          </option>
+                        ))}
                         <option value="__custom__">Create custom room...</option>
                       </select>
                       {useCustomRoom && (
@@ -394,73 +384,57 @@ export default function ModConsDashboard() {
                           value={customRoomName}
                           onChange={(e) => setCustomRoomName(e.target.value)}
                           className="mt-2 w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 transition-all"
-                          autoFocus
                         />
                       )}
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-400 mb-1">
+                      <label htmlFor="join-name" className="block text-sm text-gray-400 mb-1">
                         Your Name
                       </label>
                       <input
                         type="text"
                         data-testid="join-name"
+                        id="join-name"
                         placeholder="Enter your name"
                         value={participantName}
                         onChange={(e) => setParticipantName(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleInit()}
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 transition-all"
                         disabled={isLoading}
+                        // biome-ignore lint/a11y/noAutofocus: primary CTA input, the point of this form
                         autoFocus
                       />
                     </div>
 
-                    <div className="text-xs text-gray-500 bg-neutral-800/50 rounded-lg p-3 space-y-1">
+                    <div className="text-xs text-gray-400 bg-neutral-800/50 rounded-lg p-3 space-y-1">
                       <p>
                         <strong className="text-gray-400">Server:</strong> {livekitUrl}
                       </p>
-                      {discoveryError && (
-                        <p className="text-yellow-500">Using fallback (LiveKit unreachable)</p>
-                      )}
+                      {discoveryError && <p className="text-yellow-500">Using fallback (LiveKit unreachable)</p>}
                       <div className="flex items-center gap-3 mt-2">
                         <span>
-                          Camera:{" "}
-                          {deviceValidation.camera === "ok" && (
-                            <span className="text-green-500">OK</span>
-                          )}
-                          {deviceValidation.camera === "fail" && (
-                            <span className="text-red-500">Fail</span>
-                          )}
-                          {deviceValidation.camera === "pending" && (
-                            <span className="text-gray-400">Checking...</span>
-                          )}
+                          Camera: {deviceValidation.camera === "ok" && <span className="text-green-500">OK</span>}
+                          {deviceValidation.camera === "fail" && <span className="text-red-500">Fail</span>}
+                          {deviceValidation.camera === "pending" && <span className="text-gray-400">Checking...</span>}
                         </span>
                         <span>
-                          Mic:{" "}
-                          {deviceValidation.microphone === "ok" && (
-                            <span className="text-green-500">OK</span>
-                          )}
-                          {deviceValidation.microphone === "fail" && (
-                            <span className="text-red-500">Fail</span>
-                          )}
+                          Mic: {deviceValidation.microphone === "ok" && <span className="text-green-500">OK</span>}
+                          {deviceValidation.microphone === "fail" && <span className="text-red-500">Fail</span>}
                           {deviceValidation.microphone === "pending" && (
                             <span className="text-gray-400">Checking...</span>
                           )}
                         </span>
-                        {(deviceValidation.camera === "fail" ||
-                          deviceValidation.microphone === "fail") && (
-                            <button
-                              type="button"
-                              onClick={() => deviceValidation.revalidate()}
-                              className="text-blue-400 hover:text-blue-300"
-                            >
-                              Retry
-                            </button>
-                          )}
+                        {(deviceValidation.camera === "fail" || deviceValidation.microphone === "fail") && (
+                          <button
+                            type="button"
+                            onClick={() => deviceValidation.revalidate()}
+                            className="text-blue-400 hover:text-blue-300"
+                          >
+                            Retry
+                          </button>
+                        )}
                       </div>
-                      {deviceValidation.error && (
-                        <p className="text-red-400 mt-1">{deviceValidation.error}</p>
-                      )}
+                      {deviceValidation.error && <p className="text-red-400 mt-1">{deviceValidation.error}</p>}
                     </div>
 
                     {error && (
@@ -470,6 +444,7 @@ export default function ModConsDashboard() {
                     )}
 
                     <button
+                      type="button"
                       data-testid="join-submit"
                       onClick={() => handleInit()}
                       disabled={isLoading}
@@ -493,14 +468,16 @@ export default function ModConsDashboard() {
                     </a>
                   </div>
 
-                    <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400">
                     Press <kbd className="px-1.5 py-0.5 bg-neutral-700 rounded text-gray-400">?</kbd> for help
                   </p>
                 </div>
               </div>
               <aside className="w-80 max-lg:w-full max-lg:hidden border-l border-gray-800 bg-neutral-900/50 flex flex-col items-center justify-center">
                 <p className="text-gray-500 text-sm text-center px-4">
-                  Join room to see<br />transcript and chat
+                  Join room to see
+                  <br />
+                  transcript and chat
                 </p>
               </aside>
             </>
@@ -520,38 +497,33 @@ function IntelligenceTab() {
   return <MeetingIntelligencePanel room={room} />;
 }
 
-function ModConsGrid({ 
-  focusedTrackSid, 
-  onTrackFocus 
-}: { 
-  focusedTrackSid: string | null; 
-  onTrackFocus: (sid: string) => void; 
+function ModConsGrid({
+  focusedTrackSid,
+  onTrackFocus,
+}: {
+  focusedTrackSid: string | null;
+  onTrackFocus: (sid: string) => void;
 }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
-    { onlySubscribed: false }
+    { onlySubscribed: false },
   );
 
-  const screenShareTracks = tracks.filter(
-    (t) => t.source === Track.Source.ScreenShare
-  );
-  const cameraTracks = tracks.filter(
-    (t) => t.source === Track.Source.Camera
-  );
+  const screenShareTracks = tracks.filter((t) => t.source === Track.Source.ScreenShare);
+  const cameraTracks = tracks.filter((t) => t.source === Track.Source.Camera);
 
   // Automatic Focus Selection: If no manual focus, pick the first screen share
   // When user explicitly releases focus (focusedTrackSid set to null), don't re-auto-focus
   const hasScreenShares = screenShareTracks.length > 0;
-  const effectiveFocusSid = focusedTrackSid !== null
-    ? (focusedTrackSid ?? (hasScreenShares ? screenShareTracks[0]?.publication?.trackSid : null))
-    : null;
-  const focusedTrack = effectiveFocusSid
-    ? tracks.find(t => t.publication?.trackSid === effectiveFocusSid)
-    : null;
-  const otherTracks = tracks.filter(t => t.publication?.trackSid !== effectiveFocusSid);
+  const effectiveFocusSid =
+    focusedTrackSid !== null
+      ? (focusedTrackSid ?? (hasScreenShares ? screenShareTracks[0]?.publication?.trackSid : null))
+      : null;
+  const focusedTrack = effectiveFocusSid ? tracks.find((t) => t.publication?.trackSid === effectiveFocusSid) : null;
+  const otherTracks = tracks.filter((t) => t.publication?.trackSid !== effectiveFocusSid);
 
   if (effectiveFocusSid && focusedTrack) {
     const focusedSid = focusedTrack.publication?.trackSid;
@@ -561,7 +533,8 @@ function ModConsGrid({
         <div className="flex-[7] min-h-0 bg-neutral-900 rounded-2xl overflow-hidden border border-blue-500/30 relative group">
           <ParticipantTile trackRef={focusedTrack} />
           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-             <button 
+            <button
+              type="button"
               onClick={() => focusedSid && onTrackFocus(focusedSid)}
               className="px-2 py-1 bg-black/50 backdrop-blur text-[10px] text-white rounded border border-white/10 uppercase tracking-tighter"
             >
@@ -574,14 +547,16 @@ function ModConsGrid({
         <div className="flex-[3] flex flex-col gap-3 overflow-y-auto pr-1 custom-scrollbar">
           {otherTracks.map((track) => {
             const sid = track.publication?.trackSid;
+            const focus = () => sid && onTrackFocus(sid);
             return (
-              <div
+              <button
                 key={track.participant.identity + track.source + sid}
-                onClick={() => sid && onTrackFocus(sid)}
-                className="aspect-video bg-neutral-900 rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-white/20 transition-all flex-shrink-0"
+                type="button"
+                onClick={focus}
+                className="aspect-video bg-neutral-900 rounded-xl overflow-hidden cursor-pointer border border-transparent hover:border-white/20 transition-all flex-shrink-0 text-left"
               >
                 <ParticipantTile trackRef={track} />
-              </div>
+              </button>
             );
           })}
         </div>
@@ -594,14 +569,16 @@ function ModConsGrid({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 overflow-y-auto p-1">
         {cameraTracks.map((track) => {
           const sid = track.publication?.trackSid;
+          const focus = () => sid && onTrackFocus(sid);
           return (
-            <div
+            <button
               key={track.participant.identity + track.source + sid}
-              onClick={() => sid && onTrackFocus(sid)}
-              className="aspect-video bg-neutral-900 rounded-xl overflow-hidden border border-white/5 hover:border-white/20 transition-all cursor-pointer"
+              type="button"
+              onClick={focus}
+              className="aspect-video bg-neutral-900 rounded-xl overflow-hidden border border-white/5 hover:border-white/20 transition-all cursor-pointer text-left"
             >
               <ParticipantTile trackRef={track} />
-            </div>
+            </button>
           );
         })}
       </div>
@@ -663,7 +640,10 @@ function TranscriptionFeed() {
   useEffect(() => {
     if (!room) return;
 
-    const handleMetadata = (prevMetadata: string | undefined, participant: { identity: string; metadata?: string }) => {
+    const handleMetadata = (
+      _prevMetadata: string | undefined,
+      participant: { identity: string; metadata?: string },
+    ) => {
       try {
         const meta = JSON.parse(participant.metadata || "{}");
         if (meta.lastTranscript) {
@@ -696,9 +676,7 @@ function TranscriptionFeed() {
     return (
       <div className="flex-1 space-y-2 overflow-y-auto">
         <div className="text-blue-400 font-mono text-sm">[SYSTEM] Waiting for transcriptions...</div>
-        <div className="text-gray-500 font-mono text-sm opacity-50">
-          Monitoring for Ontological Drift...
-        </div>
+        <div className="text-gray-500 font-mono text-sm opacity-50">Monitoring for Ontological Drift...</div>
       </div>
     );
   }

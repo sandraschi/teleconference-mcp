@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { ArrowLeft, CheckCircle2, Loader2, RefreshCw, XCircle } from "lucide-react";
 import Link from "next/link";
-import { ArrowLeft, RefreshCw, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface HealthData {
   status: string;
@@ -22,14 +22,11 @@ export default function HealthDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [healthRes, discoveryRes] = await Promise.all([
-        fetch("/api/health"),
-        fetch("/api/discovery"),
-      ]);
+      const [healthRes, discoveryRes] = await Promise.all([fetch("/api/health"), fetch("/api/discovery")]);
       const healthData = await healthRes.json();
       const discoveryData = await discoveryRes.json();
       setHealth(healthData);
@@ -39,13 +36,13 @@ export default function HealthDashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchAll();
     const id = setInterval(fetchAll, 10000);
     return () => clearInterval(id);
-  }, []);
+  }, [fetchAll]);
 
   if (isLoading && !health) {
     return (
@@ -60,14 +57,12 @@ export default function HealthDashboardPage() {
     <div className="min-h-screen bg-neutral-950 text-white p-6" data-testid="health-page">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-          >
+          <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Conference
           </Link>
           <button
+            type="button"
             data-testid="health-refresh"
             onClick={fetchAll}
             disabled={isLoading}
@@ -99,18 +94,12 @@ export default function HealthDashboardPage() {
             <div className="space-y-2 text-sm">
               <p>
                 <span className="text-gray-500">Status:</span>{" "}
-                <span
-                  className={
-                    health?.status === "ok" ? "text-green-400" : "text-red-400"
-                  }
-                >
+                <span className={health?.status === "ok" ? "text-green-400" : "text-red-400"}>
                   {health?.status ?? "unknown"}
                 </span>
               </p>
               {health?.timestamp && (
-                <p className="text-gray-500">
-                  Last check: {new Date(health.timestamp).toLocaleString()}
-                </p>
+                <p className="text-gray-500">Last check: {new Date(health.timestamp).toLocaleString()}</p>
               )}
             </div>
           </section>
@@ -135,27 +124,22 @@ export default function HealthDashboardPage() {
               </p>
               {health?.livekit?.roomCount !== undefined && (
                 <p>
-                  <span className="text-gray-500">Active rooms:</span>{" "}
-                  {health.livekit.roomCount}
+                  <span className="text-gray-500">Active rooms:</span> {health.livekit.roomCount}
                 </p>
               )}
-              {health?.livekit?.error && (
-                <p className="text-red-400">{health.livekit.error}</p>
-              )}
+              {health?.livekit?.error && <p className="text-red-400">{health.livekit.error}</p>}
             </div>
           </section>
 
           {discovery && (
-          <section className="bg-neutral-900 border border-gray-800 rounded-xl p-6" data-testid="health-backend">
+            <section className="bg-neutral-900 border border-gray-800 rounded-xl p-6" data-testid="health-backend">
               <h2 className="text-lg font-semibold mb-4">Discovery</h2>
               <div className="space-y-2 text-sm">
                 <p>
                   <span className="text-gray-500">LiveKit URL:</span>{" "}
                   <code className="text-gray-300">{discovery.livekitUrl}</code>
                 </p>
-                {discovery.error && (
-                  <p className="text-yellow-500">{discovery.error}</p>
-                )}
+                {discovery.error && <p className="text-yellow-500">{discovery.error}</p>}
                 {discovery.rooms.length > 0 && (
                   <div className="mt-4">
                     <p className="text-gray-500 mb-2">Active rooms:</p>
@@ -163,9 +147,7 @@ export default function HealthDashboardPage() {
                       {discovery.rooms.map((r) => (
                         <li key={r.name} className="flex justify-between">
                           <span>{r.name}</span>
-                          <span className="text-gray-500">
-                            {r.participantCount} participants
-                          </span>
+                          <span className="text-gray-500">{r.participantCount} participants</span>
                         </li>
                       ))}
                     </ul>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { ArrowLeft, Calendar, CheckCheck, Clock, Link2, Loader2, Plus } from "lucide-react";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Clock, Plus, Link2, CheckCheck, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Meeting {
   id: string;
@@ -17,13 +17,16 @@ interface Meeting {
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
-    weekday: "short", month: "short", day: "numeric",
+    weekday: "short",
+    month: "short",
+    day: "numeric",
   });
 }
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString("en-US", {
-    hour: "2-digit", minute: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -103,10 +106,7 @@ export default function MeetingsPage() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-            >
+            <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Back
             </Link>
@@ -125,18 +125,18 @@ export default function MeetingsPage() {
 
         {/* Create Form */}
         {showForm && (
-          <form
-            onSubmit={handleCreate}
-            className="bg-neutral-900 border border-gray-800 rounded-xl p-6 mb-8 space-y-4"
-          >
+          <form onSubmit={handleCreate} className="bg-neutral-900 border border-gray-800 rounded-xl p-6 mb-8 space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-500" />
               New Meeting
             </h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Title</label>
+              <label htmlFor="meetings-title" className="block text-sm font-medium text-gray-300 mb-1">
+                Title
+              </label>
               <input
+                id="meetings-title"
                 type="text"
                 data-testid="meetings-title"
                 value={title}
@@ -149,8 +149,11 @@ export default function MeetingsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Date & Time</label>
+                <label htmlFor="meetings-date" className="block text-sm font-medium text-gray-300 mb-1">
+                  Date & Time
+                </label>
                 <input
+                  id="meetings-date"
                   type="datetime-local"
                   data-testid="meetings-date"
                   value={date}
@@ -160,25 +163,31 @@ export default function MeetingsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor="meetings-duration" className="block text-sm font-medium text-gray-300 mb-1">
                   Duration (min)
                 </label>
                 <select
+                  id="meetings-duration"
                   value={duration}
                   onChange={(e) => setDuration(Number(e.target.value))}
                   className="w-full px-4 py-2 bg-neutral-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
                   title="Meeting duration"
                 >
                   {[15, 30, 45, 60, 90, 120].map((m) => (
-                    <option key={m} value={m}>{m} min</option>
+                    <option key={m} value={m}>
+                      {m} min
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Room</label>
+              <label htmlFor="meetings-room" className="block text-sm font-medium text-gray-300 mb-1">
+                Room
+              </label>
               <input
+                id="meetings-room"
                 type="text"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
@@ -288,11 +297,7 @@ function MeetingCard({
             className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
             title="Copy invite link"
           >
-            {isCopied ? (
-              <CheckCheck className="w-4 h-4 text-green-500" />
-            ) : (
-              <Link2 className="w-4 h-4 text-gray-400" />
-            )}
+            {isCopied ? <CheckCheck className="w-4 h-4 text-green-500" /> : <Link2 className="w-4 h-4 text-gray-400" />}
           </button>
         </div>
       </div>
