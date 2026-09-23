@@ -51,8 +51,11 @@ async def conference_schedule(
         room = result.get("room_name") or "ag-visio-conference"
         task = asyncio.create_task(
             notify_meeting_event(
-                "SCHEDULED", title, room,
-                organizer=organizer, when=scheduled_at,
+                "SCHEDULED",
+                title,
+                room,
+                organizer=organizer,
+                when=scheduled_at,
             )
         )
         _notify_tasks.add(task)

@@ -54,7 +54,7 @@ async def generate_meeting_summary(
             "correlation_id": _cid,
         }
     except Exception as e:
-        logger.error(f"Summary generation failed: {e}", extra={"correlation_id": _cid})
+        logger.exception(f"Summary generation failed: {e}", extra={"correlation_id": _cid})
         return {"success": False, "error": str(e)}
 
 
@@ -105,7 +105,7 @@ async def extract_action_items(
             "correlation_id": _cid,
         }
     except Exception as e:
-        logger.error(f"Action item extraction failed: {e}", extra={"correlation_id": _cid})
+        logger.exception(f"Action item extraction failed: {e}", extra={"correlation_id": _cid})
         return {"success": False, "error": str(e)}
 
 

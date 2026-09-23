@@ -31,7 +31,7 @@ async def room_create(
     try:
         return await conf.lk_create_room(name, max_participants, empty_timeout, metadata)
     except Exception as exc:
-        logger.error("room_create failed: %s", exc, extra={"correlation_id": _cid})
+        logger.exception("room_create failed: %s", exc, extra={"correlation_id": _cid})
         return {"error": str(exc)}
 
 
@@ -73,7 +73,7 @@ async def room_delete(
     try:
         return await conf.lk_delete_room(name)
     except Exception as exc:
-        logger.error("room_delete failed: %s", exc, extra={"correlation_id": _cid})
+        logger.exception("room_delete failed: %s", exc, extra={"correlation_id": _cid})
         return {"error": str(exc)}
 
 
@@ -95,7 +95,7 @@ async def room_update_metadata(
     try:
         return await conf.lk_update_room_metadata(name, metadata)
     except Exception as exc:
-        logger.error("room_update_metadata failed: %s", exc, extra={"correlation_id": _cid})
+        logger.exception("room_update_metadata failed: %s", exc, extra={"correlation_id": _cid})
         return {"error": str(exc)}
 
 

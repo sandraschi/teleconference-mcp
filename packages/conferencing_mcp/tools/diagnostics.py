@@ -57,7 +57,7 @@ async def get_dev_stats(ctx: Context) -> str:
             f"{disk_proc.stdout}"
         )
     except Exception as e:
-        logger.error(f"Dev stats failed: {e!s}", extra={"correlation_id": _cid})
+        logger.exception(f"Dev stats failed: {e!s}", extra={"correlation_id": _cid})
         return f"ERROR [SOTA-E01]: Substrate telemetry failed. {e!s}"
 
 
@@ -88,7 +88,7 @@ async def query_system_logs(
 
         return proc.stdout or "RES [SOTA-N01]: No matches found for pattern."
     except subprocess.CalledProcessError as e:
-        logger.error(f"Log query failed: {e.stderr}", extra={"correlation_id": _cid})
+        logger.exception(f"Log query failed: {e.stderr}", extra={"correlation_id": _cid})
         return f"ERROR [SOTA-E02]: Log query failed. {e.stderr}"
     except Exception as e:
         logger.critical(f"Error in query_system_logs: {e!s}", extra={"correlation_id": _cid})
@@ -331,5 +331,52 @@ async def sample_system_forensics(
         analysis = await ctx.sample(prompt, max_tokens=500)
         return f"FORENSIC_REPORT [SOTA-F01]: {analysis.content.text}"
     except Exception as e:
-        logger.error(f"Forensics sampling failed: {e!s}", extra={"correlation_id": _cid})
+        logger.exception(f"Forensics sampling failed: {e!s}", extra={"correlation_id": _cid})
         return f"ERROR [SOTA-E05]: Forensics substrate timed out. {e!s}"
+
+
+def _tcp_probe(host: str, port: int, timeout: float = 0.5) -> str:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(timeout)
+            return "up" if s.connect_ex((host, port)) == 0 else "down"
+    except Exception as e:
+        logger.debug(f"TCP probe {host}:{port} failed: {e}")
+        return "error"
+
+
+@mcp.tool(annotations=_READ_ONLY)
+async def status(ctx: Context) -> dict[str, Any]:
+    """Server status: version, tool count, and dependency reachability.
+
+    ## Return Format
+    {"success": bool, "message": str, "data": {"version": str, "tool_count": int,
+    "backend": str, "health": str, "livekit": str, "remoting": str}} — dialogic shape.
+
+    ## Examples
+    await status()
+    """
+    _cid = cid(ctx)
+    logger.info("Executing status tool", extra={"correlation_id": _cid})
+    try:
+        from importlib.metadata import version as _pkg_version
+
+        ver = _pkg_version("teleconference-mcp")
+    except Exception:
+        ver = "0.1.0"
+    data = {
+        "version": ver,
+        "backend": _tcp_probe("127.0.0.1", 10887),
+        "health": _tcp_probe("127.0.0.1", 10891),
+        "livekit": _tcp_probe("127.0.0.1", 15580),
+        "remoting": _tcp_probe("127.0.0.1", 11069),
+        "frontend": _tcp_probe("127.0.0.1", 10886),
+    }
+    down = sorted(k for k, v in data.items() if k != "version" and v != "up")
+    ok = not down
+    return {
+        "success": ok,
+        "message": "All endpoints reachable" if ok else f"Down: {', '.join(down)}",
+        "data": data,
+        "correlation_id": _cid,
+    }

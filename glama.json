@@ -33,7 +33,8 @@
     "get_substrate_heartbeat",
     "orchestrate_industrial_diagnostics",
     "orchestrate_remote_support",
-    "sample_system_forensics"
+    "sample_system_forensics",
+    "status"
   ],
   "tags": ["video-conferencing", "webrtc", "livekit", "voice-agent", "remote-desktop", "meeting-intelligence"],
   "license": "MIT"
