@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Upload, Download, File, Trash2, Loader2, Paperclip } from "lucide-react";
+import { Upload, Download, File, Loader2, Paperclip } from "lucide-react";
 import { useRoomContext } from "@livekit/components-react";
 
 interface FileEntry {
@@ -52,15 +52,16 @@ export default function FileSharingPanel() {
     if (!room) return;
     const onData = (payload: Uint8Array) => {
       try {
-        const msg = JSON.parse(new TextDecoder().decode(payload));
+        const msg: { type?: string } = JSON.parse(new TextDecoder().decode(payload));
         if (msg.type === "file_shared") {
           loadFiles();
         }
+        // eslint-disable-next-line no-empty -- non-file packets belong to other features
       } catch {}
     };
-    room.on("dataReceived" as any, onData);
+    room.on("dataReceived", onData);
     return () => {
-      room.off("dataReceived" as any, onData);
+      room.off("dataReceived", onData);
     };
   }, [room, loadFiles]);
 
@@ -88,6 +89,7 @@ export default function FileSharingPanel() {
       try {
         const msg = JSON.stringify({ type: "file_shared", id: entry.id, name: entry.name });
         await room.localParticipant?.publishData(new TextEncoder().encode(msg));
+        // eslint-disable-next-line no-empty -- broadcast is best-effort
       } catch {}
 
       setUploadProgress("Uploaded!");
@@ -124,7 +126,7 @@ export default function FileSharingPanel() {
           <Paperclip className="w-4 h-4 text-blue-400" />
           <span className="text-xs font-semibold uppercase tracking-wider text-gray-300">Files</span>
         </div>
-        <span className="text-[10px] text-gray-500">{files.length} files</span>
+        <span className="text-xs text-gray-400">{files.length} files</span>
       </div>
 
       {/* Upload area */}
@@ -153,7 +155,7 @@ export default function FileSharingPanel() {
           <div className="flex flex-col items-center gap-1">
             <Upload className="w-5 h-5 text-gray-500" />
             <span className="text-xs text-gray-400">Drop files or click to upload</span>
-            <span className="text-[10px] text-gray-600">Max 50MB</span>
+            <span className="text-xs text-gray-400">Max 50MB</span>
           </div>
         )}
       </div>
@@ -178,7 +180,7 @@ export default function FileSharingPanel() {
               <File className="w-5 h-5 text-blue-400 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{file.name}</p>
-                <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
                   <span>{formatSize(file.size)}</span>
                   <span>{file.uploaded_by}</span>
                   <span>{formatDate(file.uploaded_at)}</span>

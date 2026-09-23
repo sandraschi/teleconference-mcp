@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Users, 
-  RefreshCw, 
-  Search, 
-  Mail, 
-  Phone, 
+import Image from "next/image";
+import {
+  Users,
+  RefreshCw,
+  Search,
+  Mail,
   Building,
-  MessageSquare,
   ChevronRight,
   ShieldCheck,
   Globe
@@ -88,13 +87,13 @@ export default function ContactPanel() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
             <RefreshCw className="w-6 h-6 text-blue-500 animate-spin" />
-            <p className="text-xs text-gray-500 font-mono italic">Synchronizing with substrate...</p>
+            <p className="text-xs text-gray-400 font-mono italic">Synchronizing with substrate...</p>
           </div>
         ) : filteredContacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full py-12 px-4 text-center">
             <Users className="w-12 h-12 text-gray-800 mb-4" />
             <p className="text-sm text-gray-400">No contacts found</p>
-            <p className="text-xs text-gray-600 mt-1">Try refreshing or changing your search</p>
+            <p className="text-xs text-gray-400 mt-1">Try refreshing or changing your search</p>
           </div>
         ) : (
           filteredContacts.map(contact => (
@@ -105,7 +104,7 @@ export default function ContactPanel() {
               {/* Avatar */}
               <div className="relative w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden border border-white/10">
                 {contact.avatar_url ? (
-                  <img src={contact.avatar_url} alt={contact.name} className="w-full h-full object-cover" />
+                  <Image src={contact.avatar_url} alt={contact.name} fill sizes="40px" className="object-cover" />
                 ) : (
                   <span className="text-sm font-bold text-gray-400">{contact.name.charAt(0)}</span>
                 )}
@@ -134,7 +133,7 @@ export default function ContactPanel() {
                 </div>
                 <div className="flex flex-col gap-0.5 mt-0.5">
                   {contact.email && (
-                    <div className="flex items-center gap-1.5 text-[10px] text-gray-500 truncate">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-400 truncate">
                       <Mail className="w-3 h-3 shrink-0" />
                       <span>{contact.email}</span>
                     </div>
@@ -156,7 +155,7 @@ export default function ContactPanel() {
 
       {/* Footer Info */}
       <div className="p-3 bg-white/[0.01] border-top border-white/5">
-        <p className="text-[10px] text-gray-600 font-mono text-center">
+        <p className="text-xs text-gray-400 font-mono text-center">
           Materialist Substrate Sync: Verified
         </p>
       </div>

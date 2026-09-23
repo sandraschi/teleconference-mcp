@@ -50,7 +50,7 @@ export const AgentFleetPanel: React.FC = () => {
       </h3>
       <div className="space-y-4">
         {agents.length === 0 && (
-          <p className="text-xs text-gray-500 italic">No peer agents detected in fleet...</p>
+          <p className="text-xs text-gray-400 italic">No peer agents detected in fleet...</p>
         )}
         {agents.map(agent => (
           <div key={agent.identity} className="agent-card bg-black/30 p-3 rounded border border-blue-500/20">

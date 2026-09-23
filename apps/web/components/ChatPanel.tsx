@@ -38,7 +38,7 @@ export default function ChatPanel() {
         className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0 font-mono text-sm"
       >
         {chatMessages.length === 0 && (
-          <li className="text-gray-500 text-center py-4">
+          <li className="text-gray-400 text-center py-4">
             No messages yet. Say hello!
           </li>
         )}

@@ -96,7 +96,7 @@ export default function Topbar({
             {isRoomMenuOpen && (
               <div className="absolute top-full left-0 mt-2 w-64 bg-neutral-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
                 <div className="px-3 py-2 border-b border-gray-700">
-                  <p className="text-xs text-gray-500 uppercase font-semibold">
+                  <p className="text-xs text-gray-400 uppercase font-semibold">
                     Switch Room
                   </p>
                 </div>
@@ -124,7 +124,7 @@ export default function Topbar({
                         )}
                       </span>
                       {getParticipantCount(room) !== undefined && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           {getParticipantCount(room)} in room
                         </span>
                       )}
@@ -137,7 +137,7 @@ export default function Topbar({
         )}
 
         {!isConnected && (
-          <div className="flex items-center gap-2 text-gray-500 text-sm">
+          <div className="flex items-center gap-2 text-gray-400 text-sm">
             <div className="w-2 h-2 bg-gray-600 rounded-full" />
             <span>Not connected</span>
           </div>
@@ -204,7 +204,7 @@ export default function Topbar({
               <div className="absolute top-full right-0 mt-2 w-56 bg-neutral-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
                 <div className="px-3 py-3 border-b border-gray-700">
                   <p className="text-sm font-medium text-white">{userName}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     {isConnected ? "Connected" : "Offline"}
                   </p>
                 </div>
@@ -234,7 +234,7 @@ export default function Topbar({
                 </div>
 
                 <div className="px-3 py-2 border-t border-gray-700">
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-400">
                     AG-Visio v0.1.0-SOTA
                   </p>
                 </div>
@@ -244,7 +244,7 @@ export default function Topbar({
         ) : (
           <div className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800 rounded-lg">
             <User className="w-5 h-5 text-gray-500" />
-            <span className="text-sm text-gray-500">Guest</span>
+            <span className="text-sm text-gray-400">Guest</span>
           </div>
         )}
       </div>
