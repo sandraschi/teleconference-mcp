@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
       canSubscribe: true,
     });
 
-    return NextResponse.json({ token: at.toJwt() });
+    // NOTE: toJwt() is async in livekit-server-sdk v2 (Promise<string>). Forgetting
+    // await serializes to {"token":{}} and every join 401s with [object Object].
+    return NextResponse.json({ token: await at.toJwt() });
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Token generation failed" },

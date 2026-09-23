@@ -23,10 +23,10 @@ test.describe("AG-Visio smoke", () => {
     await page.goto("/settings");
     await expect(page.getByRole("heading", { name: /settings/i })).toBeVisible();
     await expect(page.getByText(/livekit configuration/i)).toBeVisible();
-    await expect(page.getByText(/ollama/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /ollama \(ai agent\)/i })).toBeVisible();
     await expect(page.getByText(/audio & video devices/i)).toBeVisible();
     await expect(page.getByText(/appearance/i)).toBeVisible();
-    await expect(page.getByText(/privacy/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^privacy$/i })).toBeVisible();
   });
 
   test("theme selector works", async ({ page }) => {
@@ -53,10 +53,11 @@ test.describe("AG-Visio smoke", () => {
 
   test("sidebar navigation is present", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /dashboard/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /meetings/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /health/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /settings/i })).toBeVisible();
+    const nav = page.getByTestId("sidebar-nav");
+    await expect(nav.getByRole("link", { name: /dashboard/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /meetings/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /health/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /settings/i })).toBeVisible();
   });
 
   test("meetings page loads", async ({ page }) => {
@@ -81,9 +82,9 @@ test.describe("AG-Visio smoke", () => {
 
   test("device test page loads camera/mic sections", async ({ page }) => {
     await page.goto("/test");
-    await expect(page.getByText(/camera/i)).toBeVisible();
-    await expect(page.getByText(/microphone/i)).toBeVisible();
-    await expect(page.getByText(/speaker/i)).toBeVisible();
+    await expect(page.getByText("Camera", { exact: true })).toBeVisible();
+    await expect(page.getByText("Microphone", { exact: true })).toBeVisible();
+    await expect(page.getByText("Speakers", { exact: true })).toBeVisible();
   });
 
   test("reset to defaults button exists in settings", async ({ page }) => {

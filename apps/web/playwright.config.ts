@@ -13,7 +13,16 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Fake camera/mic so join flows reach "connected" headlessly.
+        launchOptions: {
+          args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+        },
+      },
+    },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
   ],
   webServer: [
@@ -31,6 +40,9 @@ export default defineConfig({
       url: "http://localhost:10886",
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
+      // E2E runs as dev-bypass auth (same flag as local dev): specs assert the
+      // product UI, not the Authentik sign-in wall.
+      env: { AUTH_DISABLED: "true" },
     },
   ],
 });
