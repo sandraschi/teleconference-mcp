@@ -52,6 +52,7 @@ Full signatures in `packages/conferencing_mcp/tools/`.
 | `orchestrate_industrial_diagnostics` | Full-stack diagnostic run |
 | `orchestrate_remote_support` | Guided remote-support session |
 | `sample_system_forensics` | System forensics sample |
+| `status` | Version + endpoint reachability (dialogic shape) |
 
 ## signaling — Inter-agent bus (3)
 

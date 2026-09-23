@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] - 2026-09-23 assfix
+### Fixed (fleet assfix, SOTA pass)
+- **Launcher**: `python -m teleconference_mcp --serve` now boots the dual-surface backend
+  (MCP `/mcp` + `/health` + `/api/shutdown` on :10887 via Starlette mount, BUG-008/038
+  pattern). Fleet `start.ps1` previously launched stdio into the void.
+- **CORS**: explicit origins + Tailscale/LAN regex on the backend (was: none).
+- **Remoting ports**: moved off 10725 (mcp-studio's) to fleet-registered 11069; server no
+  longer binds forbidden :8000 default; launcher stops killing other repos' processes.
+- **LiveKit compose**: removed `livekit` service (port fight killed native LiveKitSFU);
+  web/agent point at native `:15580`; ONBOARDING/README updated.
+- **Lint gates green**: eslint 49 warnings → 0 (unused vars, `any` types, empty blocks,
+  conditional hook extracted to `IntelligenceTab`, `disable()` → typed `destroy()`),
+  tsc clean, ruff clean, pytest 104 green.
+- **Contrast pass**: dim gray-500/600 UI text → gray-400/300; `text-[10px]` → `text-xs`.
+- **Dev-key docs**: `.env.example` secret now matches repo dev default; livekit.yaml marked.
+- **HelpModal**: fixed stale `:10800` URL → `:10886`.
+### Added
+- `status` MCP tool (version + TCP probes, dialogic shape); `GET /api/llm/onboarding`;
+  Tauri `@tauri-apps/api` dep + `FleetEffects` (backend-status listen/HTTP fallback, zoom
+  shortcuts persisted); dashboard hero + data-testids; `serve`/`e2e` just recipes;
+  `skills/SKILL.md`; session-context files (copilot/opencode/antigravity); renovate.json;
+  `.gitattributes`; pyright CI step (non-blocking); `T20` ruff rule; e2e backend webServer.
+### Changed
+- CI node 20 → 22. `logger.error` → `logger.exception` in except blocks. Direct
+  `starlette`+`uvicorn` deps (were transitive-only).
+
 ## [2.3.0] - Unreleased (Planned)
 ### Added
 - **Test infrastructure overhaul**: 7 new test files (51 tests) with parametrized tool-level coverage.

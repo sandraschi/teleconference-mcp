@@ -26,7 +26,7 @@ cd teleconference-mcp
 just
 ```
 
-This opens an interactive dashboard showing all available commands. Run `just bootstrap` to install dependencies, then `just serve` or `just dev` to start.
+This opens an interactive dashboard showing all available commands. Run `just bootstrap` to install dependencies, then `just serve` to start.
 
 ### Manual Setup
 
@@ -62,21 +62,23 @@ docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│              Docker Stack (8 containers)             │
+│              Hybrid stack (native + docker)          │
 │                                                      │
-│  Browser (10886/15500) ←→ LiveKit SFU (15580)       │
+│  Browser (10886) ←→ LiveKit SFU native (15580)      │
 │       │                            │                 │
-│       ├── Redis (16379)            └── Agent (10887) │
+│       ├── Redis docker (16379)       ├── Agent       │
 │       │                                │             │
-│       ├── conferencing-mcp (10720)     ├── Ollama    │
-│       ├── remoting-mcp (10725)         ├── LanceDB   │
-│       │                                └── MCP Disc  │
+│       ├── conferencing-mcp (10887)     ├── Ollama    │
+│       ├── health/diag (10891)          ├── LanceDB   │
+│       ├── remoting-mcp (11069)         └── MCP Disc  │
 │       │                                              │
-│       └── Observability Stack:                       │
+│       └── Observability Stack (docker):               │
 │            Prometheus (19090) → Grafana (13000)      │
 │            Promtail → Loki (13100)                   │
 └─────────────────────────────────────────────────────┘
 ```
+LiveKit runs **natively** (Windows service `LiveKitSFU`) — never `docker compose up`
+a livekit service (port fight on :15580 killed the native service, 2026-09-23).
 
 ---
 
@@ -115,14 +117,13 @@ docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
 | Service | Dev Port | Docker Port |
 |---------|----------|-------------|
 | Web dashboard | 10886 | 15500 |
-| AI agent | 10887 | (container) |
-| Conferencing MCP | 10720 | (dev only) |
-| Conferencing health | 10721 | (dev only) |
-| Remoting MCP | 10725 | (dev only, Win) |
-| MCP discovery | 10700–10800 | — |
-| LiveKit WS | 15580 | 15580 |
-| LiveKit WebRTC | 15581 | 15581 |
-| LiveKit UDP | 15582 | 15582 |
+| Conferencing MCP (`/mcp`, `/health`, `/api/shutdown`) | 10887 | — (native via `start.ps1`) |
+| Conferencing health/diag/metrics | 10891 | — |
+| Remoting MCP (SSE) | 11069 | (dev only, Win) |
+| AI agent | (via `just agent`) | (container) |
+| LiveKit WS | 15580 | — (native service ONLY, never compose) |
+| LiveKit WebRTC | 15581 | — |
+| LiveKit UDP | 15582 | — |
 | Redis | 16379 | 16379 |
 | **Grafana** | — | **13000** |
 | **Loki** | — | **13100** |
@@ -133,14 +134,14 @@ docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
 ## Running the Stack
 
 ```powershell
-# Full stack (all 8 containers)
+# Full stack (docker infra + observability; LiveKit stays native)
 docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
 
 # Core only (no observability)
 docker compose -f docker-compose.yaml up -d
 
-# Development (local processes, Docker infra only)
-docker compose up -d livekit redis
+# Development (local processes, Docker infra only - no livekit service here)
+docker compose up -d redis
 .\start.ps1 all
 ```
 
@@ -160,8 +161,9 @@ docker compose up -d livekit redis
 
 ## What You Can Do
 
-**How it runs**: LiveKit SFU as fleet Windows service (`LiveKitSFU`) or Docker; Next.js dashboard +
-Python agent as local processes (`start.ps1`) or containers; Ollama LLM on your PC (never bundled).
+**How it runs**: LiveKit SFU as fleet Windows service (`LiveKitSFU`, native only — never
+Docker, see compose note above); Next.js dashboard + Python agent as local processes
+(`start.ps1`) or containers; Ollama LLM on your PC (never bundled).
 LiveKit itself is never bundled — install separately.
 
 | Direction | Artifacts | Notes |

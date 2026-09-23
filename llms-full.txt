@@ -16,18 +16,18 @@ Stack: Python 3.12+, FastMCP 3.4+, Next.js 16, LiveKit 1.12, Turborepo, Ruff lin
 - `teleconference_mcp/` — Entry point + shared health utilities
 - `apps/web/` — Next.js 16 dashboard (port 10886)
 - `apps/agent/` — LiveKit voice agent pipeline (Silero VAD → Whisper → Ollama → Piper TTS)
-- `packages/conferencing_mcp/` — 25 MCP tools (conferences, rooms, intelligence, diagnostics, signaling)
+- `packages/conferencing_mcp/` — 31 MCP tools (conferences, rooms, intelligence, diagnostics incl. status, signaling)
 - `packages/remoting_mcp/` — 8 MCP tools (screen capture, mouse/keyboard, join/leave meetings)
-- `tests/` — 95 pytest tests (68 conferencing + 27 agent)
+- `tests/` — 104 pytest tests (77 conferencing + 27 agent)
 - `native/` — Tauri 2.0 NSIS wrapper (untracked, in progress)
 
 ## Ports
 | Service | Port |
 |---------|------|
 | Web dashboard | 10886 |
-| Conferencing MCP | 10720 |
-| Health/Diagnostics | 10721 |
-| Remoting MCP | 10725 |
+| Conferencing MCP (`/mcp`, `/health`, `/api/shutdown`) | 10887 |
+| Health/Diagnostics | 10891 |
+| Remoting MCP (SSE) | 11069 |
 | AI Agent | 10887 |
 | LiveKit WS | 15580 |
 | LiveKit WebRTC | 15581 |
@@ -65,7 +65,7 @@ Stack: Python 3.12+, FastMCP 3.4+, Next.js 16, LiveKit 1.12, Turborepo, Ruff lin
 - `extract_action_items(room_name, transcript)` — Extract action items, persist to LanceDB
 - `set_translation_language(language)` — Set live translation target
 
-### Diagnostics (7 tools)
+### Diagnostics (8 tools)
 - `get_dev_stats()` — Git/disk local dev stats
 - `query_system_logs(pattern, limit)` — Windows Event Log search
 - `sample_log_analysis(pattern, iterations)` — Iterative log sampling
