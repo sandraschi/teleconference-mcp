@@ -1,13 +1,9 @@
-import { NextResponse } from "next/server";
 import { RoomServiceClient } from "livekit-server-sdk";
+import { NextResponse } from "next/server";
 import { livekitApiKey, livekitApiSecret, livekitHttpUrl } from "@/lib/livekit-server";
 
 export async function GET() {
-  const roomService = new RoomServiceClient(
-    livekitHttpUrl(),
-    livekitApiKey(),
-    livekitApiSecret()
-  );
+  const roomService = new RoomServiceClient(livekitHttpUrl(), livekitApiKey(), livekitApiSecret());
   try {
     const rooms = await roomService.listRooms();
     return NextResponse.json({
@@ -22,7 +18,7 @@ export async function GET() {
         livekit: { reachable: false, error: String(error) },
         timestamp: new Date().toISOString(),
       },
-      { status: 503 }
+      { status: 503 },
     );
   }
 }

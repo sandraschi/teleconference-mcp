@@ -16,19 +16,13 @@ export async function GET() {
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) {
-      return NextResponse.json(
-        { error: `Ollama returned ${res.status}` },
-        { status: 502 }
-      );
+      return NextResponse.json({ error: `Ollama returned ${res.status}` }, { status: 502 });
     }
     const data = (await res.json()) as { models?: OllamaModel[] };
     return NextResponse.json({
       models: data.models ?? [],
     });
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : String(e) },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 502 });
   }
 }

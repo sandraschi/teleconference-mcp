@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir, readFile } from "fs/promises";
-import { join } from "path";
-import crypto from "crypto";
+import crypto from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { type NextRequest, NextResponse } from "next/server";
 
 const FILES_DIR = join(process.cwd(), "data", "files");
 const INDEX_FILE = join(FILES_DIR, "_index.json");
@@ -63,10 +63,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(entry, { status: 201 });
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Upload failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : "Upload failed" }, { status: 500 });
   }
 }
 
@@ -75,10 +72,7 @@ export async function GET() {
     const index = await getIndex();
     return NextResponse.json({ files: index });
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "List failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : "List failed" }, { status: 500 });
   }
 }
 

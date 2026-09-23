@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { readFile, writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { type NextRequest, NextResponse } from "next/server";
 
 const DATA_DIR = join(process.cwd(), "data");
 const MEETINGS_FILE = join(DATA_DIR, "meetings.json");
@@ -46,9 +46,7 @@ export async function GET(request: NextRequest) {
     const meetings = await loadMeetings();
     const after = request.nextUrl.searchParams.get("after");
     const limit = Math.min(Number(request.nextUrl.searchParams.get("limit")) || 50, 100);
-    let list = meetings.sort(
-      (a, b) => new Date(a.start_utc).getTime() - new Date(b.start_utc).getTime()
-    );
+    let list = meetings.sort((a, b) => new Date(a.start_utc).getTime() - new Date(b.start_utc).getTime());
     if (after) {
       const t = new Date(after).getTime();
       list = list.filter((m) => new Date(m.start_utc).getTime() >= t);
@@ -56,10 +54,7 @@ export async function GET(request: NextRequest) {
     list = list.slice(0, limit);
     return NextResponse.json({ meetings: list });
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : String(e) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
   }
 }
 
@@ -76,10 +71,7 @@ export async function POST(request: NextRequest) {
     const duration_min = Number(body.duration_min) || 60;
     const room_name = body.room_name?.trim() || "ag-visio-conference";
     if (!title || !start_utc) {
-      return NextResponse.json(
-        { error: "Missing title or start_utc" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing title or start_utc" }, { status: 400 });
     }
     const start = new Date(start_utc);
     if (Number.isNaN(start.getTime())) {
@@ -104,9 +96,6 @@ export async function POST(request: NextRequest) {
     await saveMeetings(meetings);
     return NextResponse.json(meeting);
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : String(e) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
   }
 }

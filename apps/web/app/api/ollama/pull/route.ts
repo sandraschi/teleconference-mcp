@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST ?? "http://localhost:11434";
 
@@ -7,17 +7,11 @@ export async function POST(request: NextRequest) {
   try {
     body = (await request.json()) as { model?: string; stream?: boolean };
   } catch {
-    return NextResponse.json(
-      { ok: false, error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ ok: false, error: "Invalid JSON body" }, { status: 400 });
   }
   const model = body.model?.trim();
   if (!model) {
-    return NextResponse.json(
-      { ok: false, error: "Missing model name" },
-      { status: 400 }
-    );
+    return NextResponse.json({ ok: false, error: "Missing model name" }, { status: 400 });
   }
   const stream = body.stream === true;
 
@@ -30,10 +24,7 @@ export async function POST(request: NextRequest) {
     });
     if (!res.ok) {
       const text = await res.text();
-      return NextResponse.json(
-        { ok: false, error: text || `Ollama returned ${res.status}` },
-        { status: 200 }
-      );
+      return NextResponse.json({ ok: false, error: text || `Ollama returned ${res.status}` }, { status: 200 });
     }
     if (stream && res.body) {
       return new NextResponse(res.body, {
@@ -51,7 +42,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: e instanceof Error ? e.message : String(e),
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 }
