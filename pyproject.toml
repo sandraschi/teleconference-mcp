@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "fastmcp>=3.4.4,<4",
+    # Direct deps (imported by run_server.py dual-surface backend, not just transitive via fastmcp)
+    "starlette>=0.37",
+    "uvicorn>=0.30",
     "livekit>=1.0.0",
     "livekit-api>=1.0.0",
     "livekit-agents>=1.8.0",
@@ -67,8 +70,16 @@ line-length = 120
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "S", "UP", "RUF"]
+select = ["E", "F", "W", "I", "B", "S", "UP", "RUF", "T20"]
 ignore = ["S101", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# CLI entry points / launchers: console output is the interface
+"teleconference_mcp/__main__.py" = ["T20"]
+"run_server.py" = ["T20"]
+"apps/agent/**/*.py" = ["T20"]
+# Tests may print
+"tests/**/*.py" = ["T20"]
 
 [tool.ruff.format]
 quote-style = "double"

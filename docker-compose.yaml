@@ -1,19 +1,11 @@
-# Full stack: livekit, redis, web, agent.
+# Partial stack: redis, web, agent.
+# LiveKit is NOT containerized here: it runs natively as the NSSM service LiveKitSFU
+# on :15580 (fleet-registered). A compose livekit service binding :15580 killed the
+# native service in a port fight (2026-09-23 outage) and was removed. Containers
+# below reach it via host.docker.internal:15580.
 # Ollama runs OUTSIDE Docker on your PC (start it yourself: ollama serve, ollama pull gemma2).
 # The agent container reaches the host's Ollama via OLLAMA_BASE_URL=http://host.docker.internal:11434/v1.
 services:
-  livekit:
-    build:
-      context: .
-      dockerfile: livekit.Dockerfile
-    ports:
-      - "15580:15580"
-      - "15581:15581"
-      - "15582:15582/udp"
-    restart: always
-    volumes:
-      - livekit_data:/var/lib/livekit
-
   redis:
     image: redis:7-alpine
     command: redis-server --save 20 1
@@ -40,8 +32,6 @@ services:
       # AUTH_SECRET + provider vars for a secured deployment).
       - AUTH_DISABLED=${AUTH_DISABLED:-true}
       - PORT=15500
-    depends_on:
-      - livekit
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -51,14 +41,13 @@ services:
       context: .
       dockerfile: apps/agent/Dockerfile
     environment:
-      - LIVEKIT_URL=ws://livekit:15580
+      # Native NSSM LiveKitSFU on the host (compose must NOT bind :15580 itself).
+      - LIVEKIT_URL=ws://host.docker.internal:15580
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
       # Dev default must match keys: in livekit.yaml
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-dev-secret-0123456789abcdef-0123456789abcdef}
       - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
       - OLLAMA_MODEL=gemma2
-    depends_on:
-      - livekit
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -66,7 +55,6 @@ services:
       - lancedb_data:/app/lancedb_data
 
 volumes:
-  livekit_data:
   redis_data:
   lancedb_data:
 

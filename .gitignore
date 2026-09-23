@@ -71,3 +71,10 @@ _dashboard/
 # Timestamped backup specialists (fleet standard - both patterns required)
 *.bak
 *.bak.*
+
+# Assess reports (regenerable snapshots, not source)
+reports/
+
+# MCPB pack staging + bundles (exact copy of src/, never commit)
+mcpb/src/
+*.mcpb

@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: package-lock.json
       - name: Install dependencies (workspace root)
@@ -46,6 +46,9 @@ jobs:
         run: uv run ruff format --check apps/agent/ packages/ teleconference_mcp/ tests/
       - name: Pytest with coverage
         run: uv run pytest tests/ apps/agent/tests/ -v --tb=short --junit-xml=test-results.xml --cov --cov-fail-under=70
+      - name: Pyright type-check (non-blocking; 29 pre-existing SDK-drift errors tracked for cleanup)
+        continue-on-error: true
+        run: uv run --with pyright pyright packages/ teleconference_mcp/
       - name: ty type-check (non-blocking)
         continue-on-error: true
         run: uv run ty check apps/agent/ packages/conferencing_mcp/ teleconference_mcp/ --ignore-missing-imports 2>&1
