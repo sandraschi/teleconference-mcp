@@ -9,7 +9,7 @@ export default function BackgroundBlurToggle() {
   const { localParticipant } = useLocalParticipant();
   const [isBlurred, setIsBlurred] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
-  const processorRef = useRef<any>(null);
+  const processorRef = useRef<{ destroy(): Promise<void> } | null>(null);
 
   const handleToggle = useCallback(async () => {
     if (isToggling) return;
@@ -17,7 +17,10 @@ export default function BackgroundBlurToggle() {
     try {
       if (isBlurred) {
         if (processorRef.current) {
-          try { processorRef.current.disable(); } catch {}
+          try {
+            await processorRef.current.destroy();
+            // eslint-disable-next-line no-empty -- destroy is best-effort on teardown
+          } catch {}
           processorRef.current = null;
         }
         setIsBlurred(false);
@@ -28,7 +31,8 @@ export default function BackgroundBlurToggle() {
         if (videoTrack && "setProcessor" in videoTrack) {
           const processor = BackgroundBlur();
           processorRef.current = processor;
-          await (videoTrack as any).setProcessor(processor);
+          type ProcessorTarget = { setProcessor(p: unknown): Promise<void> };
+          await (videoTrack as ProcessorTarget).setProcessor(processor);
           setIsBlurred(true);
         }
       }

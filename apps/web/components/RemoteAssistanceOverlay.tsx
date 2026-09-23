@@ -1,7 +1,7 @@
 "use client";
 
 import { useRoomContext } from "@livekit/components-react";
-import { RoomEvent } from "livekit-client";
+import { RoomEvent, type RemoteParticipant } from "livekit-client";
 import { useEffect, useState } from "react";
 import { Shield, ShieldAlert, X, Monitor, ChevronRight } from "lucide-react";
 
@@ -15,17 +15,16 @@ export default function RemoteAssistanceOverlay() {
   useEffect(() => {
     if (!room) return;
 
-    const handleData = (payload: Uint8Array, participant: any) => {
+    const handleData = (payload: Uint8Array, participant?: RemoteParticipant) => {
       try {
         const text = new TextDecoder().decode(payload);
-        const data = JSON.parse(text);
+        const data: { type?: string; reason?: string } = JSON.parse(text);
 
         if (data.type === "remote_request") {
-          setRequest({ reason: data.reason, sender: participant?.identity || "Agent" });
+          setRequest({ reason: data.reason ?? "", sender: participant?.identity || "Agent" });
         }
-      } catch (e) {
-        // Ignore non-JSON
-      }
+        // eslint-disable-next-line no-empty -- non-JSON packets belong to other features
+      } catch {}
     };
 
     room.on(RoomEvent.DataReceived, handleData);
@@ -72,7 +71,7 @@ export default function RemoteAssistanceOverlay() {
 
           <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/5">
             <p className="text-sm text-gray-300 leading-relaxed italic">
-              "{request.reason}"
+              &ldquo;{request.reason}&rdquo;
             </p>
           </div>
 

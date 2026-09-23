@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir, readFile } from "fs/promises";
-import { existsSync } from "fs";
 import { join } from "path";
 import crypto from "crypto";
 
@@ -71,7 +70,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const index = await getIndex();
     return NextResponse.json({ files: index });

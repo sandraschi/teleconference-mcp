@@ -18,14 +18,14 @@ export default function ScreenShareControl() {
         for (const pub of room.localParticipant?.trackPublications.values() ?? []) {
           if (pub.source === Track.Source.ScreenShare) {
             pub.track?.stop();
-            await (room.localParticipant as any)?.unpublishTrack(pub.trackSid);
+            if (pub.track) await room.localParticipant?.unpublishTrack(pub.track);
           }
         }
       } else {
         const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
         const mediaTrack = stream.getVideoTracks()[0];
         if (!mediaTrack) return;
-        await room.localParticipant?.publishTrack(mediaTrack as any, {
+        await room.localParticipant?.publishTrack(mediaTrack, {
           source: Track.Source.ScreenShare,
         });
         mediaTrack.onended = () => {};
