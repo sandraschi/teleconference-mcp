@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, ReactNode } from "react";
-import Sidebar from "@/components/Sidebar";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import HelpModal from "@/components/HelpModal";
+import Sidebar from "@/components/Sidebar";
 import { getSettings } from "@/lib/settings";
 
 interface AppShellProps {
@@ -23,11 +23,7 @@ export default function AppShell({ children }: AppShellProps) {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     // Ignore if typing in an input
     const target = e.target as HTMLElement;
-    if (
-      target.tagName === "INPUT" ||
-      target.tagName === "TEXTAREA" ||
-      target.isContentEditable
-    ) {
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
       return;
     }
 

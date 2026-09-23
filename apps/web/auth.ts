@@ -1,6 +1,5 @@
+import type { DefaultSession, NextAuthConfig, Profile, Session } from "next-auth";
 import NextAuth from "next-auth";
-import type { NextAuthConfig, Profile, Session } from "next-auth";
-import type { DefaultSession } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
@@ -56,9 +55,7 @@ const config: NextAuthConfig = {
   // AUTH_DISABLED bypass or public pages), so without this the dev server
   // 500s with MissingSecret when AUTH_SECRET is unset. Production without
   // AUTH_SECRET still throws — as it should.
-  secret:
-    process.env.AUTH_SECRET ||
-    (process.env.NODE_ENV !== "production" ? "dev-only-insecure-secret" : undefined),
+  secret: process.env.AUTH_SECRET || (process.env.NODE_ENV !== "production" ? "dev-only-insecure-secret" : undefined),
 };
 
 const authInstance = NextAuth(config);
@@ -67,9 +64,6 @@ export const handlers = authInstance.handlers as {
   GET: (req: Request) => Promise<Response>;
   POST: (req: Request) => Promise<Response>;
 };
-export const signIn = authInstance.signIn as (
-  provider?: string,
-  options?: Record<string, unknown>
-) => Promise<void>;
+export const signIn = authInstance.signIn as (provider?: string, options?: Record<string, unknown>) => Promise<void>;
 export const signOut = authInstance.signOut as (options?: Record<string, unknown>) => Promise<void>;
 export const auth = authInstance.auth as (req?: Request) => Promise<Session | null>;

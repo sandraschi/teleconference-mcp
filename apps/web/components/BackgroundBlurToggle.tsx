@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
-import { VideoOff, Video, Loader2 } from "lucide-react";
 import { useLocalParticipant } from "@livekit/components-react";
 import { Track } from "livekit-client";
+import { Loader2, Video, VideoOff } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 
 export default function BackgroundBlurToggle() {
   const { localParticipant } = useLocalParticipant();
@@ -49,9 +49,7 @@ export default function BackgroundBlurToggle() {
       onClick={handleToggle}
       disabled={isToggling}
       className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-        isBlurred
-          ? "bg-purple-600 text-white hover:bg-purple-700"
-          : "bg-neutral-800 text-gray-300 hover:bg-neutral-700"
+        isBlurred ? "bg-purple-600 text-white hover:bg-purple-700" : "bg-neutral-800 text-gray-300 hover:bg-neutral-700"
       } disabled:opacity-50`}
       title={isBlurred ? "Disable background blur" : "Enable background blur"}
     >
@@ -62,9 +60,7 @@ export default function BackgroundBlurToggle() {
       ) : (
         <Video className="w-4 h-4" />
       )}
-      <span className="hidden sm:inline">
-        {isBlurred ? "Blur On" : "Blur"}
-      </span>
+      <span className="hidden sm:inline">{isBlurred ? "Blur On" : "Blur"}</span>
     </button>
   );
 }
