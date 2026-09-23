@@ -322,7 +322,7 @@ export default function ModConsDashboard() {
                   ) : rightPanelTab === "files" ? (
                     <FileSharingPanel />
                   ) : rightPanelTab === "intelligence" ? (
-                    <MeetingIntelligencePanel room={useRoomContext()} />
+                    <IntelligenceTab />
                   ) : (
                     <div className="h-full p-2">
                        <ContactPanel />
@@ -335,11 +335,22 @@ export default function ModConsDashboard() {
             <>
               <div className="relative flex-1 p-4 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-6 w-full max-w-md p-8 glass-panel rounded-3xl animate-glow">
+                  <div className="text-center" data-testid="dashboard-hero">
+                    <h1 className="text-2xl font-bold text-white mb-1">
+                      AG-Visio Conference
+                    </h1>
+                    <p className="text-gray-400 text-sm" data-testid="dashboard-subtitle">
+                      Self-hosted video conferencing with AI assistance — pick a room
+                      below, or browse <a className="text-blue-400 hover:text-blue-300" href="/tools">MCP tools</a>,{" "}
+                      <a className="text-blue-400 hover:text-blue-300" href="/schedule">schedule</a> and{" "}
+                      <a className="text-blue-400 hover:text-blue-300" href="/health">system health</a>.
+                    </p>
+                  </div>
                   <div className="text-center">
                     <h2 className="text-xl font-semibold text-white mb-2">
                       Join Conference
                     </h2>
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-gray-400 text-sm">
                       Enter your name to join the AG-Visio conference room
                     </p>
                   </div>
@@ -350,6 +361,7 @@ export default function ModConsDashboard() {
                         Room
                       </label>
                       <select
+                        data-testid="room-select"
                         value={useCustomRoom ? "__custom__" : currentRoom}
                         onChange={(e) => {
                           if (e.target.value === "__custom__") {
@@ -392,6 +404,7 @@ export default function ModConsDashboard() {
                       </label>
                       <input
                         type="text"
+                        data-testid="join-name"
                         placeholder="Enter your name"
                         value={participantName}
                         onChange={(e) => setParticipantName(e.target.value)}
@@ -457,6 +470,7 @@ export default function ModConsDashboard() {
                     )}
 
                     <button
+                      data-testid="join-submit"
                       onClick={() => handleInit()}
                       disabled={isLoading}
                       className="w-full px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
@@ -479,7 +493,7 @@ export default function ModConsDashboard() {
                     </a>
                   </div>
 
-                  <p className="text-xs text-gray-600">
+                    <p className="text-xs text-gray-400">
                     Press <kbd className="px-1.5 py-0.5 bg-neutral-700 rounded text-gray-400">?</kbd> for help
                   </p>
                 </div>
@@ -498,6 +512,12 @@ export default function ModConsDashboard() {
       </div>
     </ErrorBoundary>
   );
+}
+
+function IntelligenceTab() {
+  // Hook runs unconditionally in its own component (rules-of-hooks).
+  const room = useRoomContext();
+  return <MeetingIntelligencePanel room={room} />;
 }
 
 function ModConsGrid({ 

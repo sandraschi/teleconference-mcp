@@ -91,6 +91,7 @@ export default function ToolsPage() {
             <h1 className="text-2xl font-bold">MCP Tools</h1>
           </div>
           <button
+            data-testid="tools-refresh"
             onClick={fetchAll}
             disabled={isLoading}
             className="flex items-center gap-2 px-4 py-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-sm disabled:opacity-50"
@@ -156,6 +157,7 @@ export default function ToolsPage() {
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <code className="text-sm text-blue-400 truncate">{name}</code>
                         <button
+                          data-testid={`tool-invoke-${name}`}
                           onClick={() => invoke(name)}
                           disabled={running === name}
                           className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-xs disabled:opacity-50"
@@ -171,6 +173,7 @@ export default function ToolsPage() {
                       {result && (
                         <div className="mt-2">
                           <button
+                            data-testid={`tool-expand-${name}`}
                             onClick={() => setExpanded((p) => ({ ...p, [name]: !p[name] }))}
                             className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300"
                           >

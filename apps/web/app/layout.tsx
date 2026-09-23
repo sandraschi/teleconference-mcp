@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
+import FleetEffects from "@/components/FleetEffects";
 import { ToastProvider } from "@/lib/toast";
 import ThemeProvider from "@/components/ThemeProvider";
 import AuthProvider from "@/components/AuthProvider";
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-white`}>
+        <FleetEffects />
         <AuthProvider>
           <ThemeProvider>
             <ToastProvider>

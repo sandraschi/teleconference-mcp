@@ -57,7 +57,7 @@ export default function HealthDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-6">
+    <div className="min-h-screen bg-neutral-950 text-white p-6" data-testid="health-page">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <Link
@@ -68,6 +68,7 @@ export default function HealthDashboardPage() {
             Back to Conference
           </Link>
           <button
+            data-testid="health-refresh"
             onClick={fetchAll}
             disabled={isLoading}
             className="flex items-center gap-2 px-4 py-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-sm disabled:opacity-50"
@@ -145,7 +146,7 @@ export default function HealthDashboardPage() {
           </section>
 
           {discovery && (
-            <section className="bg-neutral-900 border border-gray-800 rounded-xl p-6">
+          <section className="bg-neutral-900 border border-gray-800 rounded-xl p-6" data-testid="health-backend">
               <h2 className="text-lg font-semibold mb-4">Discovery</h2>
               <div className="space-y-2 text-sm">
                 <p>

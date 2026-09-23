@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Clock, Plus, Link2, Copy, CheckCheck, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Plus, Link2, CheckCheck, Loader2 } from "lucide-react";
 
 interface Meeting {
   id: string;
@@ -114,6 +114,7 @@ export default function MeetingsPage() {
           </div>
           <button
             type="button"
+            data-testid="meetings-new"
             onClick={() => setShowForm(!showForm)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
           >
@@ -137,6 +138,7 @@ export default function MeetingsPage() {
               <label className="block text-sm font-medium text-gray-300 mb-1">Title</label>
               <input
                 type="text"
+                data-testid="meetings-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Sprint Review, 1:1, etc."
@@ -150,6 +152,7 @@ export default function MeetingsPage() {
                 <label className="block text-sm font-medium text-gray-300 mb-1">Date & Time</label>
                 <input
                   type="datetime-local"
+                  data-testid="meetings-date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
