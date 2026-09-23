@@ -20,6 +20,7 @@
     "@livekit/components-styles": "^1.2.0",
     "@livekit/track-processors": "^0.7.2",
     "@repo/ui": "*",
+    "@tauri-apps/api": "^2.11.1",
     "clsx": "^2.1.1",
     "livekit-client": "^2.22.2",
     "livekit-server-sdk": "^2.18.0",

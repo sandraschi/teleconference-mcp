@@ -16,10 +16,21 @@ export default defineConfig({
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
   ],
-  webServer: {
-    command: "npm run dev",
-    url: "http://localhost:10886",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  webServer: [
+    {
+      // Python backend MUST be up: specs navigate tools/health pages that call
+      // :10887 (MCP + /health) and :10891 (diagnostics). Frontend-only webServer
+      // left those specs hitting a dead backend (assfix 2026-09-23).
+      command: "uv run --project ../.. python -m teleconference_mcp --serve",
+      url: "http://localhost:10887/health",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+    },
+    {
+      command: "npm run dev",
+      url: "http://localhost:10886",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+    },
+  ],
 });

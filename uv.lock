@@ -2811,6 +2811,8 @@ dependencies = [
     { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "pywinctl", marker = "sys_platform == 'win32'" },
     { name = "redis" },
+    { name = "starlette" },
+    { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
@@ -2847,6 +2849,8 @@ requires-dist = [
     { name = "pywin32", marker = "sys_platform == 'win32'", specifier = ">=306" },
     { name = "pywinctl", marker = "sys_platform == 'win32'", specifier = ">=0.0.43" },
     { name = "redis", specifier = ">=5.0.0" },
+    { name = "starlette", specifier = ">=0.37" },
+    { name = "uvicorn", specifier = ">=0.30" },
 ]
 
 [package.metadata.requires-dev]
