@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useCallback, ReactNode } from "react";
 import { X } from "lucide-react";
+import { type ReactNode, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface ModalProps {
@@ -21,21 +21,14 @@ const sizeClasses = {
   full: "max-w-[90vw] max-h-[90vh]",
 };
 
-export default function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-  size = "lg",
-  showCloseButton = true,
-}: ModalProps) {
+export default function Modal({ isOpen, onClose, title, children, size = "lg", showCloseButton = true }: ModalProps) {
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
       }
     },
-    [onClose]
+    [onClose],
   );
 
   useEffect(() => {
@@ -54,18 +47,14 @@ export default function Modal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Content */}
       <div
         className={cn(
           "relative z-10 w-full bg-neutral-900 border border-gray-700 rounded-xl shadow-2xl",
           "animate-in fade-in zoom-in-95 duration-200",
-          sizeClasses[size]
+          sizeClasses[size],
         )}
         role="dialog"
         aria-modal="true"
@@ -81,6 +70,7 @@ export default function Modal({
             )}
             {showCloseButton && (
               <button
+                type="button"
                 onClick={onClose}
                 className="p-1 text-gray-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors ml-auto"
                 aria-label="Close modal"
