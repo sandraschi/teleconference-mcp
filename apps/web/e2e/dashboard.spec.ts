@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Dashboard smoke + navigation", () => {
   test("home page loads", async ({ page }) => {
@@ -8,7 +8,7 @@ test.describe("Dashboard smoke + navigation", () => {
 
   test("sidebar navigation works", async ({ page }) => {
     await page.goto("/");
-        const sidebar = page.locator("nav").first();
+    const sidebar = page.locator("nav").first();
     const links = sidebar.locator("a");
     const count = await links.count();
     expect(count).toBeGreaterThanOrEqual(3);
@@ -16,17 +16,19 @@ test.describe("Dashboard smoke + navigation", () => {
 
   test("settings page loads sections", async ({ page }) => {
     await page.goto("/settings");
-        await expect(page.locator("text=Settings").first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("text=Settings").first()).toBeVisible({ timeout: 10000 });
   });
 
   test("health page loads", async ({ page }) => {
     await page.goto("/health");
-        await expect(page.locator("text=Health").or(page.locator("text=health")).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("text=Health").or(page.locator("text=health")).first()).toBeVisible({ timeout: 10000 });
   });
 
   test("meetings page loads", async ({ page }) => {
     await page.goto("/meetings");
-        await expect(page.locator("text=Meetings").or(page.locator("text=meetings")).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("text=Meetings").or(page.locator("text=meetings")).first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("keyboard shortcut ? opens help modal", async ({ page }) => {
@@ -65,7 +67,10 @@ test.describe("Join flow", () => {
     const nameInput = page.locator('input[placeholder*="name" i], input[placeholder*="Name"]').first();
     if (await nameInput.isVisible()) {
       await nameInput.fill("TestUser");
-      const joinBtn = page.locator("button").filter({ hasText: /join|enter/i }).first();
+      const joinBtn = page
+        .locator("button")
+        .filter({ hasText: /join|enter/i })
+        .first();
       await joinBtn.click();
       // Dev-server hydration race (see multi-client.spec): retry once if still on form.
       await page.waitForTimeout(3000);

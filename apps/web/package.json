@@ -9,7 +9,6 @@
     "start": "next start --port 10886",
     "lint": "biome check .",
     "biome:ci": "biome check .",
-    "biome:ci": "biome check .",
     "check-types": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

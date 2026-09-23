@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("AG-Visio smoke", () => {
   test("home page loads and shows join form", async ({ page }) => {
