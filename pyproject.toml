@@ -80,6 +80,7 @@ ignore = ["S101", "B008"]
 "apps/agent/**/*.py" = ["T20"]
 # Tests may print
 "tests/**/*.py" = ["T20"]
+"scripts/**" = ["E501", "S110", "S310", "S603", "S607", "T20"]
 
 [tool.ruff.format]
 quote-style = "double"
