@@ -15,6 +15,7 @@ import json
 import logging
 import os
 import sys
+from pathlib import Path
 from typing import Annotated, Any
 
 import aiohttp
@@ -48,12 +49,16 @@ from state_bus import StateBus
 from transcription_substrate import TranscriptionSubstrate
 from vision_analyze import VisionSubstrate
 
+# Absolute log path: a bare filename lands in the host's cwd (BUG-063)
+LOG_DIR = Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "teleconference-mcp" / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler("agent_industrial.log"),
+        logging.FileHandler(LOG_DIR / "agent_industrial.log"),
     ],
 )
 logger = logging.getLogger("ag-visio-agent")

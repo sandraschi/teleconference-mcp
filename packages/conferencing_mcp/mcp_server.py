@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from pathlib import Path
 
 from fastmcp import FastMCP
 from fastmcp.server import create_proxy
@@ -15,8 +16,12 @@ class CorrelationIdFilter(logging.Filter):
         return True
 
 
+# Absolute log path: a bare filename lands in the host's cwd (BUG-063)
+_log_dir = Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "teleconference-mcp" / "logs"
+_log_dir.mkdir(parents=True, exist_ok=True)
+
 _handler_stdout = logging.StreamHandler(sys.stdout)
-_handler_file = logging.FileHandler("mcp_server.log")
+_handler_file = logging.FileHandler(_log_dir / "mcp_server.log")
 for _h in (_handler_stdout, _handler_file):
     _h.addFilter(CorrelationIdFilter())
 
