@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import socket
 import subprocess
@@ -25,16 +26,24 @@ async def get_dev_stats(ctx: Context) -> str:
     _cid = cid(ctx)
     logger.info("Executing get_dev_stats tool", extra={"correlation_id": _cid})
     try:
-        git_branch = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True).stdout.strip()  # noqa: S607
-        git_status = subprocess.run(["git", "status", "--short"], capture_output=True, text=True).stdout  # noqa: S607
-        git_last_commit = subprocess.run(
-            ["git", "log", "-1", "--oneline"],  # noqa: S607
-            capture_output=True,
-            text=True,
+        git_branch = (
+            await asyncio.to_thread(subprocess.run, ["git", "branch", "--show-current"], capture_output=True, text=True)
+        ).stdout.strip()
+        git_status = (
+            await asyncio.to_thread(subprocess.run, ["git", "status", "--short"], capture_output=True, text=True)
+        ).stdout
+        git_last_commit = (
+            await asyncio.to_thread(
+                subprocess.run,
+                ["git", "log", "-1", "--oneline"],
+                capture_output=True,
+                text=True,
+            )
         ).stdout.strip()
 
-        disk_proc = subprocess.run(
-            [  # noqa: S607
+        disk_proc = await asyncio.to_thread(
+            subprocess.run,
+            [
                 "powershell",
                 "-Command",
                 (
@@ -84,7 +93,9 @@ async def query_system_logs(
             f"Where-Object {{ $_.Message -match '{pattern}' }} | "
             f"Select-Object -First {limit} | Format-List Message"
         )
-        proc = subprocess.run(["powershell", "-Command", cmd], capture_output=True, text=True, check=True)  # noqa: S603, S607
+        proc = await asyncio.to_thread(
+            subprocess.run, ["powershell", "-Command", cmd], capture_output=True, text=True, check=True
+        )
 
         return proc.stdout or "RES [SOTA-N01]: No matches found for pattern."
     except subprocess.CalledProcessError as e:
