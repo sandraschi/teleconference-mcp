@@ -5,15 +5,14 @@
     BackendPort  = 10887
     FrontendPort = 10886
     HealthPath   = '/health'
-    WebRoot      = '.'
+    WebRoot      = 'apps\web'
     Backend = @{
         Kind       = 'module-serve'
         Module     = 'teleconference_mcp'
     }
     Frontend = @{
-        Kind           = 'vite-npm'
+        Kind           = 'next'
         PackageManager = 'npm'
-        PortEnvVar     = 'VITE_PORT'
-        ApiTargetEnv   = 'VITE_API_TARGET'
+        ApiTargetEnv   = 'BACKEND_URL'
     }
 }

@@ -54,50 +54,50 @@ services:
     volumes:
       - lancedb_data:/app/lancedb_data
 
+  # Optional: Authentik identity provider. Once running, create an OIDC
+  # provider + application in the admin UI (http://localhost:9000/if/flow/initial-setup/
+  # on first boot) and set AUTH_AUTHENTIK_ID / AUTH_AUTHENTIK_SECRET / AUTH_DISABLED=false
+  # in apps/web/.env.local. See docs/CONFIGURATION.md "Authentication — Authentik, explained".
+  authentik:
+    image: ghcr.io/goauthentik/server:stable
+    command: server
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-change-me}
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASSWORD:-change-me}
+    depends_on:
+      - authentik-db
+    restart: always
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:stable
+    command: worker
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-change-me}
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASSWORD:-change-me}
+    depends_on:
+      - authentik-db
+    restart: always
+
+  authentik-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${AUTHENTIK_DB_PASSWORD:-change-me}
+    volumes:
+      - authentik_db_data:/var/lib/postgresql/data
+    restart: always
+
 volumes:
   redis_data:
   lancedb_data:
-
-  # Optional: Authentik identity provider
-  # To enable, uncomment the authentik service below and configure
-  # AUTH_AUTHENTIK_ID / AUTH_AUTHENTIK_SECRET in your web env.
-  # See docs/LIVEKIT.md for full setup guide.
-  #
-  # authentik:
-  #   image: ghcr.io/goauthentik/server:latest
-  #   command: server
-  #   ports:
-  #     - "9000:9000"
-  #     - "9443:9443"
-  #   environment:
-  #     AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-change-me}
-  #     AUTHENTIK_POSTGRESQL__HOST: authentik-db
-  #     AUTHENTIK_POSTGRESQL__NAME: authentik
-  #     AUTHENTIK_POSTGRESQL__USER: authentik
-  #     AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASSWORD:-change-me}
-  #   depends_on:
-  #     - authentik-db
-  #   restart: always
-  #
-  # authentik-db:
-  #   image: postgres:16-alpine
-  #   environment:
-  #     POSTGRES_DB: authentik
-  #     POSTGRES_USER: authentik
-  #     POSTGRES_PASSWORD: ${AUTHENTIK_DB_PASSWORD:-change-me}
-  #   volumes:
-  #     - authentik_db_data:/var/lib/postgresql/data
-  #   restart: always
-  #
-  # authentik-worker:
-  #   image: ghcr.io/goauthentik/server:latest
-  #   command: worker
-  #   environment:
-  #     AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-change-me}
-  #     AUTHENTIK_POSTGRESQL__HOST: authentik-db
-  #     AUTHENTIK_POSTGRESQL__NAME: authentik
-  #     AUTHENTIK_POSTGRESQL__USER: authentik
-  #     AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASSWORD:-change-me}
-  #   depends_on:
-  #     - authentik-db
-  #   restart: always
+  authentik_db_data:
