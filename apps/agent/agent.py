@@ -111,6 +111,11 @@ OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 CLOUD_STT_PROVIDER = os.environ.get("CLOUD_STT_PROVIDER", "deepgram").lower()
 MUSE_TRANSCRIBE_MODEL = os.environ.get("MUSE_TRANSCRIBE_MODEL", "muse-voice-transcribe-1.0")
 MUSE_TRANSCRIBE_BASE_URL = os.environ.get("MUSE_TRANSCRIBE_BASE_URL", "https://api.meta.ai/v1")
+# CLOUD_STT_PROVIDER="mistral" (EXPERIMENTAL): Voxtral 3 via its OpenAI-compatible
+# batch route. This buys accuracy, NOT end-of-turn - the realtime WebSocket lane
+# (sub-500ms, turn.* events) needs a custom stt.STT plugin. Measure in bakeoff_stt.py first.
+MISTRAL_STT_MODEL = os.environ.get("MISTRAL_STT_MODEL", "voxtral-small-latest")
+MISTRAL_API_BASE = os.environ.get("MISTRAL_API_BASE", "https://api.mistral.ai").rstrip("/")
 
 
 # ---------------------------------------------------------------------------
@@ -402,6 +407,25 @@ async def entrypoint(ctx: JobContext) -> None:
                 except Exception as e:
                     logger.warning("Muse STT init failed (%s); falling back to Deepgram", e)
                     stt = deepgram.STT()
+            elif CLOUD_STT_PROVIDER == "mistral":
+                # EXPERIMENTAL (2026-10-20): Voxtral 3 through LiveKit's generic
+                # OpenAI-shaped STT. Batch latency, no turn.* events - this is a
+                # quality comparison arm, not the realtime plugin.
+                _mistral_key = os.environ.get("MISTRAL_API_KEY", "")
+                if not _mistral_key:
+                    logger.warning("MISTRAL_API_KEY missing; falling back to Deepgram")
+                    stt = deepgram.STT()
+                else:
+                    try:
+                        stt = openai.STT(
+                            model=MISTRAL_STT_MODEL,
+                            base_url=f"{MISTRAL_API_BASE}/v1",
+                            api_key=_mistral_key,
+                        )
+                        logger.info("Using Cloud STT: Mistral Voxtral 3 (%s, experimental)", MISTRAL_STT_MODEL)
+                    except Exception as e:
+                        logger.warning("Mistral STT init failed (%s); falling back to Deepgram", e)
+                        stt = deepgram.STT()
             else:
                 logger.info("Using Cloud providers (Deepgram/OpenAI)")
                 stt = deepgram.STT()

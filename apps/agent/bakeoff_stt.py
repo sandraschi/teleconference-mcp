@@ -1,5 +1,5 @@
 """
-apps/agent/bakeoff_stt.py — STT provider bake-off (Whisper vs Deepgram vs Muse).
+apps/agent/bakeoff_stt.py - STT provider bake-off (Whisper vs Deepgram vs Muse vs Voxtral).
 
 Runs the SAME audio file through each vendor's one-shot REST API and scores
 WER against a reference transcript plus a simplified time-based DER against an
@@ -8,11 +8,14 @@ optional reference RTTM. Numbers decide — see docs/FEATURES.md section 18.
 Usage:
     uv run python apps/agent/bakeoff_stt.py --audio meeting.wav \\
         --reference ref.txt [--rttm ref.rttm] \\
-        [--providers whisper,deepgram,muse] [--out results.json]
+        [--providers whisper,deepgram,muse,mistral] [--out results.json]
 
 Keys (only needed for providers you actually run):
-    OPENAI_API_KEY, DEEPGRAM_API_KEY, META_API_KEY
+    OPENAI_API_KEY, DEEPGRAM_API_KEY, META_API_KEY, MISTRAL_API_KEY
     MUSE_TRANSCRIBE_BASE_URL (default https://api.meta.ai/v1)
+    MISTRAL_API_BASE (default https://api.mistral.ai),
+    MISTRAL_STT_MODEL (default voxtral-small-latest),
+    MISTRAL_CONTEXT_BIAS (optional, comma-separated keyphrases)
 
 Notes:
 - This scores one-shot/file transcription, NOT live streaming latency or
@@ -21,6 +24,9 @@ Notes:
 - DER here is simplified: fraction of scored time where the hypothesis speaker
   disagrees with the RTTM reference, using word-level timestamps. Providers
   that return no word timestamps get DER "n/a" instead of a fake number.
+- Voxtral returns segment-level speaker spans, not word timings, so its DER is
+  coarser than the word-level arms. Compare it against Deepgram with that in
+  mind instead of reading the two numbers as directly equivalent.
 """
 
 from __future__ import annotations
@@ -210,7 +216,58 @@ async def run_muse(session: aiohttp.ClientSession, audio: str) -> tuple[str, lis
     return text, words
 
 
-PROVIDERS = {"whisper": run_whisper, "deepgram": run_deepgram, "muse": run_muse}
+async def run_mistral(session: aiohttp.ClientSession, audio: str) -> tuple[str, list]:
+    """Voxtral 3 (Mistral) one-shot file transcription.
+
+    Scores the batch route only, same as the other arms: realtime latency and
+    end-of-turn behaviour cannot be compared here and must be measured in the
+    agent (see the header note).
+
+    Segments carry speaker + span but not word timings, so DER is computed at
+    segment granularity. That is coarser than Deepgram/Whisper word-level DER and
+    the comparison is not perfectly like-for-like - it is stated rather than
+    hidden.
+    """
+    key = os.environ.get("MISTRAL_API_KEY", "")
+    if not key:
+        raise RuntimeError("MISTRAL_API_KEY not set")
+    base = os.environ.get("MISTRAL_API_BASE", "https://api.mistral.ai").rstrip("/")
+    data = aiohttp.FormData()
+    data.add_field("file", open(audio, "rb"), filename=os.path.basename(audio))
+    data.add_field("model", os.environ.get("MISTRAL_STT_MODEL", "voxtral-small-latest"))
+    data.add_field("diarize", "true")
+    data.add_field("timestamp_granularities", "segment")
+    # Optional: measure the context-biasing feature, not just the base model.
+    for term in (t.strip() for t in os.environ.get("MISTRAL_CONTEXT_BIAS", "").split(",")):
+        if term:
+            data.add_field("context_bias", term)
+    async with session.post(
+        f"{base}/v1/audio/transcriptions",
+        headers={"Authorization": f"Bearer {key}"},
+        data=data,
+    ) as resp:
+        body = await resp.json()
+        if resp.status != 200:
+            raise RuntimeError(f"mistral {resp.status}: {body}")
+    words = []
+    for seg in body.get("segments") or []:
+        if not isinstance(seg, dict) or not (seg.get("text") or "").strip():
+            continue
+        start = seg.get("start", seg.get("start_s"))
+        end = seg.get("end", seg.get("end_s"))
+        words.append(
+            {
+                "start": float(start) if start is not None else None,
+                "end": float(end) if end is not None else None,
+                "speaker": str(seg.get("speaker", seg.get("speaker_id", "?"))),
+                "text": str(seg["text"]).strip(),
+            }
+        )
+    text = body.get("text", "") or " ".join(w["text"] for w in words)
+    return text, words
+
+
+PROVIDERS = {"whisper": run_whisper, "deepgram": run_deepgram, "muse": run_muse, "mistral": run_mistral}
 
 
 async def main() -> None:
@@ -218,7 +275,7 @@ async def main() -> None:
     ap.add_argument("--audio", required=True)
     ap.add_argument("--reference", required=True, help="Reference transcript (.txt)")
     ap.add_argument("--rttm", default=None, help="Reference diarization (.rttm, optional)")
-    ap.add_argument("--providers", default="whisper,deepgram,muse")
+    ap.add_argument("--providers", default="whisper,deepgram,muse,mistral")
     ap.add_argument("--out", default=None, help="Write results JSON here")
     args = ap.parse_args()
 
