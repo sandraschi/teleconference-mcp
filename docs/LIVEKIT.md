@@ -41,7 +41,7 @@ Participant session ID key changed `pID` -> `participantID`. Update Loki/Grafana
 
 ## Overview
 
-[LiveKit](https://livekit.io) is the WebRTC infrastructure powering all real-time audio/video communication. It runs as a Docker container and provides:
+[LiveKit](https://livekit.io) is the WebRTC infrastructure powering all real-time audio/video communication. On this fleet it runs as the Windows service `LiveKitSFU` and provides:
 
 - **SFU** (Selective Forwarding Unit) for multi-participant video
 - **Room management** via REST API
@@ -109,17 +109,11 @@ Get-Content D:\Dev\repos\teleconference-mcp\logs\livekit.out.log -Tail 50
 powershell -ExecutionPolicy Bypass -File D:\Dev\repos\teleoperator-mcp\scripts\install-livekit-service.ps1
 ```
 
-Docker alternative (non-Windows or dev machines):
+`docker-compose.yaml` has no `livekit` service. A container bound to :15580
+takes the port from `LiveKitSFU` and the service dies. Start the native service:
 
 ```powershell
-docker compose up -d livekit
-```
-
-Or build from source:
-
-```powershell
-docker build -t livekit-server -f livekit.Dockerfile .
-docker run -p 15580:15580 -p 15581:15581 -p 15582:15582/udp livekit-server
+sc.exe start LiveKitSFU
 ```
 
 > **Note:** `teleoperator-mcp/scripts/install-livekit-service.ps1` is the canonical service installer. Keep `livekit.yaml` in this repo as the single source of config truth.

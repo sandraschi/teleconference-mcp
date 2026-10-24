@@ -6,7 +6,7 @@ Problem → Cause → Fix, flat list.
 
 ## Dashboard doesn't load
 **Cause**: Web service not running.
-**Fix**: `.\start.ps1 all`; check `http://localhost:10886` (dev) or `:15500` (Docker).
+**Fix**: `.\start.ps1 -NoBrowser`; check `http://localhost:10886` (dev) or `:15500` (Docker).
 
 ## "Failed to connect" to LiveKit
 **Cause**: SFU down or wrong URL.
@@ -27,7 +27,7 @@ auth entirely in dev.
 
 ## Agent joins but never speaks
 **Cause**: Ollama unreachable or wrong model.
-**Fix**: `ollama serve`, `ollama list` (need the `OLLAMA_MODEL`, default `gemma2`); check
+**Fix**: `ollama serve`, `ollama list` (need the `OLLAMA_MODEL`, default `llama3.1:8b`); check
 `OLLAMA_HOST` — Docker agent needs `http://host.docker.internal:11434`. Agent logs show the LLM error.
 
 ## Agent never appears in room

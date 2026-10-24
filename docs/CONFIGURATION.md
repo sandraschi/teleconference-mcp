@@ -22,7 +22,7 @@ All knobs in one place. Copy `.env.example` to `.env` and override what you need
 | `FASTMCP_LOG_LEVEL` | `WARNING` | `DEBUG` for agent/tool tracing |
 | `AGENT_MODE` | `local` | `local` (Ollama/Whisper/Piper) or `cloud` (OpenAI/Deepgram/ElevenLabs) |
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama API (Docker agent: `http://host.docker.internal:11434`) |
-| `OLLAMA_MODEL` | `gemma2` | Agent LLM (`gemma2`, `gemma3-27b`, …) |
+| `OLLAMA_MODEL` | `llama3.1:8b` | Agent LLM. Any tag from `ollama list`. |
 | `OPENAI_API_KEY` / `DEEPGRAM_API_KEY` / `ELEVEN_LABS_API_KEY` | — | Cloud mode only |
 | `CLOUD_STT_PROVIDER` | `deepgram` | Cloud STT: `deepgram` (proven) or `muse` (EXPERIMENTAL — Meta Muse Voice Transcribe, bake-off only, falls back to Deepgram) |
 | `META_API_KEY` | — | Muse Voice Transcribe ($0.18/hr, OpenAI-SDK-compatible endpoint) |

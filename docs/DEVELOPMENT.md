@@ -29,7 +29,7 @@ git clone https://github.com/sandraschi/teleconference-mcp
 cd teleconference-mcp
 uv sync
 npm install
-docker compose up -d livekit redis
+docker compose up -d redis
 ```
 
 ## Common Tasks
@@ -41,7 +41,7 @@ just agent       # Visio voice agent (dev)
 just web         # Next.js dashboard
 just conferencing # Conferencing MCP server
 just remoting    # Remoting MCP server (Windows)
-.\start.ps1 all  # everything via start scripts
+.\start.ps1 -NoBrowser  # backend :10887, health :10891, dashboard :10886
 ```
 
 ## Code Standards
