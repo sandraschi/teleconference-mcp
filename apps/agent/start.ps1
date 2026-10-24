@@ -1,36 +1,28 @@
 Param([switch]$Headless)
 
-# --- SOTA Headless Standard ---
+# Visio voice agent. Does not bind the conferencing backend port (10887).
 if ($Headless -and ($Host.UI.RawUI.WindowTitle -notmatch 'Hidden')) {
     Start-Process pwsh -ArgumentList '-NoProfile', '-File', $PSCommandPath, '-Headless' -WindowStyle Hidden
     exit
 }
-$WindowStyle = if ($Headless) { 'Hidden' } else { 'Normal' }
-# ------------------------------
 
-# Sandra Schipal | SOTA 2026 | Agent Startup Protocol
-# Port: 10887 (teleconference-mcp backend)
-
-$WebPort = 10887
-$FleetStartPath = Join-Path $ProjectRoot "scripts\FleetStartMode.ps1"
+$RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$FleetStartPath = Join-Path $RepoRoot "scripts\FleetStartMode.ps1"
 if (-not (Test-Path -LiteralPath $FleetStartPath)) {
     Write-Host "ERROR: Missing vendored launcher helper: $FleetStartPath" -ForegroundColor Red
     exit 1
 }
 . $FleetStartPath
 
-Write-Host "Sandra: Cleansing port $WebPort of zombie processes..." -ForegroundColor Cyan
+if (-not $env:LIVEKIT_URL) { $env:LIVEKIT_URL = "ws://127.0.0.1:15580" }
+if (-not $env:LIVEKIT_API_KEY) { $env:LIVEKIT_API_KEY = "devkey" }
+if (-not $env:LIVEKIT_API_SECRET) { $env:LIVEKIT_API_SECRET = "dev-secret-0123456789abcdef-0123456789abcdef" }
+if (-not $env:REDIS_HOST) { $env:REDIS_HOST = "127.0.0.1" }
+if (-not $env:REDIS_PORT) { $env:REDIS_PORT = "16379" }
+if (-not $env:OLLAMA_BASE_URL) { $env:OLLAMA_BASE_URL = "http://127.0.0.1:11434/v1" }
+if (-not $env:OLLAMA_MODEL) { $env:OLLAMA_MODEL = "llama3.1:8b" }
 
-# Clear port for potential supervisor/health-check binding
-npx --yes kill-port $WebPort 2>$null
-
-Write-Host "Sandra: Port $WebPort secured. Initializing AG-Visio Voice Agent..." -ForegroundColor Green
-
-# Ensure virtual environment is active if present
-if (Test-Path "venv\Scripts\Activate.ps1") {
-    . venv\Scripts\Activate.ps1
-}
-
-# Run the agent with dev mode and explicit port
-python agent.py dev --http-port $WebPort
-
+Write-Host "Starting Visio agent against $env:LIVEKIT_URL (model $env:OLLAMA_MODEL)" -ForegroundColor Green
+Set-Location $PSScriptRoot
+uv run --project $RepoRoot python agent.py dev
+if (-not $?) { exit 1 }

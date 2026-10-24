@@ -24,23 +24,21 @@ from contacts_substrate import ContactManager
 from dotenv import load_dotenv
 from livekit import rtc
 from livekit.agents import (
+    Agent,
     JobContext,
     WorkerOptions,
     cli,
     llm,
 )
+from livekit.agents.inference import VAD as LocalVAD
+from livekit.agents.llm import LLMStream, function_tool
+from livekit.agents.voice import AgentSession
+from livekit.plugins import openai
 
 try:
     from livekit.agents.job import AutoRestartPolicy
 except ImportError:
     AutoRestartPolicy = None
-from livekit.agents.llm import LLMStream, function_tool
-from livekit.agents.voice import AgentSession
-from livekit.plugins import (
-    deepgram,
-    openai,
-    silero,
-)
 from logic import ReductionistLogic
 from mcp import ClientSession
 from mcp.client.sse import sse_client
@@ -65,14 +63,13 @@ logger = logging.getLogger("ag-visio-agent")
 
 load_dotenv()
 
-# UserTurnLimitOptions (Agents 1.5.12+, still current in 1.8.0).
-# Caps user speech duration to prevent long monologues from hijacking the agent.
-try:
-    from livekit.agents.voice import UserTurnLimitOptions
-
-    _turn_limit_options = UserTurnLimitOptions(max_user_turn_duration=60.0)
-except ImportError:
-    _turn_limit_options = None
+# Dev defaults match livekit.yaml and the published Redis port. Real env wins.
+os.environ.setdefault("LIVEKIT_URL", "ws://127.0.0.1:15580")
+os.environ.setdefault("LIVEKIT_API_KEY", "devkey")
+os.environ.setdefault("LIVEKIT_API_SECRET", "dev-secret-0123456789abcdef-0123456789abcdef")
+os.environ.setdefault("REDIS_HOST", "127.0.0.1")
+os.environ.setdefault("REDIS_PORT", "16379")
+os.environ.setdefault("OLLAMA_MODEL", "llama3.1:8b")
 
 # ===========================================================================
 # MCP DISCOVERY
@@ -105,6 +102,7 @@ async def check_endpoint(session, url):
 
 AGENT_MODE = os.environ.get("AGENT_MODE", "local").lower()
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
 # Cloud STT provider: "deepgram" (default, proven) or "muse" (EXPERIMENTAL —
 # Meta Muse Voice Transcribe, OpenAI-SDK-compatible endpoint, bake-off only;
 # see apps/agent/bakeoff_stt.py and docs/FEATURES.md section 18).
@@ -191,11 +189,11 @@ class SOTAOllamaLLMStream(LLMStream):
 
 
 class SOTAOllamaLLM(llm.LLM):
-    def __init__(self, model: str = "llama3.1", base_url: str | None = None) -> None:
+    def __init__(self, model: str | None = None, base_url: str | None = None) -> None:
         super().__init__()
-        self._model = model
+        self._model = model or OLLAMA_MODEL
         self._client = ollama.AsyncClient(host=base_url or OLLAMA_BASE_URL)
-        logger.info("Initialized Ollama LLM with model: %s", model)
+        logger.info("Initialized Ollama LLM with model: %s", self._model)
 
     def chat(
         self,
@@ -230,7 +228,7 @@ class CombinedMCPFunctionContext(llm.ToolContext):
         room: rtc.Room,
         contacts: ContactManager,
     ):
-        super().__init__()
+        super().__init__([])
         self._logic = logic
         self._memory = memory
         self._room = room
@@ -364,6 +362,40 @@ class CombinedMCPFunctionContext(llm.ToolContext):
 # ---------------------------------------------------------------------------
 
 
+def _deepgram_stt():
+    """Cloud STT. The Deepgram plugin is optional and is not a default dependency."""
+    try:
+        from livekit.plugins import deepgram
+    except ImportError as exc:
+        logger.warning("livekit-plugins-deepgram is not installed (%s). Cloud STT stays off.", exc)
+        return None
+    return deepgram.STT()
+
+
+def _local_stt():
+    """On-device Whisper. Cloud whisper-1 is only a fallback when a key is set."""
+    try:
+        from local_speech import LocalWhisperSTT
+
+        return LocalWhisperSTT()
+    except Exception as exc:
+        logger.warning("Local Whisper failed (%s).", exc)
+        if os.environ.get("OPENAI_API_KEY"):
+            return openai.STT(model="whisper-1")
+        return None
+
+
+def _local_tts():
+    """On-device Piper. The worker still joins the room if the voice cannot load."""
+    try:
+        from local_speech import LocalPiperTTS
+
+        return LocalPiperTTS()
+    except Exception as exc:
+        logger.warning("Local Piper failed (%s). Spoken replies stay off.", exc)
+        return None
+
+
 async def entrypoint(ctx: JobContext) -> None:
     logger.info("Initializing Agent Substrate [Teams++]...")
 
@@ -389,7 +421,9 @@ async def entrypoint(ctx: JobContext) -> None:
         transcriber = TranscriptionSubstrate(ctx.room, mode=AGENT_MODE)
         await transcriber.start()
 
-        vad = silero.VAD.load()
+        vad = LocalVAD()
+        stt = None
+        tts = None
         if AGENT_MODE == "cloud":
             tts = openai.TTS()
             llm_engine = openai.LLM(model="gpt-4o-mini")
@@ -406,7 +440,7 @@ async def entrypoint(ctx: JobContext) -> None:
                     logger.info("Using Cloud STT: Muse Voice Transcribe (experimental)")
                 except Exception as e:
                     logger.warning("Muse STT init failed (%s); falling back to Deepgram", e)
-                    stt = deepgram.STT()
+                    stt = _deepgram_stt()
             elif CLOUD_STT_PROVIDER == "mistral":
                 # EXPERIMENTAL (2026-10-20): Voxtral 3 through LiveKit's generic
                 # OpenAI-shaped STT. Batch latency, no turn.* events - this is a
@@ -414,7 +448,7 @@ async def entrypoint(ctx: JobContext) -> None:
                 _mistral_key = os.environ.get("MISTRAL_API_KEY", "")
                 if not _mistral_key:
                     logger.warning("MISTRAL_API_KEY missing; falling back to Deepgram")
-                    stt = deepgram.STT()
+                    stt = _deepgram_stt()
                 else:
                     try:
                         stt = openai.STT(
@@ -425,26 +459,25 @@ async def entrypoint(ctx: JobContext) -> None:
                         logger.info("Using Cloud STT: Mistral Voxtral 3 (%s, experimental)", MISTRAL_STT_MODEL)
                     except Exception as e:
                         logger.warning("Mistral STT init failed (%s); falling back to Deepgram", e)
-                        stt = deepgram.STT()
+                        stt = _deepgram_stt()
             else:
                 logger.info("Using Cloud providers (Deepgram/OpenAI)")
-                stt = deepgram.STT()
+                stt = _deepgram_stt()
         else:
-            logger.info("Using Local providers (Whisper via OpenAI/Piper/Ollama)")
-            stt = openai.STT(model="whisper-1")
-            tts = __import__("livekit.plugins.piper", fromlist=["TTS"]).TTS()
-            llm_engine = SOTAOllamaLLM(model="llama3.1")
+            logger.info("Using local providers (Ollama model %s)", OLLAMA_MODEL)
+            stt = _local_stt()
+            tts = _local_tts()
+            llm_engine = SOTAOllamaLLM()
 
-        assistant_kwargs = {
+        assistant_kwargs: dict[str, Any] = {
             "vad": vad,
-            "stt": stt,
             "llm": llm_engine,
-            "tts": tts,
-            "turn_handling": "auto",
-            "tools": fnc_ctx,
+            "turn_handling": {"user_turn_limit": {"max_duration": 60.0}},
         }
-        if _turn_limit_options:
-            assistant_kwargs["turn_limit"] = _turn_limit_options
+        if stt is not None:
+            assistant_kwargs["stt"] = stt
+        if tts is not None:
+            assistant_kwargs["tts"] = tts
 
         assistant = AgentSession(**assistant_kwargs)
 
@@ -485,8 +518,27 @@ async def entrypoint(ctx: JobContext) -> None:
             except Exception as e:
                 logger.error("Failed to parse data packet: %s", e)
 
-        assistant.start(ctx.room)
-        await assistant.say("Visio Substrate Operational. Discovery Complete.")
+        await assistant.start(
+            Agent(
+                instructions=("You are Visio, a local meeting assistant. Keep replies to one or two sentences."),
+                tools=list(fnc_ctx.function_tools.values()),
+            ),
+            room=ctx.room,
+        )
+        if tts is not None:
+            assistant.say("Visio Substrate Operational. Discovery Complete.")
+        else:
+            logger.info("Agent joined the room without text-to-speech.")
+
+        room_closed: asyncio.Future[None] = asyncio.get_running_loop().create_future()
+
+        @ctx.room.on("disconnected")
+        def _on_room_disconnected(*_args: object) -> None:
+            if not room_closed.done():
+                room_closed.set_result(None)
+
+        if ctx.room.isconnected():
+            await room_closed
 
     except Exception as exc:
         logger.critical("Failed to initialize session. %s", exc)

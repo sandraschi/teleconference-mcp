@@ -5,6 +5,7 @@ Uses Redis for cross-agent state synchronization.
 
 import json
 import logging
+import os
 
 import redis.asyncio as redis
 
@@ -12,9 +13,9 @@ logger = logging.getLogger("ag-visio-agent")
 
 
 class StateBus:
-    def __init__(self, host: str = "localhost", port: int = 6379):
-        self._host = host
-        self._port = port
+    def __init__(self, host: str | None = None, port: int | None = None):
+        self._host = host or os.environ.get("REDIS_HOST", "127.0.0.1")
+        self._port = int(port if port is not None else os.environ.get("REDIS_PORT", "16379"))
         self._redis = None
         self._pubsub = None
         self._connected = False

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Bot, ChevronRight, ExternalLink, Keyboard, Rocket, Search, Users } from "lucide-react";
+import { AlertTriangle, Bot, ChevronRight, ExternalLink, Globe, Keyboard, Rocket, Search, Users } from "lucide-react";
 import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
@@ -32,10 +32,11 @@ const helpSections: HelpSection[] = [
         <h4 className="font-semibold text-white mt-4">Prerequisites</h4>
         <ul className="list-disc list-inside space-y-2 text-gray-400">
           <li>
-            <strong className="text-gray-300">Docker</strong> - Required for LiveKit server and Redis
+            <strong className="text-gray-300">LiveKitSFU</strong> - Windows service on this PC. Do not start a second
+            LiveKit in Docker.
           </li>
           <li>
-            <strong className="text-gray-300">Ollama</strong> - Local LLM runtime (with gemma2 or similar model)
+            <strong className="text-gray-300">Ollama</strong> - Local LLM. Default model is llama3.1:8b.
           </li>
           <li>
             <strong className="text-gray-300">Python 3.11+</strong> - For the Visio agent
@@ -47,14 +48,11 @@ const helpSections: HelpSection[] = [
 
         <h4 className="font-semibold text-white mt-4">Quick Start</h4>
         <div className="bg-neutral-800 rounded-lg p-4 font-mono text-sm text-gray-300 space-y-2">
-          <p className="text-gray-400"># 1. Start infrastructure</p>
-          <p>docker compose up -d</p>
-          <p className="text-gray-400 mt-2"># 2. Start Ollama with a model</p>
-          <p>ollama run gemma2</p>
-          <p className="text-gray-400 mt-2"># 3. Activate agent venv and run</p>
-          <p>apps\agent\venv\Scripts\activate</p>
-          <p>python apps/agent/agent.py dev</p>
-          <p className="text-gray-400 mt-2"># 4. Open http://localhost:10886</p>
+          <p className="text-gray-400"># Host PC (LiveKit service already installed)</p>
+          <p>.\start.ps1 -NoBrowser</p>
+          <p className="text-gray-400 mt-2"># Voice agent, second window</p>
+          <p>apps\agent\start.ps1</p>
+          <p className="text-gray-400 mt-2"># Open http://127.0.0.1:10886</p>
         </div>
       </div>
     ),
@@ -89,8 +87,8 @@ const helpSections: HelpSection[] = [
             Important
           </h5>
           <p className="text-gray-400 text-sm mt-2">
-            Make sure the LiveKit server is running (docker compose up -d) before attempting to join. If connection
-            fails, check the browser console for errors.
+            LiveKit is the LiveKitSFU service on the host, port 15580. A second PC cannot use ws://localhost:15580.
+            See &quot;Another PC&quot; in this help.
           </p>
         </div>
 
@@ -113,6 +111,77 @@ const helpSections: HelpSection[] = [
             Disconnect from the room
           </li>
         </ul>
+      </div>
+    ),
+  },
+  {
+    id: "another-pc",
+    title: "Another PC: Tailscale or public IP",
+    icon: Globe,
+    content: (
+      <div className="space-y-4">
+        <p className="text-gray-300">
+          One LiveKit server hosts the room. It stays on the PC that runs the LiveKitSFU service. The other person does
+          not install LiveKit, Ollama, or the agent. They run this web app and point it at your server.
+        </p>
+        <p className="text-gray-300">
+          Your page on 127.0.0.1 is only for you. Their browser must use an address they can route. ws://localhost:15580
+          on their PC is their own machine.
+        </p>
+
+        <h4 className="font-semibold text-white mt-4">Ports the guest must reach</h4>
+        <ul className="list-disc list-inside space-y-2 text-gray-400">
+          <li>TCP 15580 - room join</li>
+          <li>TCP 15581 - WebRTC signaling</li>
+          <li>UDP 15582 and UDP 50000-60000 - audio and video. Closed UDP means black tiles.</li>
+        </ul>
+
+        <h4 className="font-semibold text-white mt-4">Usual: both PCs on the same Tailscale tailnet</h4>
+        <p className="text-gray-400">
+          A normal dev PC has no fixed public address. Tailscale is the path to use.
+        </p>
+        <ol className="list-decimal list-inside space-y-2 text-gray-400">
+          <li>On the host, note tailscale ip -4.</li>
+          <li>
+            In livekit.yaml set rtc.node_ip to that 100.x address. Leave use_external_ip false. Restart with sc.exe
+            stop LiveKitSFU, then sc.exe start LiveKitSFU.
+          </li>
+          <li>Allow the ports above inbound. Limiting the rule to the Tailscale interface is enough.</li>
+          <li>
+            On the guest, apps\web\.env.local gets NEXT_PUBLIC_LIVEKIT_URL=ws://&lt;tailscale-ipv4&gt;:15580 plus the
+            same devkey and secret as the host livekit.yaml, and AUTH_DISABLED=true.
+          </li>
+          <li>Guest runs npm install, then .\start.ps1 -FrontendOnly, and joins the same room name.</li>
+        </ol>
+
+        <h4 className="font-semibold text-white mt-4">Unusual: the host has a fixed public IP</h4>
+        <p className="text-gray-400">
+          A fixed public IP is unusual for a dev PC. This fleet host, Goliath, has one. Use it only when
+          Tailscale is not available.
+        </p>
+        <ol className="list-decimal list-inside space-y-2 text-gray-400">
+          <li>Forward TCP 15580, TCP 15581, UDP 15582, and UDP 50000-60000 from the router to the host.</li>
+          <li>
+            In livekit.yaml set rtc.use_external_ip to true, or set rtc.node_ip to the public address. Restart
+            LiveKitSFU the same way.
+          </li>
+          <li>
+            Guest NEXT_PUBLIC_LIVEKIT_URL is ws://&lt;public-ipv4&gt;:15580. This app does not terminate TLS, so the
+            scheme stays ws://.
+          </li>
+          <li>
+            The dev secret is in the repo. Anyone who can open port 15580 can mint a token. Prefer Tailscale. If you
+            publish the port, replace keys.devkey and every LIVEKIT_API_SECRET first.
+          </li>
+        </ol>
+
+        <div className="bg-blue-900/30 border border-blue-800 rounded-lg p-4 mt-4">
+          <h5 className="font-semibold text-blue-400">Black tiles, room says connected</h5>
+          <p className="text-gray-400 text-sm mt-2">
+            Signaling worked and UDP did not. Check the firewall, the router forward, and that node_ip is an address
+            the guest can route. A virtual adapter such as 172.26.x is not reachable from the other PC.
+          </p>
+        </div>
       </div>
     ),
   },
@@ -215,7 +284,7 @@ const helpSections: HelpSection[] = [
           <div className="bg-neutral-800 rounded-lg p-4">
             <h5 className="font-medium text-white">&quot;Connection failed&quot; when joining</h5>
             <ul className="mt-2 space-y-1 text-gray-400 text-sm">
-              <li>- Verify LiveKit is running: docker compose ps</li>
+              <li>- Verify the service: Get-Service LiveKitSFU</li>
               <li>- Check port 15580 is accessible</li>
               <li>- Ensure LIVEKIT_API_KEY matches livekit.yaml</li>
             </ul>
