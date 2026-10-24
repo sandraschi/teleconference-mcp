@@ -36,7 +36,7 @@ cd teleconference-mcp
 uv sync
 npm install
 docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
-.\start.ps1 all
+.\start.ps1 -NoBrowser
 > **Prerequisites**: [Python 3.12+](https://python.org), [Node.js 18+](https://nodejs.org), [Docker](https://docker.com), [Ollama](https://ollama.com)
 
 ## Documentation
@@ -44,7 +44,7 @@ docker compose -f docker-compose.yaml -f docker-compose.observability.yaml up -d
 | Guide | Description |
 |-------|-------------|
 | **[Installation](INSTALL.md)** | All install methods, prerequisites |
-| **[Onboarding](docs/ONBOARDING.md)** | First 15 minutes: zero to working call, costs, pitfalls |
+| **[Onboarding](docs/ONBOARDING.md)** | First call on this PC, then a second PC on Tailscale or a public IP |
 | **[LiveKit Overview](docs/LIVEKIT_OVERVIEW.md)** | What LiveKit is, history, who uses it, community — read first |
 | **[Wrapped app](docs/WRAPPEE.md)** | LiveKit links, license, disambiguation |
 | **[LiveKit config](docs/LIVEKIT.md)** | SFU technical reference: server, STUN/TURN, rooms, tokens |
@@ -142,7 +142,7 @@ docker compose -f docker-compose.yaml up -d
 
 # Development (local processes, Docker infra only - no livekit service here)
 docker compose up -d redis
-.\start.ps1 all
+.\start.ps1 -NoBrowser
 ```
 
 ### Access Points

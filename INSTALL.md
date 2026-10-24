@@ -17,8 +17,9 @@ Install these if you don't have them already:
 > macOS: use `brew install` equivalents
 > Linux: use your distro package manager
 
-LiveKit itself is never bundled — fleet Windows uses the `LiveKitSFU` service, everyone else runs
-the container (`docker compose up -d livekit`). See [docs/ONBOARDING.md](docs/ONBOARDING.md) for the
+LiveKit itself is never bundled. Fleet Windows uses the `LiveKitSFU` service
+(`sc.exe start LiveKitSFU`). Compose in this repo does not start a second SFU.
+See [docs/ONBOARDING.md](docs/ONBOARDING.md) for the
 5-minute path and [docs/LIVEKIT_OVERVIEW.md](docs/LIVEKIT_OVERVIEW.md) for what LiveKit is.
 
 ## Option A — Drag and Drop (Recommended)
@@ -39,8 +40,8 @@ npx @anthropic-ai/mcpb install https://github.com/sandraschi/teleconference-mcp
 
 1. Clone: `git clone https://github.com/sandraschi/teleconference-mcp`
 2. Install deps: `cd teleconference-mcp && uv sync && npm install`
-3. Start infrastructure: `docker compose up -d livekit redis`
-4. Pull the agent model: `ollama pull gemma2`
+3. Start Redis (LiveKit is the Windows service LiveKitSFU, not a compose service): `docker compose up -d redis`
+4. Confirm the agent model is present: `ollama list` (default `llama3.1:8b`)
 5. Add to Claude Desktop config:
 
 ```json
@@ -73,8 +74,8 @@ See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Quick version:
 ```powershell
 uv sync
 npm install
-docker compose up -d livekit redis
-.\start.ps1 all        # or: just web / just agent / just conferencing
+docker compose up -d redis
+.\start.ps1 -NoBrowser        # or: just web / just agent / just conferencing
 ```
 
 Ollama runs outside Docker on your PC; the agent reaches it via
