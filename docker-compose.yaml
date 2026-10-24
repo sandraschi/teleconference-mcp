@@ -47,7 +47,9 @@ services:
       # Dev default must match keys: in livekit.yaml
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-dev-secret-0123456789abcdef-0123456789abcdef}
       - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
-      - OLLAMA_MODEL=gemma2
+      - OLLAMA_MODEL=llama3.1:8b
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
